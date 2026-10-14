@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { DurationPicker } from './components/DurationPicker'
 import { HistoryList } from './components/HistoryList'
 import { IntentionInput } from './components/IntentionInput'
@@ -21,13 +21,61 @@ export default function App() {
     updateKind,
   } = useTimer()
 
-  const { sessions, todaySeconds, loading, refresh } = useSessions()
+  const {
+    sessions,
+    todaySeconds,
+    weekSeconds,
+    loading,
+    refresh,
+    downloadBackup,
+    uploadBackup,
+    backupMessage,
+  } = useSessions()
 
   useEffect(() => {
     if (state.phase === 'finished' || state.phase === 'idle') {
       void refresh()
     }
   }, [state.phase, refresh])
+
+  // Warn before closing tab during an active session
+  useEffect(() => {
+    if (!isActive(state.phase)) return
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault()
+      e.returnValue = ''
+    }
+    window.addEventListener('beforeunload', onBeforeUnload)
+    return () => window.removeEventListener('beforeunload', onBeforeUnload)
+  }, [state.phase])
+
+  const requestStop = useCallback(() => {
+    if (state.elapsedSeconds > 0) {
+      const ok = window.confirm('إنهاء الجلسة الآن وحفظ الوقت المقضي؟')
+      if (!ok) return
+    }
+    void stop()
+  }, [state.elapsedSeconds, stop])
+
+  // Space / Enter shortcuts when not typing in an input
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement | null)?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault()
+        if (state.phase === 'idle') start()
+        else if (state.phase === 'running') pause()
+        else if (state.phase === 'paused') resume()
+        else if (state.phase === 'finished') reset()
+      } else if (e.key === 'Escape' && isActive(state.phase)) {
+        e.preventDefault()
+        requestStop()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [state.phase, start, pause, resume, reset, requestStop])
 
   const locked = isActive(state.phase)
 
@@ -51,11 +99,18 @@ export default function App() {
           phase={state.phase}
         />
 
-        <IntentionInput
-          value={state.intention}
-          onChange={updateIntention}
-          disabled={locked}
-        />
+        {locked && state.intention ? (
+          <p className="max-w-md text-center text-sm text-slate-400">
+            <span className="text-slate-500">النية: </span>
+            {state.intention}
+          </p>
+        ) : (
+          <IntentionInput
+            value={state.intention}
+            onChange={updateIntention}
+            disabled={locked}
+          />
+        )}
 
         <DurationPicker
           kind={state.kind}
@@ -70,15 +125,23 @@ export default function App() {
           onStart={start}
           onPause={pause}
           onResume={resume}
-          onStop={() => void stop()}
+          onStop={requestStop}
           onReset={reset}
         />
+
+        <p className="text-center text-[11px] text-slate-600">
+          مسافة: ابدأ / إيقاف · Esc: إنهاء
+        </p>
 
         <div className="w-full border-t border-slate-800 pt-6">
           <HistoryList
             sessions={sessions}
             todaySeconds={todaySeconds}
+            weekSeconds={weekSeconds}
             loading={loading}
+            onExport={() => void downloadBackup()}
+            onImportFile={(f) => void uploadBackup(f)}
+            backupMessage={backupMessage}
           />
         </div>
       </main>
