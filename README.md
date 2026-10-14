@@ -5,11 +5,13 @@
 جزء من منظومة [ناوي](https://github.com/inawy) للإنتاجية.
 
 - مؤقت مرن لجلسات التركيز والراحة
-- نية تركيز اختيارية قبل البدء (بدون تحويل التطبيق إلى مدير مهام)
-- سجل جلسات محلي مع ملخص بسيط لوقت اليوم
+- نية تركيز اختيارية قبل البدء
+- سجل جلسات محلي مع ملخص لوقت اليوم
+- صوت خفيف عند انتهاء الجلسة + عنوان التبويب يتحدّث أثناء التركيز
 - عربي أولاً (RTL)، وضع داكن، جاهز للتثبيت
 
-الرابط المقترح: [nawy.to/focus](https://nawy.to/focus)
+**المستودع:** https://github.com/inawy/nawy-focus  
+**الرابط المقترح:** [nawy.to/focus](https://nawy.to/focus)
 
 ## التشغيل
 
@@ -23,15 +25,19 @@ npm run preview    # تجربة النسخة المبنية (يعمل Service Wo
 ## الجودة
 
 ```bash
-npm test && npm run lint && npm run build
+npm test && npm run build
 ```
 
 ## النشر على GitHub Pages
 
-1. من **Settings → Pages** اختر **Source: GitHub Actions**.
-2. أي `push` على `main` ينشر تلقائياً عبر `.github/workflows/deploy.yml`.
+البناء والاختبارات يمرّان على Actions. لتفعيل النشر:
 
-`base: './'` في `vite.config.ts` يجعل البناء يعمل على مسار فرعي ونطاق مخصص.
+1. افتح **Settings → Pages**
+2. تحت **Build and deployment → Source** اختر **GitHub Actions**
+3. أعد تشغيل آخر workflow ناجح (أو ادفع أي commit على `main`)
+
+بعدها يظهر الموقع على:
+`https://inawy.github.io/nawy-focus/`
 
 ## الهيكل
 
@@ -39,12 +45,13 @@ npm test && npm run lint && npm run build
 src/
   types.ts          الأنواع المشتركة
   db.ts             Dexie + استعلامات الجلسات
-  lib/timer.ts      آلة حالة المؤقت (نقية، قابلة للاختبار)
+  lib/timer.ts      آلة حالة المؤقت (نقية)
+  lib/sound.ts      صوت انتهاء الجلسة (Web Audio)
   lib/format.ts     تنسيق الوقت والتاريخ
   hooks/            useTimer, useSessions
   components/       واجهة المؤقت والسجل
-docs/decisions.md   سجل القرارات المعمارية
-AGENTS.md           قواعد العمل للوكلاء والمطورين
+docs/decisions.md   سجل القرارات
+AGENTS.md           قواعد العمل
 ```
 
 ## المبادئ
@@ -52,4 +59,3 @@ AGENTS.md           قواعد العمل للوكلاء والمطورين
 - المؤقت هو البطل — ليس لوحة إحصائيات
 - لا إشعارات ولا تشغيل خلفية في الـ MVP
 - لا تعدّل `version(n)` قديمة في Dexie؛ أضف `version(n+1)`
-- كل اعتمادية جديدة تُسجَّل في `docs/decisions.md`
