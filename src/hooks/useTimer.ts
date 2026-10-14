@@ -11,16 +11,26 @@ import {
   tick,
 } from '../lib/timer'
 import { playCompletionChime } from '../lib/sound'
+import {
+  loadDefaultBreakSeconds,
+  loadDefaultFocusSeconds,
+  saveDefaultBreakSeconds,
+  saveDefaultFocusSeconds,
+} from '../lib/prefs'
 import type { SessionKind, TimerState } from '../types'
 import { addSession } from '../db'
 import { formatTime } from '../lib/format'
+
+function initialState(): TimerState {
+  return createIdleState('focus', loadDefaultFocusSeconds())
+}
 
 /**
  * Owns timer UI state and the 1s interval.
  * Persists a session when the user finishes or stops early.
  */
 export function useTimer() {
-  const [state, setState] = useState<TimerState>(() => createIdleState())
+  const [state, setState] = useState<TimerState>(initialState)
   const intervalRef = useRef<number | null>(null)
   const savedFinishedRef = useRef(false)
 
@@ -42,7 +52,6 @@ export function useTimer() {
     return clearTick
   }, [state.phase, clearTick])
 
-  // Document title while timer is active
   useEffect(() => {
     const base = 'ناوي فوكس'
     if (state.phase === 'running' || state.phase === 'paused') {
@@ -54,7 +63,6 @@ export function useTimer() {
     }
   }, [state.phase, state.remainingSeconds])
 
-  // Persist once when timer reaches finished
   useEffect(() => {
     if (state.phase !== 'finished') {
       savedFinishedRef.current = false
@@ -123,11 +131,24 @@ export function useTimer() {
   }, [])
 
   const updatePlanned = useCallback((seconds: number) => {
-    setState((s) => setPlannedSeconds(s, seconds))
+    setState((s) => {
+      const next = setPlannedSeconds(s, seconds)
+      if (next.kind === 'focus') saveDefaultFocusSeconds(next.plannedSeconds)
+      else saveDefaultBreakSeconds(next.plannedSeconds)
+      return next
+    })
   }, [])
 
   const updateKind = useCallback((kind: SessionKind) => {
-    setState((s) => setKind(s, kind))
+    setState((s) => {
+      let next = setKind(s, kind)
+      if (kind === 'focus') {
+        next = setPlannedSeconds(next, loadDefaultFocusSeconds())
+      } else {
+        next = setPlannedSeconds(next, loadDefaultBreakSeconds())
+      }
+      return next
+    })
   }, [])
 
   return {
