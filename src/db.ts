@@ -48,3 +48,13 @@ export async function totalFocusSeconds(since?: number): Promise<number> {
 export async function exportSessions(): Promise<FocusSession[]> {
   return db.sessions.orderBy('startedAt').toArray()
 }
+
+/** Safe merge import: skips ids that already exist. Returns inserted count. */
+export async function importSessions(rows: FocusSession[]): Promise<number> {
+  if (rows.length === 0) return 0
+  const existingIds = new Set(await db.sessions.toCollection().primaryKeys())
+  const fresh = rows.filter((r) => !existingIds.has(r.id))
+  if (fresh.length === 0) return 0
+  await db.sessions.bulkAdd(fresh)
+  return fresh.length
+}

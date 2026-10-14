@@ -28,3 +28,11 @@ export function startOfToday(): number {
   d.setHours(0, 0, 0, 0)
   return d.getTime()
 }
+
+/** Start of local calendar week (Sunday = 0) */
+export function startOfWeek(now = Date.now()): number {
+  const d = new Date(now)
+  d.setHours(0, 0, 0, 0)
+  d.setDate(d.getDate() - d.getDay())
+  return d.getTime()
+}
