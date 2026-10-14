@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   exportSessions,
   importSessions,
@@ -7,6 +7,11 @@ import {
 } from '../db'
 import { buildBackup, parseBackup } from '../lib/backup'
 import { startOfToday, startOfWeek } from '../lib/format'
+import {
+  loadHistoryFilter,
+  saveHistoryFilter,
+  type HistoryFilter,
+} from '../lib/prefs'
 import type { FocusSession } from '../types'
 
 export function useSessions() {
@@ -15,12 +20,13 @@ export function useSessions() {
   const [weekSeconds, setWeekSeconds] = useState(0)
   const [loading, setLoading] = useState(true)
   const [backupMessage, setBackupMessage] = useState<string | null>(null)
+  const [filter, setFilterState] = useState<HistoryFilter>(() => loadHistoryFilter())
 
   const refresh = useCallback(async () => {
     setLoading(true)
     try {
       const [rows, today, week] = await Promise.all([
-        listSessions(40),
+        listSessions(80),
         totalFocusSeconds(startOfToday()),
         totalFocusSeconds(startOfWeek()),
       ])
@@ -35,6 +41,17 @@ export function useSessions() {
   useEffect(() => {
     void refresh()
   }, [refresh])
+
+  const setFilter = useCallback((f: HistoryFilter) => {
+    setFilterState(f)
+    saveHistoryFilter(f)
+  }, [])
+
+  const filteredSessions = useMemo(() => {
+    if (filter === 'all') return sessions
+    const since = filter === 'today' ? startOfToday() : startOfWeek()
+    return sessions.filter((s) => s.startedAt >= since)
+  }, [sessions, filter])
 
   const downloadBackup = useCallback(async () => {
     const rows = await exportSessions()
@@ -73,7 +90,9 @@ export function useSessions() {
   )
 
   return {
-    sessions,
+    sessions: filteredSessions,
+    filter,
+    setFilter,
     todaySeconds,
     weekSeconds,
     loading,

@@ -4,6 +4,7 @@ import { HistoryList } from './components/HistoryList'
 import { IntentionInput } from './components/IntentionInput'
 import { SessionControls } from './components/SessionControls'
 import { TimerDisplay } from './components/TimerDisplay'
+import { useFullscreen } from './hooks/useFullscreen'
 import { useSessions } from './hooks/useSessions'
 import { useTimer } from './hooks/useTimer'
 import { isActive } from './lib/timer'
@@ -23,6 +24,8 @@ export default function App() {
 
   const {
     sessions,
+    filter,
+    setFilter,
     todaySeconds,
     weekSeconds,
     loading,
@@ -32,13 +35,22 @@ export default function App() {
     backupMessage,
   } = useSessions()
 
+  const { active: fullscreen, enter: enterFs, exit: exitFs, toggle: toggleFs } =
+    useFullscreen()
+
   useEffect(() => {
     if (state.phase === 'finished' || state.phase === 'idle') {
       void refresh()
     }
   }, [state.phase, refresh])
 
-  // Warn before closing tab during an active session
+  // Exit fullscreen when session ends
+  useEffect(() => {
+    if (state.phase === 'finished' || state.phase === 'idle') {
+      void exitFs()
+    }
+  }, [state.phase, exitFs])
+
   useEffect(() => {
     if (!isActive(state.phase)) return
     const onBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -57,38 +69,69 @@ export default function App() {
     void stop()
   }, [state.elapsedSeconds, stop])
 
-  // Space / Enter shortcuts when not typing in an input
+  const handleStart = useCallback(() => {
+    start()
+    void enterFs()
+  }, [start, enterFs])
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement | null)?.tagName
       if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
       if (e.key === ' ' || e.key === 'Enter') {
         e.preventDefault()
-        if (state.phase === 'idle') start()
+        if (state.phase === 'idle') handleStart()
         else if (state.phase === 'running') pause()
         else if (state.phase === 'paused') resume()
         else if (state.phase === 'finished') reset()
       } else if (e.key === 'Escape' && isActive(state.phase)) {
+        if (fullscreen) {
+          void exitFs()
+          return
+        }
         e.preventDefault()
         requestStop()
+      } else if ((e.key === 'f' || e.key === 'F') && !e.metaKey && !e.ctrlKey) {
+        e.preventDefault()
+        void toggleFs()
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [state.phase, start, pause, resume, reset, requestStop])
+  }, [
+    state.phase,
+    handleStart,
+    pause,
+    resume,
+    reset,
+    requestStop,
+    fullscreen,
+    exitFs,
+    toggleFs,
+  ])
 
   const locked = isActive(state.phase)
 
   return (
     <div className="min-h-dvh bg-slate-950 text-slate-100">
       <header className="border-b border-slate-800/80 px-4 py-4">
-        <div className="mx-auto flex max-w-lg items-center justify-between">
+        <div className="mx-auto flex max-w-lg items-center justify-between gap-2">
           <h1 className="text-lg font-semibold tracking-tight text-slate-50">
             ناوي فوكس
           </h1>
-          <span className="rounded-full bg-slate-800 px-2.5 py-0.5 text-xs text-slate-400">
-            Nawy Focus
-          </span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => void toggleFs()}
+              className="rounded-lg border border-slate-700 px-2.5 py-1 text-xs text-slate-300 transition hover:border-slate-500 hover:text-slate-100"
+              title="ملء الشاشة (F)"
+            >
+              {fullscreen ? 'خروج من ملء الشاشة' : 'ملء الشاشة'}
+            </button>
+            <span className="rounded-full bg-slate-800 px-2.5 py-0.5 text-xs text-slate-400">
+              Nawy Focus
+            </span>
+          </div>
         </div>
       </header>
 
@@ -122,7 +165,7 @@ export default function App() {
 
         <SessionControls
           phase={state.phase}
-          onStart={start}
+          onStart={handleStart}
           onPause={pause}
           onResume={resume}
           onStop={requestStop}
@@ -130,12 +173,14 @@ export default function App() {
         />
 
         <p className="text-center text-[11px] text-slate-600">
-          مسافة: ابدأ / إيقاف · Esc: إنهاء
+          مسافة: ابدأ / إيقاف · F: ملء الشاشة · Esc: إنهاء
         </p>
 
         <div className="w-full border-t border-slate-800 pt-6">
           <HistoryList
             sessions={sessions}
+            filter={filter}
+            onFilterChange={setFilter}
             todaySeconds={todaySeconds}
             weekSeconds={weekSeconds}
             loading={loading}

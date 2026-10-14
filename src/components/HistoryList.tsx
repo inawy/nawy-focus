@@ -1,8 +1,11 @@
 import { formatDateTime, formatDurationShort } from '../lib/format'
+import type { HistoryFilter } from '../lib/prefs'
 import type { FocusSession } from '../types'
 
 interface Props {
   sessions: FocusSession[]
+  filter: HistoryFilter
+  onFilterChange: (f: HistoryFilter) => void
   todaySeconds: number
   weekSeconds: number
   loading: boolean
@@ -11,8 +14,16 @@ interface Props {
   backupMessage: string | null
 }
 
+const FILTERS: { id: HistoryFilter; label: string }[] = [
+  { id: 'all', label: 'الكل' },
+  { id: 'today', label: 'اليوم' },
+  { id: 'week', label: 'الأسبوع' },
+]
+
 export function HistoryList({
   sessions,
+  filter,
+  onFilterChange,
   todaySeconds,
   weekSeconds,
   loading,
@@ -30,6 +41,23 @@ export function HistoryList({
           <p>اليوم: {formatDurationShort(todaySeconds)}</p>
           <p>هذا الأسبوع: {formatDurationShort(weekSeconds)}</p>
         </div>
+      </div>
+
+      <div className="mb-3 flex gap-1 rounded-xl bg-slate-900/60 p-1">
+        {FILTERS.map((f) => (
+          <button
+            key={f.id}
+            type="button"
+            onClick={() => onFilterChange(f.id)}
+            className={`flex-1 rounded-lg py-1.5 text-xs font-medium transition ${
+              filter === f.id
+                ? 'bg-slate-100 text-slate-900'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            {f.label}
+          </button>
+        ))}
       </div>
 
       <div className="mb-3 flex flex-wrap gap-2">
@@ -65,7 +93,7 @@ export function HistoryList({
 
       {!loading && sessions.length === 0 && (
         <p className="rounded-xl border border-dashed border-slate-700 px-4 py-6 text-center text-sm text-slate-500">
-          لا توجد جلسات بعد. ابدأ أول جلسة تركيز.
+          لا توجد جلسات في هذا النطاق.
         </p>
       )}
 
