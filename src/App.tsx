@@ -9,6 +9,14 @@ import { useSessions } from './hooks/useSessions'
 import { useTimer } from './hooks/useTimer'
 import { isActive } from './lib/timer'
 
+function isTypingTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false
+  const tag = target.tagName
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true
+  if (target.isContentEditable) return true
+  return Boolean(target.closest('input, textarea, select, [contenteditable="true"]'))
+}
+
 export default function App() {
   const {
     state,
@@ -44,7 +52,6 @@ export default function App() {
     }
   }, [state.phase, refresh])
 
-  // Exit fullscreen when session ends
   useEffect(() => {
     if (state.phase === 'finished' || state.phase === 'idle') {
       void exitFs()
@@ -76,8 +83,7 @@ export default function App() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      const tag = (e.target as HTMLElement | null)?.tagName
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+      if (isTypingTarget(e.target)) return
       if (e.key === ' ' || e.key === 'Enter') {
         e.preventDefault()
         if (state.phase === 'idle') handleStart()

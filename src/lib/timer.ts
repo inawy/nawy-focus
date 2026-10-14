@@ -22,6 +22,7 @@ export function startTimer(state: TimerState, now = Date.now()): TimerState {
   return {
     ...state,
     phase: 'running',
+    intention: state.intention.trim(),
     remainingSeconds: state.remainingSeconds || state.plannedSeconds,
     startedAt: state.startedAt ?? now,
   }
@@ -66,8 +67,9 @@ export function resetTimer(state: TimerState): TimerState {
   return createIdleState(state.kind, state.plannedSeconds)
 }
 
+/** Do not trim while typing — spaces must stay until save/start. */
 export function setIntention(state: TimerState, intention: string): TimerState {
-  return { ...state, intention: intention.trim() }
+  return { ...state, intention }
 }
 
 export function setPlannedSeconds(

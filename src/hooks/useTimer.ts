@@ -74,7 +74,7 @@ export function useTimer() {
     playCompletionChime()
 
     void addSession({
-      intention: state.intention,
+      intention: state.intention.trim(),
       kind: state.kind,
       plannedSeconds: state.plannedSeconds,
       actualSeconds: state.elapsedSeconds,
@@ -108,7 +108,7 @@ export function useTimer() {
     setState((prev) => {
       if (prev.elapsedSeconds > 0) {
         void addSession({
-          intention: prev.intention,
+          intention: prev.intention.trim(),
           kind: prev.kind,
           plannedSeconds: prev.plannedSeconds,
           actualSeconds: prev.elapsedSeconds,
