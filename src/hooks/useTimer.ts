@@ -10,8 +10,10 @@ import {
   startTimer,
   tick,
 } from '../lib/timer'
+import { playCompletionChime } from '../lib/sound'
 import type { SessionKind, TimerState } from '../types'
 import { addSession } from '../db'
+import { formatTime } from '../lib/format'
 
 /**
  * Owns timer UI state and the 1s interval.
@@ -20,6 +22,7 @@ import { addSession } from '../db'
 export function useTimer() {
   const [state, setState] = useState<TimerState>(() => createIdleState())
   const intervalRef = useRef<number | null>(null)
+  const savedFinishedRef = useRef(false)
 
   const clearTick = useCallback(() => {
     if (intervalRef.current !== null) {
@@ -39,23 +42,49 @@ export function useTimer() {
     return clearTick
   }, [state.phase, clearTick])
 
+  // Document title while timer is active
   useEffect(() => {
-    if (state.phase !== 'finished') return
+    const base = 'ناوي فوكس'
+    if (state.phase === 'running' || state.phase === 'paused') {
+      document.title = `${formatTime(state.remainingSeconds)} · ${base}`
+    } else if (state.phase === 'finished') {
+      document.title = `انتهت الجلسة · ${base}`
+    } else {
+      document.title = base
+    }
+  }, [state.phase, state.remainingSeconds])
 
-    void (async () => {
-      await addSession({
-        intention: state.intention,
-        kind: state.kind,
-        plannedSeconds: state.plannedSeconds,
-        actualSeconds: state.elapsedSeconds,
-        status: 'completed',
-        startedAt: state.startedAt ?? Date.now(),
-        endedAt: Date.now(),
-      })
-    })()
-  }, [state.phase, state.intention, state.kind, state.plannedSeconds, state.elapsedSeconds, state.startedAt])
+  // Persist once when timer reaches finished
+  useEffect(() => {
+    if (state.phase !== 'finished') {
+      savedFinishedRef.current = false
+      return
+    }
+    if (savedFinishedRef.current) return
+    savedFinishedRef.current = true
+
+    playCompletionChime()
+
+    void addSession({
+      intention: state.intention,
+      kind: state.kind,
+      plannedSeconds: state.plannedSeconds,
+      actualSeconds: state.elapsedSeconds,
+      status: 'completed',
+      startedAt: state.startedAt ?? Date.now(),
+      endedAt: Date.now(),
+    })
+  }, [
+    state.phase,
+    state.intention,
+    state.kind,
+    state.plannedSeconds,
+    state.elapsedSeconds,
+    state.startedAt,
+  ])
 
   const start = useCallback(() => {
+    savedFinishedRef.current = false
     setState((s) => startTimer(s))
   }, [])
 
@@ -85,6 +114,7 @@ export function useTimer() {
   }, [])
 
   const reset = useCallback(() => {
+    savedFinishedRef.current = false
     setState((s) => resetTimer(s))
   }, [])
 
