@@ -43,8 +43,8 @@ export function DurationPicker({
   }
 
   return (
-    <div className="flex w-full max-w-md flex-col gap-3">
-      <div className="flex gap-2 rounded-xl bg-slate-900/60 p-1">
+    <div className="flex w-full max-w-sm flex-col gap-3">
+      <div className="flex gap-1 rounded-2xl border border-white/[0.06] bg-black/25 p-1">
         {(
           [
             ['focus', 'تركيز'],
@@ -60,11 +60,13 @@ export function DurationPicker({
               setShowCustom(false)
               setCustomText('')
             }}
-            className={`min-h-11 flex-1 rounded-lg py-2 text-sm font-medium transition ${
+            className={`min-h-11 flex-1 rounded-xl py-2 text-sm font-medium transition ${
               kind === value
-                ? 'bg-brand-500 text-white shadow-brand-500/20 shadow'
+                ? value === 'focus'
+                  ? 'bg-brand-500 text-white shadow-md shadow-brand-500/25'
+                  : 'bg-white text-slate-950 shadow-md'
                 : 'text-slate-400 hover:text-slate-200'
-            } disabled:opacity-50`}
+            } disabled:opacity-40`}
           >
             {label}
           </button>
@@ -82,11 +84,11 @@ export function DurationPicker({
               setShowCustom(false)
               setCustomText('')
             }}
-            className={`min-h-11 min-w-[3.25rem] rounded-lg px-3 py-2 text-sm font-medium transition ${
+            className={`min-h-11 min-w-[3.5rem] rounded-xl px-3 py-2 text-sm font-medium transition ${
               currentMinutes === m && !showCustom
-                ? 'bg-slate-100 text-slate-900'
-                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-            } disabled:opacity-50`}
+                ? 'bg-white text-slate-950 shadow-sm'
+                : 'border border-white/[0.06] bg-white/[0.03] text-slate-300 hover:border-white/15 hover:bg-white/[0.06]'
+            } disabled:opacity-40`}
           >
             {m}د
           </button>
@@ -95,20 +97,20 @@ export function DurationPicker({
           type="button"
           disabled={disabled}
           onClick={() => setShowCustom(true)}
-          className={`min-h-11 min-w-[3.25rem] rounded-lg px-3 py-2 text-sm font-medium transition ${
+          className={`min-h-11 min-w-[3.5rem] rounded-xl px-3 py-2 text-sm font-medium transition ${
             showCustom || isCustom
-              ? 'bg-slate-100 text-slate-900'
-              : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-          } disabled:opacity-50`}
+              ? 'bg-white text-slate-950 shadow-sm'
+              : 'border border-white/[0.06] bg-white/[0.03] text-slate-300 hover:border-white/15 hover:bg-white/[0.06]'
+          } disabled:opacity-40`}
         >
           مخصص
         </button>
       </div>
 
       {showCustom && !disabled && (
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-2 pt-0.5">
           <label className="flex items-center gap-2 text-sm text-slate-400">
-            <span>دقائق:</span>
+            <span>دقائق</span>
             <input
               type="number"
               min={1}
@@ -116,7 +118,7 @@ export function DurationPicker({
               inputMode="numeric"
               value={customText || (isCustom ? String(currentMinutes) : '')}
               onChange={(e) => applyCustom(e.target.value)}
-              className="w-20 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-center text-slate-100 outline-none focus:border-brand-500/60"
+              className="w-[4.5rem] rounded-xl border border-white/10 bg-black/30 px-3 py-2.5 text-center text-slate-100 outline-none transition focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/15"
               aria-label="مدة مخصصة بالدقائق"
             />
           </label>
