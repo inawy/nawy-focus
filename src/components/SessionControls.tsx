@@ -27,13 +27,15 @@ export function SessionControls({
   onStartBreak,
 }: Props) {
   return (
-    <div className="flex w-full max-w-sm flex-col items-center gap-3.5">
+    <div className="flex w-full max-w-sm flex-col items-center gap-3">
       {phase === 'idle' && (
         <button
           type="button"
           onClick={onStart}
           className={
-            kind === 'break' ? 'btn-secondary-quiet w-full sm:w-auto sm:min-w-[15rem]' : 'btn-primary-brand w-full sm:w-auto sm:min-w-[15rem]'
+            kind === 'break'
+              ? 'btn-secondary-quiet w-full sm:w-auto sm:min-w-[15rem]'
+              : 'btn-primary-brand w-full sm:w-auto sm:min-w-[15rem]'
           }
         >
           {kind === 'break' ? 'ابدأ الراحة' : 'ابدأ التركيز'}
@@ -83,13 +85,16 @@ export function SessionControls({
       )}
 
       {phase === 'finished' && (
-        <div className="flex w-full flex-col items-center gap-4">
+        <div className="surface-panel w-full px-5 py-5">
           <div className="text-center">
-            <p className="text-[15px] font-medium text-slate-200">
-              {kind === 'focus' ? 'أحسنت — انتهت جلسة التركيز' : 'انتهت الراحة'}
+            <p className="text-[15px] font-medium text-slate-100">
+              {kind === 'focus' ? 'أحسنت' : 'انتهت الراحة'}
+            </p>
+            <p className="mt-1 text-sm text-slate-400">
+              {kind === 'focus' ? 'انتهت جلسة التركيز' : 'جاهز لجلسة جديدة'}
             </p>
             {(elapsedSeconds > 0 || plannedSeconds > 0) && (
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-3 font-mono text-2xl font-medium tabular-nums text-brand-300">
                 {formatDurationShort(
                   elapsedSeconds > 0 ? elapsedSeconds : plannedSeconds,
                 )}
@@ -97,7 +102,7 @@ export function SessionControls({
             )}
           </div>
 
-          <div className="flex w-full flex-col items-stretch gap-2.5">
+          <div className="mt-5 flex w-full flex-col items-stretch gap-2.5">
             {kind === 'focus' && onStartBreak && (
               <button
                 type="button"
