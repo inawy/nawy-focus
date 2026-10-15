@@ -73,6 +73,8 @@ export default function App() {
   const [autoBreakCountdown, setAutoBreakCountdown] = useState<number | null>(
     null,
   )
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const settingsRef = useRef<HTMLDivElement | null>(null)
   const autoBreakTimerRef = useRef<number | null>(null)
 
   const clearAutoBreakTimer = useCallback(() => {
@@ -141,6 +143,33 @@ export default function App() {
     return () => window.removeEventListener('beforeunload', onBeforeUnload)
   }, [state.phase])
 
+  // Close settings panel on outside click / Escape
+  useEffect(() => {
+    if (!settingsOpen) return
+    const onPointer = (e: MouseEvent) => {
+      if (
+        settingsRef.current &&
+        !settingsRef.current.contains(e.target as Node)
+      ) {
+        setSettingsOpen(false)
+      }
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSettingsOpen(false)
+    }
+    document.addEventListener('mousedown', onPointer)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onPointer)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [settingsOpen])
+
+  // Collapse settings while a session is active (quieter chrome)
+  useEffect(() => {
+    if (isActive(state.phase)) setSettingsOpen(false)
+  }, [state.phase])
+
   const requestStop = useCallback(() => {
     if (state.elapsedSeconds > 0) {
       const ok = window.confirm('إنهاء الجلسة الآن وحفظ الوقت المقضي؟')
@@ -152,12 +181,14 @@ export default function App() {
 
   const handleStart = useCallback(() => {
     clearAutoBreakTimer()
+    setSettingsOpen(false)
     start()
     void enterFs()
   }, [start, enterFs, clearAutoBreakTimer])
 
   const handleStartBreak = useCallback(() => {
     clearAutoBreakTimer()
+    setSettingsOpen(false)
     startBreak()
     void enterFs()
   }, [startBreak, enterFs, clearAutoBreakTimer])
@@ -209,6 +240,7 @@ export default function App() {
   ])
 
   const locked = isActive(state.phase)
+  const sessionFocus = state.phase === 'running' || state.phase === 'paused'
 
   const toggleSound = () => {
     const next = !soundOn
@@ -250,73 +282,133 @@ export default function App() {
     }
   }
 
+  const settingsActiveCount =
+    (soundOn ? 0 : 1) +
+    (vibrateOn ? 0 : 1) +
+    (autoBreak === 'auto' ? 1 : 0) +
+    (notifyOn ? 1 : 0)
+
   return (
     <div className="min-h-dvh bg-slate-950 text-slate-100">
-      <header className="border-b border-slate-800/80 px-4 py-4">
+      <header
+        className={`border-b border-slate-800/80 px-4 transition-all duration-300 ${
+          sessionFocus ? 'py-2.5' : 'py-4'
+        }`}
+      >
         <div className="mx-auto flex max-w-lg items-center justify-between gap-2">
-          <h1 className="text-lg font-semibold tracking-tight text-slate-50">
+          <h1
+            className={`font-semibold tracking-tight text-slate-50 transition-all duration-300 ${
+              sessionFocus ? 'text-base opacity-70' : 'text-lg'
+            }`}
+          >
             ناوي فوكاس
           </h1>
-          <div className="flex flex-wrap items-center justify-end gap-1.5">
-            <button
-              type="button"
-              onClick={toggleSound}
-              className="min-h-11 min-w-11 rounded-lg border border-slate-700 px-2 text-xs text-slate-300 transition hover:border-slate-500 hover:text-slate-100"
-              title={soundOn ? 'كتم الصوت' : 'تشغيل الصوت'}
-              aria-label={soundOn ? 'كتم الصوت' : 'تشغيل الصوت'}
-              aria-pressed={soundOn}
-            >
-              {soundOn ? '🔊' : '🔇'}
-            </button>
-            <button
-              type="button"
-              onClick={toggleVibrate}
-              className="min-h-11 min-w-11 rounded-lg border border-slate-700 px-2 text-xs text-slate-300 transition hover:border-slate-500 hover:text-slate-100"
-              title={vibrateOn ? 'إيقاف الاهتزاز' : 'تفعيل الاهتزاز'}
-              aria-label={vibrateOn ? 'إيقاف الاهتزاز' : 'تفعيل الاهتزاز'}
-              aria-pressed={vibrateOn}
-            >
-              {vibrateOn ? '📳' : '📴'}
-            </button>
-            <button
-              type="button"
-              onClick={toggleAutoBreak}
-              className={`min-h-11 rounded-lg border px-2 text-xs transition ${
-                autoBreak === 'auto'
-                  ? 'border-sky-600/60 bg-sky-950/40 text-sky-300'
-                  : 'border-slate-700 text-slate-300 hover:border-slate-500 hover:text-slate-100'
-              }`}
-              title="بدء راحة تلقائياً بعد التركيز"
-              aria-pressed={autoBreak === 'auto'}
-            >
-              راحة تلقائية
-            </button>
-            <button
-              type="button"
-              onClick={() => void toggleNotifications()}
-              className={`min-h-11 rounded-lg border px-2 text-xs transition ${
-                notifyOn
-                  ? 'border-amber-600/60 bg-amber-950/30 text-amber-300'
-                  : 'border-slate-700 text-slate-300 hover:border-slate-500 hover:text-slate-100'
-              }`}
-              title="إشعار عند انتهاء الجلسة في الخلفية"
-              aria-pressed={notifyOn}
-            >
-              إشعار
-            </button>
+
+          <div className="flex items-center gap-1.5" ref={settingsRef}>
+            {/* Fullscreen stays one tap away */}
             <button
               type="button"
               onClick={() => void toggleFs()}
-              className="min-h-11 rounded-lg border border-slate-700 px-2.5 py-1 text-xs text-slate-300 transition hover:border-slate-500 hover:text-slate-100"
+              className="min-h-11 rounded-lg border border-slate-700 px-2.5 text-xs text-slate-300 transition hover:border-slate-500 hover:text-slate-100"
               title="ملء الشاشة (F)"
+              aria-label={fullscreen ? 'خروج من ملء الشاشة' : 'ملء الشاشة'}
             >
               {fullscreen ? 'خروج' : 'ملء الشاشة'}
             </button>
+
+            {/* U4: collapse the rest behind ⋯ */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setSettingsOpen((v) => !v)}
+                className={`relative min-h-11 min-w-11 rounded-lg border px-2 text-base transition ${
+                  settingsOpen
+                    ? 'border-slate-500 bg-slate-800 text-slate-100'
+                    : 'border-slate-700 text-slate-300 hover:border-slate-500 hover:text-slate-100'
+                }`}
+                title="الإعدادات"
+                aria-label="الإعدادات"
+                aria-expanded={settingsOpen}
+                aria-haspopup="true"
+              >
+                ⋯
+                {settingsActiveCount > 0 && !settingsOpen && (
+                  <span
+                    className="absolute -top-0.5 -start-0.5 h-2 w-2 rounded-full bg-sky-400"
+                    aria-hidden
+                  />
+                )}
+              </button>
+
+              {settingsOpen && (
+                <div
+                  className="absolute end-0 top-full z-30 mt-2 w-56 rounded-xl border border-slate-700 bg-slate-900 p-2 shadow-xl shadow-black/40"
+                  role="menu"
+                >
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={toggleSound}
+                    className="flex min-h-11 w-full items-center justify-between gap-2 rounded-lg px-3 text-sm text-slate-200 transition hover:bg-slate-800"
+                    aria-pressed={soundOn}
+                  >
+                    <span>الصوت</span>
+                    <span className="text-base" aria-hidden>
+                      {soundOn ? '🔊' : '🔇'}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={toggleVibrate}
+                    className="flex min-h-11 w-full items-center justify-between gap-2 rounded-lg px-3 text-sm text-slate-200 transition hover:bg-slate-800"
+                    aria-pressed={vibrateOn}
+                  >
+                    <span>الاهتزاز</span>
+                    <span className="text-base" aria-hidden>
+                      {vibrateOn ? '📳' : '📴'}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={toggleAutoBreak}
+                    className={`flex min-h-11 w-full items-center justify-between gap-2 rounded-lg px-3 text-sm transition hover:bg-slate-800 ${
+                      autoBreak === 'auto' ? 'text-sky-300' : 'text-slate-200'
+                    }`}
+                    aria-pressed={autoBreak === 'auto'}
+                  >
+                    <span>راحة تلقائية</span>
+                    <span className="text-xs text-slate-500">
+                      {autoBreak === 'auto' ? 'تشغيل' : 'إيقاف'}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => void toggleNotifications()}
+                    className={`flex min-h-11 w-full items-center justify-between gap-2 rounded-lg px-3 text-sm transition hover:bg-slate-800 ${
+                      notifyOn ? 'text-amber-300' : 'text-slate-200'
+                    }`}
+                    aria-pressed={notifyOn}
+                  >
+                    <span>إشعار</span>
+                    <span className="text-xs text-slate-500">
+                      {notifyOn ? 'تشغيل' : 'إيقاف'}
+                    </span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto flex max-w-lg flex-col items-center gap-8 px-4 py-8">
+      <main
+        className={`mx-auto flex max-w-lg flex-col items-center px-4 py-8 transition-all duration-300 ${
+          sessionFocus ? 'gap-4' : 'gap-8'
+        }`}
+      >
         {finishedWhileHidden && state.phase === 'finished' && (
           <div
             className="w-full max-w-md rounded-xl border border-amber-500/40 bg-amber-950/40 px-4 py-3 text-center text-sm text-amber-100"
@@ -356,7 +448,14 @@ export default function App() {
           kind={state.kind}
         />
 
-        {locked && state.intention ? (
+        {/* U1: during session — soft intention only; no editor */}
+        {sessionFocus ? (
+          state.intention ? (
+            <p className="max-w-md text-center text-xs text-slate-500">
+              {state.intention}
+            </p>
+          ) : null
+        ) : locked && state.intention ? (
           <p className="max-w-md text-center text-sm text-slate-400">
             <span className="text-slate-500">النية: </span>
             {state.intention}
@@ -370,13 +469,16 @@ export default function App() {
           />
         )}
 
-        <DurationPicker
-          kind={state.kind}
-          plannedSeconds={state.plannedSeconds}
-          onKindChange={updateKind}
-          onSecondsChange={updatePlanned}
-          disabled={locked}
-        />
+        {/* U1: hide duration picker while session is active */}
+        {!sessionFocus && (
+          <DurationPicker
+            kind={state.kind}
+            plannedSeconds={state.plannedSeconds}
+            onKindChange={updateKind}
+            onSecondsChange={updatePlanned}
+            disabled={locked}
+          />
+        )}
 
         <SessionControls
           phase={state.phase}
@@ -389,11 +491,19 @@ export default function App() {
           onStartBreak={handleStartBreak}
         />
 
-        <p className="text-center text-[11px] text-slate-600">
-          مسافة: ابدأ / إيقاف · F: ملء الشاشة · Esc: إنهاء
-        </p>
+        {!sessionFocus && (
+          <p className="text-center text-[11px] text-slate-600">
+            مسافة: ابدأ / إيقاف · F: ملء الشاشة · Esc: إنهاء
+          </p>
+        )}
 
-        <div className="w-full border-t border-slate-800 pt-6">
+        {/* U1: dim history during session so the timer stays the hero */}
+        <div
+          className={`w-full border-t border-slate-800 pt-6 transition-opacity duration-300 ${
+            sessionFocus ? 'pointer-events-none opacity-20' : ''
+          }`}
+          aria-hidden={sessionFocus}
+        >
           <HistoryList
             sessions={sessions}
             filter={filter}
@@ -413,35 +523,37 @@ export default function App() {
           />
         </div>
 
-        <footer className="w-full max-w-md border-t border-slate-800/80 pt-4 pb-2 text-center text-[11px] text-slate-600">
-          <p className="mb-1">جزء من منظومة ناوي للإنتاجية</p>
-          <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
-            <a
-              className="text-slate-500 underline-offset-2 hover:text-slate-300 hover:underline"
-              href="https://github.com/inawy"
-              target="_blank"
-              rel="noreferrer"
-            >
-              GitHub
-            </a>
-            <a
-              className="text-slate-500 underline-offset-2 hover:text-slate-300 hover:underline"
-              href="https://nawy.to/focus"
-              target="_blank"
-              rel="noreferrer"
-            >
-              nawy.to/focus
-            </a>
-            <a
-              className="text-slate-500 underline-offset-2 hover:text-slate-300 hover:underline"
-              href="https://inawy.github.io/nawy-focus/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              التطبيق المباشر
-            </a>
-          </p>
-        </footer>
+        {!sessionFocus && (
+          <footer className="w-full max-w-md border-t border-slate-800/80 pt-4 pb-2 text-center text-[11px] text-slate-600">
+            <p className="mb-1">جزء من منظومة ناوي للإنتاجية</p>
+            <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+              <a
+                className="text-slate-500 underline-offset-2 hover:text-slate-300 hover:underline"
+                href="https://github.com/inawy"
+                target="_blank"
+                rel="noreferrer"
+              >
+                GitHub
+              </a>
+              <a
+                className="text-slate-500 underline-offset-2 hover:text-slate-300 hover:underline"
+                href="https://nawy.to/focus"
+                target="_blank"
+                rel="noreferrer"
+              >
+                nawy.to/focus
+              </a>
+              <a
+                className="text-slate-500 underline-offset-2 hover:text-slate-300 hover:underline"
+                href="https://inawy.github.io/nawy-focus/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                التطبيق المباشر
+              </a>
+            </p>
+          </footer>
+        )}
       </main>
     </div>
   )
