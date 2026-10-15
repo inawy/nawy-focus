@@ -8,13 +8,13 @@ interface Props {
   kind: SessionKind
 }
 
-/** تركيز → أزرق ناوي · راحة → رمادي هادئ · إيقاف → كهرماني */
 function phaseTheme(phase: TimerPhase, kind: SessionKind) {
   if (phase === 'paused') {
     return {
-      stroke: 'stroke-amber-400/80',
+      stroke: 'stroke-amber-400/90',
       label: 'text-amber-300/90',
-      glow: 'shadow-[0_0_28px_-10px_rgba(251,191,36,0.28)]',
+      glow: 'shadow-[0_0_40px_-12px_rgba(251,191,36,0.35)]',
+      track: 'stroke-white/[0.06]',
     }
   }
   if (phase === 'running' || phase === 'finished') {
@@ -31,15 +31,17 @@ function phaseTheme(phase: TimerPhase, kind: SessionKind) {
       glow:
         phase === 'running'
           ? focus
-            ? 'shadow-[0_0_48px_-10px_rgba(61,123,255,0.4)]'
-            : 'shadow-[0_0_28px_-10px_rgba(148,163,184,0.2)]'
+            ? 'shadow-[0_0_64px_-14px_rgba(61,123,255,0.5)]'
+            : 'shadow-[0_0_36px_-12px_rgba(148,163,184,0.25)]'
           : '',
+      track: 'stroke-white/[0.06]',
     }
   }
   return {
     stroke: 'stroke-slate-600',
     label: 'text-slate-500',
     glow: '',
+    track: 'stroke-white/[0.06]',
   }
 }
 
@@ -52,7 +54,7 @@ export function TimerDisplay({
   const progress =
     plannedSeconds > 0 ? 1 - remainingSeconds / plannedSeconds : 0
 
-  const radius = 108
+  const radius = 104
   const circumference = 2 * Math.PI * radius
   const offset = circumference * (1 - progress)
 
@@ -63,22 +65,26 @@ export function TimerDisplay({
   const phaseLabel =
     phase === 'running'
       ? isBreak
-        ? 'جاري الراحة'
-        : 'جاري التركيز'
+        ? 'راحة'
+        : 'تركيز'
       : phase === 'paused'
-        ? 'متوقف مؤقتًا'
+        ? 'متوقف'
         : phase === 'finished'
-          ? 'انتهت الجلسة'
+          ? 'انتهت'
           : 'جاهز'
 
   return (
     <div
-      className={`relative mx-auto flex items-center justify-center rounded-full transition-all duration-300 ease-[var(--ease-out)] ${
-        sessionFocus ? 'h-72 w-72 sm:h-80 sm:w-80' : 'h-64 w-64 sm:h-72 sm:w-72'
-      } ${theme.glow}`}
+      className={`relative mx-auto flex items-center justify-center transition-all duration-500 ease-[var(--ease-out)] ${
+        sessionFocus ? 'h-[18.5rem] w-[18.5rem] sm:h-[20.5rem] sm:w-[20.5rem]' : 'h-64 w-64 sm:h-72 sm:w-72'
+      }`}
     >
+      <div
+        className={`absolute inset-[8%] rounded-full bg-gradient-to-b from-white/[0.04] to-transparent ${theme.glow}`}
+        aria-hidden
+      />
       <svg
-        className="-rotate-90"
+        className="-rotate-90 drop-shadow-sm"
         width="100%"
         height="100%"
         viewBox="0 0 240 240"
@@ -89,8 +95,8 @@ export function TimerDisplay({
           cy="120"
           r={radius}
           fill="none"
-          className="stroke-slate-800"
-          strokeWidth="8"
+          className={theme.track}
+          strokeWidth="10"
         />
         <circle
           cx="120"
@@ -98,25 +104,31 @@ export function TimerDisplay({
           r={radius}
           fill="none"
           className={theme.stroke}
-          strokeWidth="8"
+          strokeWidth="10"
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
         />
       </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
         <span
-          className={`font-mono font-semibold tracking-tight text-slate-50 tabular-nums transition-all duration-300 ${
-            sessionFocus ? 'text-6xl sm:text-7xl' : 'text-5xl sm:text-6xl'
+          className={`font-mono font-medium tracking-tight text-white tabular-nums transition-all duration-500 ${
+            sessionFocus
+              ? 'text-[3.35rem] sm:text-[3.85rem] leading-none'
+              : 'text-[2.75rem] sm:text-[3.15rem] leading-none'
           }`}
           aria-live="polite"
         >
           {formatTime(remainingSeconds)}
         </span>
-        <span className={`mt-1 text-sm ${theme.label}`}>{phaseLabel}</span>
+        <span
+          className={`mt-2.5 text-[11px] font-medium uppercase tracking-[0.18em] ${theme.label}`}
+        >
+          {phaseLabel}
+        </span>
         {phase === 'idle' && (
-          <span className="mt-0.5 text-[11px] text-slate-600">
-            {isBreak ? 'راحة' : 'تركيز'} · {Math.round(plannedSeconds / 60)}د
+          <span className="mt-1.5 text-[11px] text-slate-600">
+            {isBreak ? 'راحة' : 'تركيز'} · {Math.round(plannedSeconds / 60)} د
           </span>
         )}
       </div>

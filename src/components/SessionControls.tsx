@@ -26,40 +26,33 @@ export function SessionControls({
   onReset,
   onStartBreak,
 }: Props) {
-  const primaryFocus =
-    'bg-brand-500 text-white shadow-lg shadow-brand-500/25 hover:bg-brand-600'
-  const primaryBreak =
-    'bg-slate-200 text-slate-900 shadow-lg shadow-black/20 hover:bg-white'
-  const secondary =
-    'border border-slate-600 text-slate-300 hover:border-slate-400 hover:text-slate-100'
-
   return (
-    <div className="flex w-full max-w-md flex-col items-center gap-3">
+    <div className="flex w-full max-w-sm flex-col items-center gap-3.5">
       {phase === 'idle' && (
         <button
           type="button"
           onClick={onStart}
-          className={`min-h-12 rounded-full px-10 py-3.5 text-base font-semibold transition active:scale-[0.98] ${
-            kind === 'break' ? primaryBreak : primaryFocus
-          }`}
+          className={
+            kind === 'break' ? 'btn-secondary-quiet w-full sm:w-auto sm:min-w-[15rem]' : 'btn-primary-brand w-full sm:w-auto sm:min-w-[15rem]'
+          }
         >
           {kind === 'break' ? 'ابدأ الراحة' : 'ابدأ التركيز'}
         </button>
       )}
 
       {phase === 'running' && (
-        <div className="flex flex-wrap items-center justify-center gap-3">
+        <div className="flex w-full flex-wrap items-center justify-center gap-2.5">
           <button
             type="button"
             onClick={onPause}
-            className="min-h-12 rounded-full bg-slate-100 px-7 py-3.5 text-base font-semibold text-slate-900 transition hover:bg-white active:scale-[0.98]"
+            className="btn-secondary-quiet min-w-[8.5rem] px-7"
           >
             إيقاف مؤقت
           </button>
           <button
             type="button"
             onClick={onStop}
-            className={`min-h-11 rounded-full px-5 py-3 text-sm transition ${secondary}`}
+            className="btn-chrome min-h-12 rounded-full px-5 text-sm"
           >
             إنهاء
           </button>
@@ -67,20 +60,22 @@ export function SessionControls({
       )}
 
       {phase === 'paused' && (
-        <div className="flex flex-wrap items-center justify-center gap-3">
+        <div className="flex w-full flex-wrap items-center justify-center gap-2.5">
           <button
             type="button"
             onClick={onResume}
-            className={`min-h-12 rounded-full px-7 py-3.5 text-base font-semibold transition active:scale-[0.98] ${
-              kind === 'break' ? primaryBreak : primaryFocus
-            }`}
+            className={
+              kind === 'break'
+                ? 'btn-secondary-quiet min-w-[8.5rem] px-7'
+                : 'btn-primary-brand min-w-[8.5rem] px-7'
+            }
           >
             متابعة
           </button>
           <button
             type="button"
             onClick={onStop}
-            className={`min-h-11 rounded-full px-5 py-3 text-sm transition ${secondary}`}
+            className="btn-chrome min-h-12 rounded-full px-5 text-sm"
           >
             إنهاء
           </button>
@@ -89,38 +84,25 @@ export function SessionControls({
 
       {phase === 'finished' && (
         <div className="flex w-full flex-col items-center gap-4">
-          <p className="text-center text-sm text-slate-300">
-            {kind === 'focus' ? (
-              <>
-                أحسنت — انتهت جلسة التركيز
-                {(elapsedSeconds > 0 || plannedSeconds > 0) && (
-                  <span className="mt-0.5 block text-xs text-slate-500">
-                    {formatDurationShort(
-                      elapsedSeconds > 0 ? elapsedSeconds : plannedSeconds,
-                    )}
-                  </span>
+          <div className="text-center">
+            <p className="text-[15px] font-medium text-slate-200">
+              {kind === 'focus' ? 'أحسنت — انتهت جلسة التركيز' : 'انتهت الراحة'}
+            </p>
+            {(elapsedSeconds > 0 || plannedSeconds > 0) && (
+              <p className="mt-1 text-xs text-slate-500">
+                {formatDurationShort(
+                  elapsedSeconds > 0 ? elapsedSeconds : plannedSeconds,
                 )}
-              </>
-            ) : (
-              <>
-                انتهت الراحة — جاهز لجلسة جديدة
-                {(elapsedSeconds > 0 || plannedSeconds > 0) && (
-                  <span className="mt-0.5 block text-xs text-slate-500">
-                    {formatDurationShort(
-                      elapsedSeconds > 0 ? elapsedSeconds : plannedSeconds,
-                    )}
-                  </span>
-                )}
-              </>
+              </p>
             )}
-          </p>
+          </div>
 
-          <div className="flex w-full flex-col items-stretch gap-2.5 sm:items-center">
+          <div className="flex w-full flex-col items-stretch gap-2.5">
             {kind === 'focus' && onStartBreak && (
               <button
                 type="button"
                 onClick={onStartBreak}
-                className={`min-h-12 w-full rounded-full px-7 py-3.5 text-base font-semibold transition active:scale-[0.98] sm:w-auto sm:min-w-[14rem] ${primaryBreak}`}
+                className="btn-secondary-quiet w-full"
               >
                 ابدأ راحة
               </button>
@@ -130,8 +112,8 @@ export function SessionControls({
               onClick={onReset}
               className={
                 kind === 'focus'
-                  ? 'min-h-11 w-full rounded-full border border-brand-500/40 bg-brand-950/40 px-6 py-3 text-sm font-medium text-brand-300 transition hover:border-brand-400 hover:bg-brand-950/60 sm:w-auto sm:min-w-[14rem]'
-                  : `min-h-12 w-full rounded-full px-7 py-3.5 text-base font-semibold transition active:scale-[0.98] sm:w-auto sm:min-w-[14rem] ${primaryFocus}`
+                  ? 'btn-chrome min-h-12 w-full rounded-full border-brand-500/30 text-sm font-medium text-brand-300 hover:border-brand-400/50 hover:text-brand-200'
+                  : 'btn-primary-brand w-full'
               }
             >
               جلسة تركيز جديدة
