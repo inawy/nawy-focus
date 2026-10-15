@@ -36,6 +36,15 @@ export async function listSessions(limit = 50): Promise<FocusSession[]> {
   return db.sessions.orderBy('startedAt').reverse().limit(limit).toArray()
 }
 
+/** Focus sessions for insights (newest first, capped). */
+export async function listFocusSessionsForInsights(
+  limit = 500,
+): Promise<FocusSession[]> {
+  const rows = await db.sessions.where('kind').equals('focus').toArray()
+  rows.sort((a, b) => b.startedAt - a.startedAt)
+  return rows.slice(0, limit)
+}
+
 export async function totalFocusSeconds(since?: number): Promise<number> {
   let collection = db.sessions.where('kind').equals('focus')
   if (since !== undefined) {
@@ -57,4 +66,17 @@ export async function importSessions(rows: FocusSession[]): Promise<number> {
   if (fresh.length === 0) return 0
   await db.sessions.bulkAdd(fresh)
   return fresh.length
+}
+
+export async function deleteSession(id: string): Promise<void> {
+  await db.sessions.delete(id)
+}
+
+/** Count focus sessions started since a timestamp. */
+export async function countFocusSessions(since?: number): Promise<number> {
+  let collection = db.sessions.where('kind').equals('focus')
+  if (since !== undefined) {
+    collection = collection.and((s) => s.startedAt >= since)
+  }
+  return collection.count()
 }

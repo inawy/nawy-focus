@@ -1,8 +1,15 @@
 /** Soft completion chime via Web Audio — no assets, no dependency */
 
+import { loadSoundEnabled, loadVibrateEnabled } from './prefs'
+
 export function playCompletionChime(): void {
+  if (!loadSoundEnabled()) return
+
   try {
-    const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+    const Ctx =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext })
+        .webkitAudioContext
     if (!Ctx) return
     const ctx = new Ctx()
     const now = ctx.currentTime
@@ -28,5 +35,17 @@ export function playCompletionChime(): void {
     window.setTimeout(() => void ctx.close(), 800)
   } catch {
     // Autoplay / unsupported — ignore
+  }
+}
+
+/** Short haptic pulse when the session ends (mobile only). */
+export function vibrateOnComplete(): void {
+  if (!loadVibrateEnabled()) return
+  try {
+    if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+      navigator.vibrate([40, 30, 40])
+    }
+  } catch {
+    // unsupported
   }
 }

@@ -12,10 +12,10 @@ export default defineConfig({
       registerType: 'prompt',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'Nawy Focus',
-        short_name: 'Focus',
+        name: 'ناوي فوكاس',
+        short_name: 'فوكاس',
         description:
-          'A simple, local-first focus timer for the Nawy productivity ecosystem.',
+          'مؤقت تركيز بسيط ومحلي أولاً ضمن منظومة ناوي للإنتاجية.',
         theme_color: '#0f172a',
         background_color: '#0f172a',
         display: 'standalone',
