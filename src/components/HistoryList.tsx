@@ -51,30 +51,29 @@ export function HistoryList({
 }: Props) {
   return (
     <section className="w-full max-w-md" aria-labelledby="history-heading">
-      <div className="mb-3 flex items-baseline justify-between gap-2">
-        <h2 id="history-heading" className="text-sm font-medium text-slate-300">
-          سجل التركيز
-        </h2>
-        <div className="text-end text-xs text-slate-500">
-          <p>اليوم: {formatDurationShort(todaySeconds)}</p>
-          <p>هذا الأسبوع: {formatDurationShort(weekSeconds)}</p>
-          {todayFocusCount > 0 && (
-            <p className="text-emerald-500/80">
-              {todayFocusCount} جلسة تركيز اليوم
+      <details className="group rounded-2xl border border-slate-800 bg-slate-900/40 open:bg-slate-900/60" open>
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-3 [&::-webkit-details-marker]:hidden">
+          <div className="flex items-center gap-2">
+            <h2 id="history-heading" className="text-sm font-medium text-slate-200">
+              السجل والملخص
+            </h2>
+            <span className="text-[11px] text-slate-500 transition group-open:rotate-0">
+              <span className="group-open:hidden">إظهار</span>
+              <span className="hidden group-open:inline">إخفاء</span>
+            </span>
+          </div>
+          <div className="text-end text-[11px] leading-relaxed text-slate-500">
+            <p>
+              اليوم {formatDurationShort(todaySeconds)}
+              {todayFocusCount > 0 ? ` · ${todayFocusCount} جلسة` : ''}
             </p>
-          )}
-          {weekFocusCount > 0 && (
-            <p className="text-slate-500">
-              {weekFocusCount} جلسة هذا الأسبوع
+            <p className="text-slate-600">
+              الأسبوع {formatDurationShort(weekSeconds)}
+              {bestHour ? ` · أفضل ${formatHourLabel(bestHour.hour)}` : ''}
             </p>
-          )}
-          {bestHour && (
-            <p className="text-sky-400/90">
-              أفضل ساعة تركيز: {formatHourLabel(bestHour.hour)}
-            </p>
-          )}
-        </div>
-      </div>
+          </div>
+        </summary>
+        <div className="border-t border-slate-800/80 px-3.5 pb-3.5 pt-3">
 
       <div className="mb-3 flex flex-wrap gap-1 rounded-xl bg-slate-900/60 p-1">
         {FILTERS.map((f) => (
@@ -124,7 +123,7 @@ export function HistoryList({
       </div>
 
       {backupMessage && (
-        <p className="mb-3 text-xs text-emerald-400/90" role="status">
+        <p className="mb-3 text-xs text-brand-400/90" role="status">
           {backupMessage}
         </p>
       )}
@@ -192,6 +191,8 @@ export function HistoryList({
           </li>
         ))}
       </ul>
+        </div>
+      </details>
     </section>
   )
 }
