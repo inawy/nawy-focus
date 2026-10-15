@@ -289,8 +289,8 @@ export default function App() {
   return (
     <div className="min-h-dvh text-slate-100">
       <header
-        className={`sticky top-0 z-20 border-b border-white/[0.06] bg-[#0e0e10]/70 px-4 backdrop-blur-xl transition-all duration-300 ${
-          sessionFocus ? 'py-2.5' : 'py-3.5'
+        className={`sticky top-0 z-20 border-b border-white/[0.06] bg-[#0e0e10]/70 px-4 pt-[max(0.5rem,env(safe-area-inset-top))] backdrop-blur-xl transition-all duration-300 ${
+          sessionFocus ? 'pb-2.5' : 'pb-3.5'
         }`}
       >
         <div className="mx-auto flex max-w-md items-center justify-between gap-2">
@@ -351,8 +351,12 @@ export default function App() {
                     aria-pressed={soundOn}
                   >
                     <span>الصوت</span>
-                    <span className="text-base" aria-hidden>
-                      {soundOn ? '🔊' : '🔇'}
+                    <span
+                      className={`text-xs font-medium ${
+                        soundOn ? 'text-brand-300' : 'text-slate-500'
+                      }`}
+                    >
+                      {soundOn ? 'تشغيل' : 'إيقاف'}
                     </span>
                   </button>
                   <button
@@ -363,8 +367,12 @@ export default function App() {
                     aria-pressed={vibrateOn}
                   >
                     <span>الاهتزاز</span>
-                    <span className="text-base" aria-hidden>
-                      {vibrateOn ? '📳' : '📴'}
+                    <span
+                      className={`text-xs font-medium ${
+                        vibrateOn ? 'text-brand-300' : 'text-slate-500'
+                      }`}
+                    >
+                      {vibrateOn ? 'تشغيل' : 'إيقاف'}
                     </span>
                   </button>
                   <button
@@ -403,8 +411,12 @@ export default function App() {
       </header>
 
       <main
-        className={`mx-auto flex max-w-md flex-col items-center px-5 py-8 transition-all duration-300 ${
-          sessionFocus ? 'gap-4' : 'gap-8'
+        className={`mx-auto flex max-w-md flex-col items-center px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-6 transition-all duration-300 ${
+          state.phase === 'finished'
+            ? 'gap-5'
+            : sessionFocus
+              ? 'gap-3'
+              : 'gap-6'
         }`}
       >
         {finishedWhileHidden && state.phase === 'finished' && (
