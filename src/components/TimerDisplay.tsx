@@ -8,12 +8,13 @@ interface Props {
   kind: SessionKind
 }
 
+/** تركيز → أزرق ناوي · راحة → رمادي هادئ · إيقاف → كهرماني */
 function phaseTheme(phase: TimerPhase, kind: SessionKind) {
   if (phase === 'paused') {
     return {
       stroke: 'stroke-amber-400/80',
       label: 'text-amber-300/90',
-      glow: 'shadow-[0_0_24px_-8px_rgba(251,191,36,0.25)]',
+      glow: 'shadow-[0_0_28px_-10px_rgba(251,191,36,0.28)]',
     }
   }
   if (phase === 'running' || phase === 'finished') {
@@ -21,23 +22,23 @@ function phaseTheme(phase: TimerPhase, kind: SessionKind) {
     return {
       stroke: focus
         ? phase === 'running'
-          ? 'stroke-emerald-400 transition-[stroke-dashoffset] duration-1000 linear'
-          : 'stroke-emerald-300'
+          ? 'stroke-brand-500 transition-[stroke-dashoffset] duration-1000 linear'
+          : 'stroke-brand-400'
         : phase === 'running'
-          ? 'stroke-sky-400 transition-[stroke-dashoffset] duration-1000 linear'
-          : 'stroke-sky-300',
-      label: focus ? 'text-emerald-300/90' : 'text-sky-300/90',
+          ? 'stroke-slate-400 transition-[stroke-dashoffset] duration-1000 linear'
+          : 'stroke-slate-500',
+      label: focus ? 'text-brand-300' : 'text-slate-400',
       glow:
         phase === 'running'
           ? focus
-            ? 'shadow-[0_0_40px_-8px_rgba(52,211,153,0.35)]'
-            : 'shadow-[0_0_40px_-8px_rgba(56,189,248,0.35)]'
+            ? 'shadow-[0_0_48px_-10px_rgba(61,123,255,0.4)]'
+            : 'shadow-[0_0_28px_-10px_rgba(148,163,184,0.2)]'
           : '',
     }
   }
   return {
-    stroke: 'stroke-slate-500',
-    label: 'text-slate-400',
+    stroke: 'stroke-slate-600',
+    label: 'text-slate-500',
     glow: '',
   }
 }
@@ -72,7 +73,7 @@ export function TimerDisplay({
 
   return (
     <div
-      className={`relative mx-auto flex items-center justify-center rounded-full transition-all duration-300 ${
+      className={`relative mx-auto flex items-center justify-center rounded-full transition-all duration-300 ease-[var(--ease-out)] ${
         sessionFocus ? 'h-72 w-72 sm:h-80 sm:w-80' : 'h-64 w-64 sm:h-72 sm:w-72'
       } ${theme.glow}`}
     >
