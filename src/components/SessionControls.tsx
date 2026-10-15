@@ -1,8 +1,13 @@
+import { formatDurationShort } from '../lib/format'
 import type { SessionKind, TimerPhase } from '../types'
 
 interface Props {
   phase: TimerPhase
   kind: SessionKind
+  /** Planned length of the session that just finished (for U7 message) */
+  plannedSeconds?: number
+  /** Actual elapsed of the finished session */
+  elapsedSeconds?: number
   onStart: () => void
   onPause: () => void
   onResume: () => void
@@ -14,6 +19,8 @@ interface Props {
 export function SessionControls({
   phase,
   kind,
+  plannedSeconds = 0,
+  elapsedSeconds = 0,
   onStart,
   onPause,
   onResume,
@@ -22,7 +29,7 @@ export function SessionControls({
   onStartBreak,
 }: Props) {
   return (
-    <div className="flex flex-wrap items-center justify-center gap-3">
+    <div className="flex w-full max-w-md flex-col items-center gap-3">
       {phase === 'idle' && (
         <button
           type="button"
@@ -38,7 +45,7 @@ export function SessionControls({
       )}
 
       {phase === 'running' && (
-        <>
+        <div className="flex flex-wrap items-center justify-center gap-3">
           <button
             type="button"
             onClick={onPause}
@@ -53,11 +60,11 @@ export function SessionControls({
           >
             إنهاء
           </button>
-        </>
+        </div>
       )}
 
       {phase === 'paused' && (
-        <>
+        <div className="flex flex-wrap items-center justify-center gap-3">
           <button
             type="button"
             onClick={onResume}
@@ -76,27 +83,60 @@ export function SessionControls({
           >
             إنهاء
           </button>
-        </>
+        </div>
       )}
 
+      {/* U7: finished screen — clear primary / secondary actions */}
       {phase === 'finished' && (
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          {kind === 'focus' && onStartBreak && (
+        <div className="flex w-full flex-col items-center gap-4">
+          <p className="text-center text-sm text-slate-300">
+            {kind === 'focus' ? (
+              <>
+                أحسنت — انتهت جلسة التركيز
+                {(elapsedSeconds > 0 || plannedSeconds > 0) && (
+                  <span className="mt-0.5 block text-xs text-slate-500">
+                    {formatDurationShort(
+                      elapsedSeconds > 0 ? elapsedSeconds : plannedSeconds,
+                    )}
+                  </span>
+                )}
+              </>
+            ) : (
+              <>
+                انتهت الراحة — جاهز لجلسة جديدة
+                {(elapsedSeconds > 0 || plannedSeconds > 0) && (
+                  <span className="mt-0.5 block text-xs text-slate-500">
+                    {formatDurationShort(
+                      elapsedSeconds > 0 ? elapsedSeconds : plannedSeconds,
+                    )}
+                  </span>
+                )}
+              </>
+            )}
+          </p>
+
+          <div className="flex w-full flex-col items-stretch gap-2.5 sm:items-center">
+            {kind === 'focus' && onStartBreak && (
+              <button
+                type="button"
+                onClick={onStartBreak}
+                className="min-h-12 w-full rounded-full bg-sky-500 px-7 py-3.5 text-base font-semibold text-slate-950 shadow-lg shadow-sky-500/25 transition hover:bg-sky-400 active:scale-[0.98] sm:w-auto sm:min-w-[14rem]"
+              >
+                ابدأ راحة
+              </button>
+            )}
             <button
               type="button"
-              onClick={onStartBreak}
-              className="min-h-12 rounded-full bg-sky-500 px-7 py-3.5 text-base font-semibold text-slate-950 shadow-lg shadow-sky-500/25 transition hover:bg-sky-400 active:scale-[0.98]"
+              onClick={onReset}
+              className={
+                kind === 'focus'
+                  ? 'min-h-11 w-full rounded-full border border-emerald-600/50 bg-emerald-950/30 px-6 py-3 text-sm font-medium text-emerald-200 transition hover:border-emerald-500 hover:bg-emerald-950/50 sm:w-auto sm:min-w-[14rem]'
+                  : 'min-h-12 w-full rounded-full bg-emerald-500 px-7 py-3.5 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:bg-emerald-400 active:scale-[0.98] sm:w-auto sm:min-w-[14rem]'
+              }
             >
-              ابدأ راحة
+              جلسة تركيز جديدة
             </button>
-          )}
-          <button
-            type="button"
-            onClick={onReset}
-            className="min-h-12 rounded-full bg-emerald-500 px-7 py-3.5 text-base font-semibold text-slate-950 transition hover:bg-emerald-400 active:scale-[0.98]"
-          >
-            جلسة جديدة
-          </button>
+          </div>
         </div>
       )}
     </div>
