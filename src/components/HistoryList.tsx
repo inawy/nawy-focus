@@ -1,4 +1,8 @@
 import { formatDateTime, formatDurationShort } from '../lib/format'
+import {
+  formatHourLabel,
+  type BestHourResult,
+} from '../lib/insights'
 import type { HistoryFilter } from '../lib/prefs'
 import type { FocusSession } from '../types'
 
@@ -8,9 +12,15 @@ interface Props {
   onFilterChange: (f: HistoryFilter) => void
   todaySeconds: number
   weekSeconds: number
+  todayFocusCount: number
+  weekFocusCount: number
+  bestHour: BestHourResult | null
   loading: boolean
   onExport: () => void
+  onExportCsv: () => void
   onImportFile: (file: File) => void
+  onDelete: (id: string) => void
+  onCopySession: (session: FocusSession) => void
   backupMessage: string | null
 }
 
@@ -18,6 +28,8 @@ const FILTERS: { id: HistoryFilter; label: string }[] = [
   { id: 'all', label: 'الكل' },
   { id: 'today', label: 'اليوم' },
   { id: 'week', label: 'الأسبوع' },
+  { id: 'focus', label: 'تركيز' },
+  { id: 'break', label: 'راحة' },
 ]
 
 export function HistoryList({
@@ -26,9 +38,15 @@ export function HistoryList({
   onFilterChange,
   todaySeconds,
   weekSeconds,
+  todayFocusCount,
+  weekFocusCount,
+  bestHour,
   loading,
   onExport,
+  onExportCsv,
   onImportFile,
+  onDelete,
+  onCopySession,
   backupMessage,
 }: Props) {
   return (
@@ -40,16 +58,31 @@ export function HistoryList({
         <div className="text-end text-xs text-slate-500">
           <p>اليوم: {formatDurationShort(todaySeconds)}</p>
           <p>هذا الأسبوع: {formatDurationShort(weekSeconds)}</p>
+          {todayFocusCount > 0 && (
+            <p className="text-emerald-500/80">
+              {todayFocusCount} جلسة تركيز اليوم
+            </p>
+          )}
+          {weekFocusCount > 0 && (
+            <p className="text-slate-500">
+              {weekFocusCount} جلسة هذا الأسبوع
+            </p>
+          )}
+          {bestHour && (
+            <p className="text-sky-400/90">
+              أفضل ساعة تركيز: {formatHourLabel(bestHour.hour)}
+            </p>
+          )}
         </div>
       </div>
 
-      <div className="mb-3 flex gap-1 rounded-xl bg-slate-900/60 p-1">
+      <div className="mb-3 flex flex-wrap gap-1 rounded-xl bg-slate-900/60 p-1">
         {FILTERS.map((f) => (
           <button
             key={f.id}
             type="button"
             onClick={() => onFilterChange(f.id)}
-            className={`flex-1 rounded-lg py-1.5 text-xs font-medium transition ${
+            className={`min-h-11 flex-1 rounded-lg px-1 py-1.5 text-xs font-medium transition ${
               filter === f.id
                 ? 'bg-slate-100 text-slate-900'
                 : 'text-slate-400 hover:text-slate-200'
@@ -64,11 +97,18 @@ export function HistoryList({
         <button
           type="button"
           onClick={onExport}
-          className="rounded-lg border border-slate-700 px-3 py-1.5 text-xs text-slate-300 transition hover:border-slate-500 hover:text-slate-100"
+          className="min-h-11 rounded-lg border border-slate-700 px-3 py-1.5 text-xs text-slate-300 transition hover:border-slate-500 hover:text-slate-100"
         >
           تصدير JSON
         </button>
-        <label className="cursor-pointer rounded-lg border border-slate-700 px-3 py-1.5 text-xs text-slate-300 transition hover:border-slate-500 hover:text-slate-100">
+        <button
+          type="button"
+          onClick={onExportCsv}
+          className="min-h-11 rounded-lg border border-slate-700 px-3 py-1.5 text-xs text-slate-300 transition hover:border-slate-500 hover:text-slate-100"
+        >
+          تصدير CSV
+        </button>
+        <label className="flex min-h-11 cursor-pointer items-center rounded-lg border border-slate-700 px-3 py-1.5 text-xs text-slate-300 transition hover:border-slate-500 hover:text-slate-100">
           استيراد
           <input
             type="file"
@@ -110,19 +150,43 @@ export function HistoryList({
                 </p>
                 <p className="mt-0.5 text-xs text-slate-500">
                   {formatDateTime(s.startedAt)}
+                  <span className="mx-1 text-slate-600">·</span>
+                  {s.kind === 'focus' ? 'تركيز' : 'راحة'}
                 </p>
               </div>
-              <div className="shrink-0 text-end">
-                <p className="text-sm font-medium tabular-nums text-slate-200">
-                  {formatDurationShort(s.actualSeconds)}
-                </p>
-                <p className="text-[11px] text-slate-500">
-                  {s.status === 'completed'
-                    ? 'مكتملة'
-                    : s.status === 'stopped'
-                      ? 'مُنهَاة'
-                      : 'متروكة'}
-                </p>
+              <div className="flex shrink-0 items-start gap-1">
+                <div className="text-end">
+                  <p className="text-sm font-medium tabular-nums text-slate-200">
+                    {formatDurationShort(s.actualSeconds)}
+                  </p>
+                  <p className="text-[11px] text-slate-500">
+                    {s.status === 'completed'
+                      ? 'مكتملة'
+                      : s.status === 'stopped'
+                        ? 'مُنهَاة'
+                        : 'متروكة'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onCopySession(s)}
+                  className="min-h-11 min-w-11 rounded-lg px-1.5 text-xs text-slate-500 transition hover:bg-slate-800 hover:text-slate-200"
+                  title="نسخ ملخص الجلسة"
+                  aria-label="نسخ ملخص الجلسة"
+                >
+                  نسخ
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (window.confirm('حذف هذه الجلسة؟')) onDelete(s.id)
+                  }}
+                  className="min-h-11 min-w-11 rounded-lg px-2 text-slate-500 transition hover:bg-slate-800 hover:text-rose-400"
+                  title="حذف"
+                  aria-label="حذف الجلسة"
+                >
+                  ×
+                </button>
               </div>
             </div>
           </li>
