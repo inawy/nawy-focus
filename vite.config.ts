@@ -9,8 +9,27 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
+      // Automatically activate new SW and reload clients — no stale UI after deploy
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'icons.svg'],
+      includeAssets: [
+        'favicon.svg',
+        'apple-touch-icon.png',
+        'icons.svg',
+        'icons/icon.svg',
+        'icons/icon-square.svg',
+        'icons/icon-mono.svg',
+        'icons/icon-48.png',
+        'icons/icon-96.png',
+        'icons/icon-180.png',
+        'icons/icon-192.png',
+        'icons/icon-512.png',
+        'icons/icon-1024.png',
+        'icons/icon-maskable-192.png',
+        'icons/icon-maskable-512.png',
+        'icons/icon-maskable-1024.png',
+        'icons/icon-mono-192.png',
+        'icons/icon-mono-512.png',
+      ],
       manifest: {
         name: 'ناوي فوكاس',
         short_name: 'فوكاس',
@@ -25,10 +44,58 @@ export default defineConfig({
         start_url: './',
         icons: [
           {
-            src: 'favicon.svg',
+            src: 'icons/icon-48.png',
+            sizes: '48x48',
+            type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: 'icons/icon-96.png',
+            sizes: '96x96',
+            type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: 'icons/icon-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: 'icons/icon-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: 'icons/icon-1024.png',
+            sizes: '1024x1024',
+            type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: 'icons/icon-maskable-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+          {
+            src: 'icons/icon-maskable-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+          {
+            src: 'icons/icon-maskable-1024.png',
+            sizes: '1024x1024',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+          {
+            src: 'icons/icon.svg',
             sizes: 'any',
             type: 'image/svg+xml',
-            purpose: 'any maskable',
+            purpose: 'any',
           },
         ],
       },
@@ -37,6 +104,7 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
+        // Prefer network for the shell so deploys show up quickly
         runtimeCaching: [
           {
             urlPattern: ({ request }) => request.mode === 'navigate',
