@@ -287,18 +287,22 @@ export default function App() {
     (notifyOn ? 1 : 0)
 
   return (
-    <div className="min-h-dvh bg-slate-950 text-slate-100">
+    <div className="min-h-dvh text-slate-100">
       <header
-        className={`border-b border-slate-800/80 px-4 transition-all duration-300 ${
-          sessionFocus ? 'py-2.5' : 'py-4'
+        className={`sticky top-0 z-20 border-b border-white/[0.06] bg-[#0e0e10]/70 px-4 backdrop-blur-xl transition-all duration-300 ${
+          sessionFocus ? 'py-2.5' : 'py-3.5'
         }`}
       >
-        <div className="mx-auto flex max-w-lg items-center justify-between gap-2">
+        <div className="mx-auto flex max-w-md items-center justify-between gap-2">
           <h1
-            className={`font-semibold tracking-tight text-slate-50 transition-all duration-300 ${
-              sessionFocus ? 'text-base opacity-70' : 'text-lg'
+            className={`flex items-center gap-2 font-semibold tracking-tight text-slate-50 transition-all duration-300 ${
+              sessionFocus ? 'text-[15px] opacity-60' : 'text-base'
             }`}
           >
+            <span
+              className="inline-block h-2 w-2 rounded-full bg-brand-500 shadow-[0_0_12px_rgba(61,123,255,0.8)]"
+              aria-hidden
+            />
             ناوي فوكاس
           </h1>
 
@@ -306,7 +310,7 @@ export default function App() {
             <button
               type="button"
               onClick={() => void toggleFs()}
-              className="min-h-11 rounded-lg border border-slate-700 px-2.5 text-xs text-slate-300 transition hover:border-slate-500 hover:text-slate-100"
+              className="btn-chrome"
               title="ملء الشاشة (F)"
               aria-label={fullscreen ? 'خروج من ملء الشاشة' : 'ملء الشاشة'}
             >
@@ -317,10 +321,8 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setSettingsOpen((v) => !v)}
-                className={`relative min-h-11 min-w-11 rounded-lg border px-2 text-base transition ${
-                  settingsOpen
-                    ? 'border-slate-500 bg-slate-800 text-slate-100'
-                    : 'border-slate-700 text-slate-300 hover:border-slate-500 hover:text-slate-100'
+                className={`btn-chrome relative min-w-11 px-2 text-base ${
+                  settingsOpen ? 'border-white/25 bg-white/10 text-slate-50' : ''
                 }`}
                 title="الإعدادات"
                 aria-label="الإعدادات"
@@ -338,14 +340,14 @@ export default function App() {
 
               {settingsOpen && (
                 <div
-                  className="absolute end-0 top-full z-30 mt-2 w-56 rounded-xl border border-slate-700 bg-slate-900 p-2 shadow-xl shadow-black/40"
+                  className="absolute end-0 top-full z-30 mt-2 w-56 rounded-2xl border border-white/10 bg-[#1c1c1e]/95 p-1.5 shadow-2xl shadow-black/50 backdrop-blur-xl"
                   role="menu"
                 >
                   <button
                     type="button"
                     role="menuitem"
                     onClick={toggleSound}
-                    className="flex min-h-11 w-full items-center justify-between gap-2 rounded-lg px-3 text-sm text-slate-200 transition hover:bg-slate-800"
+                    className="flex min-h-11 w-full items-center justify-between gap-2 rounded-xl px-3 text-sm text-slate-200 transition hover:bg-white/[0.06]"
                     aria-pressed={soundOn}
                   >
                     <span>الصوت</span>
@@ -357,7 +359,7 @@ export default function App() {
                     type="button"
                     role="menuitem"
                     onClick={toggleVibrate}
-                    className="flex min-h-11 w-full items-center justify-between gap-2 rounded-lg px-3 text-sm text-slate-200 transition hover:bg-slate-800"
+                    className="flex min-h-11 w-full items-center justify-between gap-2 rounded-xl px-3 text-sm text-slate-200 transition hover:bg-white/[0.06]"
                     aria-pressed={vibrateOn}
                   >
                     <span>الاهتزاز</span>
@@ -369,7 +371,7 @@ export default function App() {
                     type="button"
                     role="menuitem"
                     onClick={toggleAutoBreak}
-                    className={`flex min-h-11 w-full items-center justify-between gap-2 rounded-lg px-3 text-sm transition hover:bg-slate-800 ${
+                    className={`flex min-h-11 w-full items-center justify-between gap-2 rounded-xl px-3 text-sm transition hover:bg-white/[0.06] ${
                       autoBreak === 'auto' ? 'text-brand-300' : 'text-slate-200'
                     }`}
                     aria-pressed={autoBreak === 'auto'}
@@ -383,7 +385,7 @@ export default function App() {
                     type="button"
                     role="menuitem"
                     onClick={() => void toggleNotifications()}
-                    className={`flex min-h-11 w-full items-center justify-between gap-2 rounded-lg px-3 text-sm transition hover:bg-slate-800 ${
+                    className={`flex min-h-11 w-full items-center justify-between gap-2 rounded-xl px-3 text-sm transition hover:bg-white/[0.06] ${
                       notifyOn ? 'text-amber-300' : 'text-slate-200'
                     }`}
                     aria-pressed={notifyOn}
@@ -401,13 +403,13 @@ export default function App() {
       </header>
 
       <main
-        className={`mx-auto flex max-w-lg flex-col items-center px-4 py-8 transition-all duration-300 ${
+        className={`mx-auto flex max-w-md flex-col items-center px-5 py-8 transition-all duration-300 ${
           sessionFocus ? 'gap-4' : 'gap-8'
         }`}
       >
         {finishedWhileHidden && state.phase === 'finished' && (
           <div
-            className="w-full max-w-md rounded-xl border border-amber-500/40 bg-amber-950/40 px-4 py-3 text-center text-sm text-amber-100"
+            className="w-full max-w-sm rounded-2xl border border-amber-500/30 bg-amber-950/30 px-4 py-3 text-center text-sm text-amber-100"
             role="status"
           >
             انتهت الجلسة أثناء غيابك عن التبويب.
@@ -423,7 +425,7 @@ export default function App() {
 
         {autoBreakCountdown !== null && (
           <div
-            className="w-full max-w-md rounded-2xl border border-brand-500/35 bg-brand-950/50 px-5 py-4"
+            className="w-full max-w-sm rounded-2xl border border-brand-500/25 bg-brand-950/40 px-5 py-4 shadow-[0_0_40px_-16px_rgba(61,123,255,0.35)]"
             role="status"
             aria-live="polite"
           >
@@ -439,7 +441,7 @@ export default function App() {
               </span>
             </div>
             <div
-              className="mt-3 h-2 overflow-hidden rounded-full bg-brand-950"
+              className="mt-3 h-1.5 overflow-hidden rounded-full bg-black/40"
               aria-hidden
             >
               <div
@@ -460,7 +462,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={clearAutoBreakTimer}
-                className="min-h-10 rounded-lg border border-brand-500/40 px-4 text-sm text-brand-200 transition hover:border-brand-400 hover:bg-brand-950/60 hover:text-brand-50"
+                className="btn-chrome border-brand-500/30 text-brand-200"
               >
                 إلغاء
               </button>
@@ -477,12 +479,12 @@ export default function App() {
 
         {sessionFocus ? (
           state.intention ? (
-            <p className="max-w-md text-center text-xs text-slate-500">
+            <p className="max-w-sm text-center text-xs text-slate-500">
               {state.intention}
             </p>
           ) : null
         ) : state.phase === 'finished' ? null : locked && state.intention ? (
-          <p className="max-w-md text-center text-sm text-slate-400">
+          <p className="max-w-sm text-center text-sm text-slate-400">
             <span className="text-slate-500">النية: </span>
             {state.intention}
           </p>
@@ -519,13 +521,13 @@ export default function App() {
         />
 
         {!sessionFocus && (
-          <p className="text-center text-[11px] text-slate-600">
-            مسافة: ابدأ / إيقاف · F: ملء الشاشة · Esc: إنهاء
+          <p className="text-center text-[11px] tracking-wide text-slate-600">
+            مسافة · F · Esc
           </p>
         )}
 
         {!sessionFocus && (
-          <div className="w-full border-t border-slate-800/80 pt-6">
+          <div className="w-full border-t border-white/[0.05] pt-6">
             <HistoryList
               sessions={sessions}
               filter={filter}
@@ -547,7 +549,7 @@ export default function App() {
         )}
 
         {!sessionFocus && (
-          <footer className="w-full max-w-md border-t border-slate-800/80 pt-4 pb-2 text-center text-[11px] text-slate-600">
+          <footer className="w-full max-w-sm border-t border-white/[0.05] pt-4 pb-2 text-center text-[11px] text-slate-600">
             <p className="mb-1">جزء من منظومة ناوي للإنتاجية</p>
             <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
               <a
