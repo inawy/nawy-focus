@@ -51,7 +51,7 @@ export function HistoryList({
 }: Props) {
   return (
     <section className="w-full max-w-md" aria-labelledby="history-heading">
-      <details className="group rounded-2xl border border-slate-800 bg-slate-900/40 open:bg-slate-900/60" open>
+      <details className="group surface-panel open:border-white/10" open>
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-3 [&::-webkit-details-marker]:hidden">
           <div className="flex items-center gap-2">
             <h2 id="history-heading" className="text-sm font-medium text-slate-200">
@@ -75,7 +75,7 @@ export function HistoryList({
         </summary>
         <div className="border-t border-slate-800/80 px-3.5 pb-3.5 pt-3">
 
-      <div className="mb-3 flex flex-wrap gap-1 rounded-xl bg-slate-900/60 p-1">
+      <div className="mb-3 flex flex-wrap gap-1 rounded-xl border border-white/[0.05] bg-black/25 p-1">
         {FILTERS.map((f) => (
           <button
             key={f.id}
@@ -83,7 +83,7 @@ export function HistoryList({
             onClick={() => onFilterChange(f.id)}
             className={`min-h-11 flex-1 rounded-lg px-1 py-1.5 text-xs font-medium transition ${
               filter === f.id
-                ? 'bg-slate-100 text-slate-900'
+                ? 'bg-white text-slate-950 shadow-sm'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -93,21 +93,13 @@ export function HistoryList({
       </div>
 
       <div className="mb-3 flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={onExport}
-          className="min-h-11 rounded-lg border border-slate-700 px-3 py-1.5 text-xs text-slate-300 transition hover:border-slate-500 hover:text-slate-100"
-        >
+        <button type="button" onClick={onExport} className="btn-chrome">
           تصدير JSON
         </button>
-        <button
-          type="button"
-          onClick={onExportCsv}
-          className="min-h-11 rounded-lg border border-slate-700 px-3 py-1.5 text-xs text-slate-300 transition hover:border-slate-500 hover:text-slate-100"
-        >
+        <button type="button" onClick={onExportCsv} className="btn-chrome">
           تصدير CSV
         </button>
-        <label className="flex min-h-11 cursor-pointer items-center rounded-lg border border-slate-700 px-3 py-1.5 text-xs text-slate-300 transition hover:border-slate-500 hover:text-slate-100">
+        <label className="btn-chrome flex cursor-pointer items-center">
           استيراد
           <input
             type="file"
@@ -140,7 +132,7 @@ export function HistoryList({
         {sessions.map((s) => (
           <li
             key={s.id}
-            className="rounded-xl border border-slate-800 bg-slate-900/50 px-3.5 py-2.5"
+            className="rounded-xl border border-white/[0.05] bg-black/20 px-3.5 py-2.5 transition hover:border-white/10"
           >
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0 flex-1">
