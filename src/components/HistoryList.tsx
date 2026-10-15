@@ -120,12 +120,22 @@ export function HistoryList({
         </p>
       )}
 
-      {loading && <p className="text-sm text-slate-500">جاري التحميل…</p>}
+      {loading && (
+        <div className="flex flex-col items-center gap-2 py-8 text-center">
+          <div className="h-1 w-16 overflow-hidden rounded-full bg-white/10">
+            <div className="h-full w-1/2 animate-pulse rounded-full bg-brand-500/60" />
+          </div>
+          <p className="text-sm text-slate-500">جاري التحميل…</p>
+        </div>
+      )}
 
       {!loading && sessions.length === 0 && (
-        <p className="rounded-xl border border-dashed border-slate-700 px-4 py-6 text-center text-sm text-slate-500">
-          لا توجد جلسات في هذا النطاق.
-        </p>
+        <div className="rounded-xl border border-dashed border-white/10 bg-black/15 px-4 py-8 text-center">
+          <p className="text-sm text-slate-400">لا جلسات بعد في هذا النطاق</p>
+          <p className="mt-1 text-[11px] text-slate-600">
+            ابدأ جلسة تركيز لتظهر هنا
+          </p>
+        </div>
       )}
 
       <ul className="flex flex-col gap-2">
