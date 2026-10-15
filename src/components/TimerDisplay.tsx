@@ -8,6 +8,40 @@ interface Props {
   kind: SessionKind
 }
 
+function phaseTheme(phase: TimerPhase, kind: SessionKind) {
+  if (phase === 'paused') {
+    return {
+      stroke: 'stroke-amber-400/80',
+      label: 'text-amber-300/90',
+      glow: 'shadow-[0_0_24px_-8px_rgba(251,191,36,0.25)]',
+    }
+  }
+  if (phase === 'running' || phase === 'finished') {
+    const focus = kind === 'focus'
+    return {
+      stroke: focus
+        ? phase === 'running'
+          ? 'stroke-emerald-400 transition-[stroke-dashoffset] duration-1000 linear'
+          : 'stroke-emerald-300'
+        : phase === 'running'
+          ? 'stroke-sky-400 transition-[stroke-dashoffset] duration-1000 linear'
+          : 'stroke-sky-300',
+      label: focus ? 'text-emerald-300/90' : 'text-sky-300/90',
+      glow:
+        phase === 'running'
+          ? focus
+            ? 'shadow-[0_0_40px_-8px_rgba(52,211,153,0.35)]'
+            : 'shadow-[0_0_40px_-8px_rgba(56,189,248,0.35)]'
+          : '',
+    }
+  }
+  return {
+    stroke: 'stroke-slate-500',
+    label: 'text-slate-400',
+    glow: '',
+  }
+}
+
 export function TimerDisplay({
   remainingSeconds,
   plannedSeconds,
@@ -22,18 +56,8 @@ export function TimerDisplay({
   const offset = circumference * (1 - progress)
 
   const isBreak = kind === 'break'
-  const activeStroke =
-    phase === 'running'
-      ? isBreak
-        ? 'stroke-sky-400 transition-[stroke-dashoffset] duration-1000 linear'
-        : 'stroke-emerald-400 transition-[stroke-dashoffset] duration-1000 linear'
-      : phase === 'paused'
-        ? 'stroke-amber-400/80'
-        : phase === 'finished'
-          ? isBreak
-            ? 'stroke-sky-300'
-            : 'stroke-emerald-300'
-          : 'stroke-slate-500'
+  const sessionFocus = phase === 'running' || phase === 'paused'
+  const theme = phaseTheme(phase, kind)
 
   const phaseLabel =
     phase === 'running'
@@ -46,18 +70,11 @@ export function TimerDisplay({
           ? 'انتهت الجلسة'
           : 'جاهز'
 
-  const ringGlow =
-    phase === 'running'
-      ? isBreak
-        ? 'shadow-[0_0_40px_-8px_rgba(56,189,248,0.35)]'
-        : 'shadow-[0_0_40px_-8px_rgba(52,211,153,0.35)]'
-      : phase === 'paused'
-        ? 'shadow-[0_0_24px_-8px_rgba(251,191,36,0.25)]'
-        : ''
-
   return (
     <div
-      className={`relative mx-auto flex h-64 w-64 items-center justify-center rounded-full sm:h-72 sm:w-72 ${ringGlow}`}
+      className={`relative mx-auto flex items-center justify-center rounded-full transition-all duration-300 ${
+        sessionFocus ? 'h-72 w-72 sm:h-80 sm:w-80' : 'h-64 w-64 sm:h-72 sm:w-72'
+      } ${theme.glow}`}
     >
       <svg
         className="-rotate-90"
@@ -79,7 +96,7 @@ export function TimerDisplay({
           cy="120"
           r={radius}
           fill="none"
-          className={activeStroke}
+          className={theme.stroke}
           strokeWidth="8"
           strokeLinecap="round"
           strokeDasharray={circumference}
@@ -88,24 +105,14 @@ export function TimerDisplay({
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span
-          className="font-mono text-5xl font-semibold tracking-tight text-slate-50 tabular-nums sm:text-6xl"
+          className={`font-mono font-semibold tracking-tight text-slate-50 tabular-nums transition-all duration-300 ${
+            sessionFocus ? 'text-6xl sm:text-7xl' : 'text-5xl sm:text-6xl'
+          }`}
           aria-live="polite"
         >
           {formatTime(remainingSeconds)}
         </span>
-        <span
-          className={`mt-1 text-sm ${
-            phase === 'running'
-              ? isBreak
-                ? 'text-sky-300/90'
-                : 'text-emerald-300/90'
-              : phase === 'paused'
-                ? 'text-amber-300/90'
-                : 'text-slate-400'
-          }`}
-        >
-          {phaseLabel}
-        </span>
+        <span className={`mt-1 text-sm ${theme.label}`}>{phaseLabel}</span>
         {phase === 'idle' && (
           <span className="mt-0.5 text-[11px] text-slate-600">
             {isBreak ? 'راحة' : 'تركيز'} · {Math.round(plannedSeconds / 60)}د
