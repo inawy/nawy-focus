@@ -50,7 +50,7 @@ export function notifySessionFinished(kind: 'focus' | 'break'): void {
         : 'جاهز لجلسة تركيز جديدة'
     const n = new Notification(title, {
       body,
-      icon: './icons/icon-192.png',
+      icon: './favicon.svg',
       tag: 'nawy-focus-session-end',
       silent: false,
     })
