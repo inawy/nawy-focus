@@ -98,7 +98,6 @@ export default function App() {
     }
   }, [state.phase, exitFs])
 
-  // B2: auto-start break countdown after focus finishes
   useEffect(() => {
     clearAutoBreakTimer()
     if (
@@ -128,7 +127,6 @@ export default function App() {
     return clearAutoBreakTimer
   }, [state.phase, state.kind, autoBreak, clearAutoBreakTimer, startBreak, enterFs])
 
-  // Dismiss hidden-finish banner when user interacts
   useEffect(() => {
     if (state.phase !== 'finished' && state.phase !== 'idle') {
       dismissFinishedBanner()
@@ -145,7 +143,6 @@ export default function App() {
     return () => window.removeEventListener('beforeunload', onBeforeUnload)
   }, [state.phase])
 
-  // Close settings panel on outside click / Escape
   useEffect(() => {
     if (!settingsOpen) return
     const onPointer = (e: MouseEvent) => {
@@ -167,7 +164,6 @@ export default function App() {
     }
   }, [settingsOpen])
 
-  // Collapse settings while a session is active (quieter chrome)
   useEffect(() => {
     if (isActive(state.phase)) setSettingsOpen(false)
   }, [state.phase])
@@ -334,7 +330,7 @@ export default function App() {
                 ⋯
                 {settingsActiveCount > 0 && !settingsOpen && (
                   <span
-                    className="absolute -top-0.5 -start-0.5 h-2 w-2 rounded-full bg-sky-400"
+                    className="absolute -top-0.5 -start-0.5 h-2 w-2 rounded-full bg-brand-500"
                     aria-hidden
                   />
                 )}
@@ -374,7 +370,7 @@ export default function App() {
                     role="menuitem"
                     onClick={toggleAutoBreak}
                     className={`flex min-h-11 w-full items-center justify-between gap-2 rounded-lg px-3 text-sm transition hover:bg-slate-800 ${
-                      autoBreak === 'auto' ? 'text-sky-300' : 'text-slate-200'
+                      autoBreak === 'auto' ? 'text-brand-300' : 'text-slate-200'
                     }`}
                     aria-pressed={autoBreak === 'auto'}
                   >
@@ -427,27 +423,27 @@ export default function App() {
 
         {autoBreakCountdown !== null && (
           <div
-            className="w-full max-w-md rounded-2xl border border-sky-500/40 bg-sky-950/50 px-5 py-4"
+            className="w-full max-w-md rounded-2xl border border-brand-500/35 bg-brand-950/50 px-5 py-4"
             role="status"
             aria-live="polite"
           >
             <div className="flex items-center justify-between gap-3">
-              <p className="text-sm font-medium text-sky-100">
+              <p className="text-sm font-medium text-brand-100">
                 ستبدأ الراحة خلال
               </p>
-              <span className="font-mono text-2xl font-semibold tabular-nums text-sky-200">
+              <span className="font-mono text-2xl font-semibold tabular-nums text-brand-200">
                 {autoBreakCountdown}
-                <span className="ms-0.5 text-sm font-normal text-sky-400/80">
+                <span className="ms-0.5 text-sm font-normal text-brand-400/80">
                   ث
                 </span>
               </span>
             </div>
             <div
-              className="mt-3 h-2 overflow-hidden rounded-full bg-sky-950"
+              className="mt-3 h-2 overflow-hidden rounded-full bg-brand-950"
               aria-hidden
             >
               <div
-                className="h-full rounded-full bg-sky-400 transition-[width] duration-1000 linear"
+                className="h-full rounded-full bg-brand-500 transition-[width] duration-1000 linear"
                 style={{
                   width: `${Math.max(
                     0,
@@ -464,7 +460,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={clearAutoBreakTimer}
-                className="min-h-10 rounded-lg border border-sky-600/40 px-4 text-sm text-sky-200 transition hover:border-sky-400 hover:bg-sky-900/40 hover:text-sky-50"
+                className="min-h-10 rounded-lg border border-brand-500/40 px-4 text-sm text-brand-200 transition hover:border-brand-400 hover:bg-brand-950/60 hover:text-brand-50"
               >
                 إلغاء
               </button>
@@ -528,30 +524,27 @@ export default function App() {
           </p>
         )}
 
-        <div
-          className={`w-full border-t border-slate-800 pt-6 transition-opacity duration-300 ${
-            sessionFocus ? 'pointer-events-none opacity-20' : ''
-          }`}
-          aria-hidden={sessionFocus}
-        >
-          <HistoryList
-            sessions={sessions}
-            filter={filter}
-            onFilterChange={setFilter}
-            todaySeconds={todaySeconds}
-            weekSeconds={weekSeconds}
-            todayFocusCount={todayFocusCount}
-            weekFocusCount={weekFocusCount}
-            bestHour={bestHour}
-            loading={loading}
-            onExport={() => void downloadBackup()}
-            onExportCsv={() => void downloadCsv()}
-            onImportFile={(f) => void uploadBackup(f)}
-            onDelete={(id) => void removeSession(id)}
-            onCopySession={(s) => void copySessionText(s)}
-            backupMessage={backupMessage}
-          />
-        </div>
+        {!sessionFocus && (
+          <div className="w-full border-t border-slate-800/80 pt-6">
+            <HistoryList
+              sessions={sessions}
+              filter={filter}
+              onFilterChange={setFilter}
+              todaySeconds={todaySeconds}
+              weekSeconds={weekSeconds}
+              todayFocusCount={todayFocusCount}
+              weekFocusCount={weekFocusCount}
+              bestHour={bestHour}
+              loading={loading}
+              onExport={() => void downloadBackup()}
+              onExportCsv={() => void downloadCsv()}
+              onImportFile={(f) => void uploadBackup(f)}
+              onDelete={(id) => void removeSession(id)}
+              onCopySession={(s) => void copySessionText(s)}
+              backupMessage={backupMessage}
+            />
+          </div>
+        )}
 
         {!sessionFocus && (
           <footer className="w-full max-w-md border-t border-slate-800/80 pt-4 pb-2 text-center text-[11px] text-slate-600">
