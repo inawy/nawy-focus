@@ -4,9 +4,7 @@ import type { SessionKind, TimerPhase } from '../types'
 interface Props {
   phase: TimerPhase
   kind: SessionKind
-  /** Planned length of the session that just finished (for U7 message) */
   plannedSeconds?: number
-  /** Actual elapsed of the finished session */
   elapsedSeconds?: number
   onStart: () => void
   onPause: () => void
@@ -28,16 +26,21 @@ export function SessionControls({
   onReset,
   onStartBreak,
 }: Props) {
+  const primaryFocus =
+    'bg-brand-500 text-white shadow-lg shadow-brand-500/25 hover:bg-brand-600'
+  const primaryBreak =
+    'bg-slate-200 text-slate-900 shadow-lg shadow-black/20 hover:bg-white'
+  const secondary =
+    'border border-slate-600 text-slate-300 hover:border-slate-400 hover:text-slate-100'
+
   return (
     <div className="flex w-full max-w-md flex-col items-center gap-3">
       {phase === 'idle' && (
         <button
           type="button"
           onClick={onStart}
-          className={`min-h-12 rounded-full px-8 py-3.5 text-base font-semibold shadow-lg transition active:scale-[0.98] ${
-            kind === 'break'
-              ? 'bg-sky-500 text-slate-950 shadow-sky-500/25 hover:bg-sky-400'
-              : 'bg-emerald-500 text-slate-950 shadow-emerald-500/25 hover:bg-emerald-400'
+          className={`min-h-12 rounded-full px-10 py-3.5 text-base font-semibold transition active:scale-[0.98] ${
+            kind === 'break' ? primaryBreak : primaryFocus
           }`}
         >
           {kind === 'break' ? 'ابدأ الراحة' : 'ابدأ التركيز'}
@@ -56,7 +59,7 @@ export function SessionControls({
           <button
             type="button"
             onClick={onStop}
-            className="min-h-11 rounded-full border border-slate-600 px-5 py-3 text-sm text-slate-300 transition hover:border-slate-400 hover:text-slate-100"
+            className={`min-h-11 rounded-full px-5 py-3 text-sm transition ${secondary}`}
           >
             إنهاء
           </button>
@@ -69,9 +72,7 @@ export function SessionControls({
             type="button"
             onClick={onResume}
             className={`min-h-12 rounded-full px-7 py-3.5 text-base font-semibold transition active:scale-[0.98] ${
-              kind === 'break'
-                ? 'bg-sky-500 text-slate-950 hover:bg-sky-400'
-                : 'bg-emerald-500 text-slate-950 hover:bg-emerald-400'
+              kind === 'break' ? primaryBreak : primaryFocus
             }`}
           >
             متابعة
@@ -79,14 +80,13 @@ export function SessionControls({
           <button
             type="button"
             onClick={onStop}
-            className="min-h-11 rounded-full border border-slate-600 px-5 py-3 text-sm text-slate-300 transition hover:border-slate-400 hover:text-slate-100"
+            className={`min-h-11 rounded-full px-5 py-3 text-sm transition ${secondary}`}
           >
             إنهاء
           </button>
         </div>
       )}
 
-      {/* U7: finished screen — clear primary / secondary actions */}
       {phase === 'finished' && (
         <div className="flex w-full flex-col items-center gap-4">
           <p className="text-center text-sm text-slate-300">
@@ -120,7 +120,7 @@ export function SessionControls({
               <button
                 type="button"
                 onClick={onStartBreak}
-                className="min-h-12 w-full rounded-full bg-sky-500 px-7 py-3.5 text-base font-semibold text-slate-950 shadow-lg shadow-sky-500/25 transition hover:bg-sky-400 active:scale-[0.98] sm:w-auto sm:min-w-[14rem]"
+                className={`min-h-12 w-full rounded-full px-7 py-3.5 text-base font-semibold transition active:scale-[0.98] sm:w-auto sm:min-w-[14rem] ${primaryBreak}`}
               >
                 ابدأ راحة
               </button>
@@ -130,8 +130,8 @@ export function SessionControls({
               onClick={onReset}
               className={
                 kind === 'focus'
-                  ? 'min-h-11 w-full rounded-full border border-emerald-600/50 bg-emerald-950/30 px-6 py-3 text-sm font-medium text-emerald-200 transition hover:border-emerald-500 hover:bg-emerald-950/50 sm:w-auto sm:min-w-[14rem]'
-                  : 'min-h-12 w-full rounded-full bg-emerald-500 px-7 py-3.5 text-base font-semibold text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:bg-emerald-400 active:scale-[0.98] sm:w-auto sm:min-w-[14rem]'
+                  ? 'min-h-11 w-full rounded-full border border-brand-500/40 bg-brand-950/40 px-6 py-3 text-sm font-medium text-brand-300 transition hover:border-brand-400 hover:bg-brand-950/60 sm:w-auto sm:min-w-[14rem]'
+                  : `min-h-12 w-full rounded-full px-7 py-3.5 text-base font-semibold transition active:scale-[0.98] sm:w-auto sm:min-w-[14rem] ${primaryFocus}`
               }
             >
               جلسة تركيز جديدة
