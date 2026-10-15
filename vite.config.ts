@@ -9,7 +9,6 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
-      // Automatically activate new SW and reload clients — no stale UI after deploy
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icons.svg'],
       manifest: {
@@ -17,8 +16,8 @@ export default defineConfig({
         short_name: 'فوكاس',
         description:
           'مؤقت تركيز بسيط ومحلي أولاً ضمن منظومة ناوي للإنتاجية.',
-        theme_color: '#0f172a',
-        background_color: '#0f172a',
+        theme_color: '#121212',
+        background_color: '#121212',
         display: 'standalone',
         orientation: 'portrait',
         lang: 'ar',
@@ -38,7 +37,6 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
-        // Prefer network for the shell so deploys show up quickly
         runtimeCaching: [
           {
             urlPattern: ({ request }) => request.mode === 'navigate',

@@ -62,7 +62,7 @@ export function DurationPicker({
             }}
             className={`min-h-11 flex-1 rounded-lg py-2 text-sm font-medium transition ${
               kind === value
-                ? 'bg-emerald-600 text-white shadow'
+                ? 'bg-brand-500 text-white shadow-brand-500/20 shadow'
                 : 'text-slate-400 hover:text-slate-200'
             } disabled:opacity-50`}
           >
@@ -116,7 +116,7 @@ export function DurationPicker({
               inputMode="numeric"
               value={customText || (isCustom ? String(currentMinutes) : '')}
               onChange={(e) => applyCustom(e.target.value)}
-              className="w-20 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-center text-slate-100 outline-none focus:border-emerald-500/60"
+              className="w-20 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-center text-slate-100 outline-none focus:border-brand-500/60"
               aria-label="مدة مخصصة بالدقائق"
             />
           </label>
