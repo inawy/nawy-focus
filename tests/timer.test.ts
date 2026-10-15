@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  catchUp,
   createIdleState,
   pauseTimer,
   resumeTimer,
@@ -46,5 +47,15 @@ describe('timer state machine', () => {
     let s = startTimer(createIdleState('focus', 1500))
     s = setPlannedSeconds(s, 600)
     expect(s.plannedSeconds).toBe(1500)
+  })
+
+  it('catchUp advances by wall-clock seconds', () => {
+    let s = startTimer(createIdleState('focus', 30))
+    s = catchUp(s, 10)
+    expect(s.remainingSeconds).toBe(20)
+    expect(s.elapsedSeconds).toBe(10)
+    s = catchUp(s, 25)
+    expect(s.phase).toBe('finished')
+    expect(s.remainingSeconds).toBe(0)
   })
 })

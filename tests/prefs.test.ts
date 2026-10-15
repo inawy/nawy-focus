@@ -1,9 +1,17 @@
 import { describe, expect, it, beforeEach } from 'vitest'
 import {
+  loadAutoBreakMode,
   loadDefaultFocusSeconds,
   loadHistoryFilter,
+  loadNotificationsEnabled,
+  loadSoundEnabled,
+  loadVibrateEnabled,
+  saveAutoBreakMode,
   saveDefaultFocusSeconds,
   saveHistoryFilter,
+  saveNotificationsEnabled,
+  saveSoundEnabled,
+  saveVibrateEnabled,
 } from '../src/lib/prefs'
 
 function mockLocalStorage() {
@@ -48,5 +56,38 @@ describe('prefs', () => {
     expect(loadHistoryFilter()).toBe('all')
     saveHistoryFilter('week')
     expect(loadHistoryFilter()).toBe('week')
+  })
+
+  it('defaults sound and vibrate to enabled', () => {
+    expect(loadSoundEnabled()).toBe(true)
+    expect(loadVibrateEnabled()).toBe(true)
+  })
+
+  it('persists sound and vibrate prefs', () => {
+    saveSoundEnabled(false)
+    saveVibrateEnabled(false)
+    expect(loadSoundEnabled()).toBe(false)
+    expect(loadVibrateEnabled()).toBe(false)
+    saveSoundEnabled(true)
+    expect(loadSoundEnabled()).toBe(true)
+  })
+
+  it('defaults auto-break off and notifications off', () => {
+    expect(loadAutoBreakMode()).toBe('off')
+    expect(loadNotificationsEnabled()).toBe(false)
+  })
+
+  it('persists auto-break and notifications', () => {
+    saveAutoBreakMode('auto')
+    saveNotificationsEnabled(true)
+    expect(loadAutoBreakMode()).toBe('auto')
+    expect(loadNotificationsEnabled()).toBe(true)
+  })
+
+  it('accepts focus/break history filters', () => {
+    saveHistoryFilter('focus')
+    expect(loadHistoryFilter()).toBe('focus')
+    saveHistoryFilter('break')
+    expect(loadHistoryFilter()).toBe('break')
   })
 })
