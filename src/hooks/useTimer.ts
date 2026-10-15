@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
+  catchUp,
   createIdleState,
   pauseTimer,
   resetTimer,
@@ -10,7 +11,8 @@ import {
   startTimer,
   tick,
 } from '../lib/timer'
-import { playCompletionChime } from '../lib/sound'
+import { playCompletionChime, vibrateOnComplete } from '../lib/sound'
+import { notifySessionFinished } from '../lib/notify'
 import {
   loadDefaultBreakSeconds,
   loadDefaultFocusSeconds,
@@ -33,6 +35,9 @@ export function useTimer() {
   const [state, setState] = useState<TimerState>(initialState)
   const intervalRef = useRef<number | null>(null)
   const savedFinishedRef = useRef(false)
+  const lastTickAtRef = useRef<number>(Date.now())
+  /** Set when we finish while the tab is hidden — App can show a banner. */
+  const [finishedWhileHidden, setFinishedWhileHidden] = useState(false)
 
   const clearTick = useCallback(() => {
     if (intervalRef.current !== null) {
@@ -43,7 +48,9 @@ export function useTimer() {
 
   useEffect(() => {
     if (state.phase === 'running') {
+      lastTickAtRef.current = Date.now()
       intervalRef.current = window.setInterval(() => {
+        lastTickAtRef.current = Date.now()
         setState((prev) => tick(prev, 1))
       }, 1000)
     } else {
@@ -52,8 +59,24 @@ export function useTimer() {
     return clearTick
   }, [state.phase, clearTick])
 
+  // Wall-clock catch-up when returning from background
   useEffect(() => {
-    const base = 'ناوي فوكس'
+    const onVisibility = () => {
+      if (document.visibilityState !== 'visible') return
+      setState((prev) => {
+        if (prev.phase !== 'running') return prev
+        const gapSec = (Date.now() - lastTickAtRef.current) / 1000
+        if (gapSec < 1.5) return prev
+        lastTickAtRef.current = Date.now()
+        return catchUp(prev, gapSec)
+      })
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => document.removeEventListener('visibilitychange', onVisibility)
+  }, [])
+
+  useEffect(() => {
+    const base = 'ناوي فوكاس'
     if (state.phase === 'running' || state.phase === 'paused') {
       document.title = `${formatTime(state.remainingSeconds)} · ${base}`
     } else if (state.phase === 'finished') {
@@ -72,9 +95,15 @@ export function useTimer() {
     savedFinishedRef.current = true
 
     playCompletionChime()
+    vibrateOnComplete()
+    notifySessionFinished(state.kind)
+
+    if (typeof document !== 'undefined' && document.visibilityState === 'hidden') {
+      setFinishedWhileHidden(true)
+    }
 
     void addSession({
-      intention: state.intention.trim(),
+      intention: state.intention,
       kind: state.kind,
       plannedSeconds: state.plannedSeconds,
       actualSeconds: state.elapsedSeconds,
@@ -93,6 +122,8 @@ export function useTimer() {
 
   const start = useCallback(() => {
     savedFinishedRef.current = false
+    setFinishedWhileHidden(false)
+    lastTickAtRef.current = Date.now()
     setState((s) => startTimer(s))
   }, [])
 
@@ -101,14 +132,16 @@ export function useTimer() {
   }, [])
 
   const resume = useCallback(() => {
+    lastTickAtRef.current = Date.now()
     setState((s) => resumeTimer(s))
   }, [])
 
   const stop = useCallback(async () => {
+    setFinishedWhileHidden(false)
     setState((prev) => {
       if (prev.elapsedSeconds > 0) {
         void addSession({
-          intention: prev.intention.trim(),
+          intention: prev.intention,
           kind: prev.kind,
           plannedSeconds: prev.plannedSeconds,
           actualSeconds: prev.elapsedSeconds,
@@ -123,7 +156,25 @@ export function useTimer() {
 
   const reset = useCallback(() => {
     savedFinishedRef.current = false
+    setFinishedWhileHidden(false)
     setState((s) => resetTimer(s))
+  }, [])
+
+  /** After a finished focus session: switch to break defaults and start. */
+  const startBreak = useCallback(() => {
+    savedFinishedRef.current = false
+    setFinishedWhileHidden(false)
+    const breakSec = loadDefaultBreakSeconds()
+    lastTickAtRef.current = Date.now()
+    setState(() => {
+      let s = createIdleState('break', breakSec)
+      s = startTimer(s)
+      return s
+    })
+  }, [])
+
+  const dismissFinishedBanner = useCallback(() => {
+    setFinishedWhileHidden(false)
   }, [])
 
   const updateIntention = useCallback((value: string) => {
@@ -158,8 +209,11 @@ export function useTimer() {
     resume,
     stop,
     reset,
+    startBreak,
     updateIntention,
     updatePlanned,
     updateKind,
+    finishedWhileHidden,
+    dismissFinishedBanner,
   }
 }
