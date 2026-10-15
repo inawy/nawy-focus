@@ -22,7 +22,6 @@ export function startTimer(state: TimerState, now = Date.now()): TimerState {
   return {
     ...state,
     phase: 'running',
-    intention: state.intention.trim(),
     remainingSeconds: state.remainingSeconds || state.plannedSeconds,
     startedAt: state.startedAt ?? now,
   }
@@ -93,4 +92,13 @@ export function setKind(state: TimerState, kind: SessionKind): TimerState {
 
 export function isActive(phase: TimerPhase): boolean {
   return phase === 'running' || phase === 'paused'
+}
+
+/**
+ * Catch up wall-clock time after the tab was backgrounded
+ * (browsers throttle setInterval).
+ */
+export function catchUp(state: TimerState, elapsedRealSeconds: number): TimerState {
+  if (state.phase !== 'running' || elapsedRealSeconds <= 0) return state
+  return tick(state, Math.floor(elapsedRealSeconds))
 }
