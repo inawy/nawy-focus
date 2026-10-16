@@ -69,6 +69,7 @@ export function HistoryList({
             </p>
             <p className="text-slate-600">
               الأسبوع {formatDurationShort(weekSeconds)}
+              {weekFocusCount > 0 ? ` · ${weekFocusCount} جلسة` : ''}
               {bestHour ? ` · أفضل ${formatHourLabel(bestHour.hour)}` : ''}
             </p>
           </div>
