@@ -37,6 +37,7 @@ export function SessionControls({
               ? 'btn-secondary-quiet w-full sm:w-auto sm:min-w-[15rem]'
               : 'btn-primary-brand w-full sm:w-auto sm:min-w-[15rem]'
           }
+          title="مفتاح المسافة"
         >
           {kind === 'break' ? 'ابدأ الراحة' : 'ابدأ التركيز'}
         </button>
