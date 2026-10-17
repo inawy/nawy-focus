@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { ConfirmDialog } from './components/ConfirmDialog'
 import { DurationPicker } from './components/DurationPicker'
 import { HistoryList } from './components/HistoryList'
 import { IntentionInput } from './components/IntentionInput'
@@ -11,6 +12,7 @@ import { useTheme } from './hooks/useTheme'
 import { useTimer } from './hooks/useTimer'
 import { useWakeLock } from './hooks/useWakeLock'
 import { formatDurationShort } from './lib/format'
+import { playCompletionChime } from './lib/sound'
 import { isActive } from './lib/timer'
 import {
   loadAutoBreakDelaySeconds,
@@ -22,6 +24,8 @@ import {
   saveNotificationsEnabled,
   saveSoundEnabled,
   saveVibrateEnabled,
+  loadInstallBannerDismissed,
+  saveInstallBannerDismissed,
   type AutoBreakMode,
 } from './lib/prefs'
 import {
@@ -88,6 +92,12 @@ export default function App() {
   )
   const [autoBreakDelayTotal, setAutoBreakDelayTotal] = useState(5)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [confirmAction, setConfirmAction] = useState<'stop' | 'reset' | null>(
+    null,
+  )
+  const [installDismissed, setInstallDismissed] = useState(() =>
+    loadInstallBannerDismissed(),
+  )
   const settingsRef = useRef<HTMLDivElement | null>(null)
   const autoBreakTimerRef = useRef<number | null>(null)
 
@@ -183,8 +193,8 @@ export default function App() {
 
   const requestStop = useCallback(() => {
     if (state.elapsedSeconds > 0) {
-      const ok = window.confirm('إنهاء الجلسة الآن وحفظ الوقت المقضي؟')
-      if (!ok) return
+      setConfirmAction('stop')
+      return
     }
     stop()
   }, [state.elapsedSeconds, stop])
@@ -207,8 +217,8 @@ export default function App() {
 
   const handleReset = useCallback(() => {
     if (isActive(state.phase) || state.elapsedSeconds > 0) {
-      const ok = window.confirm('إعادة تعيين المؤقت؟ سيُفقد الوقت الحالي.')
-      if (!ok) return
+      setConfirmAction('reset')
+      return
     }
     reset()
   }, [state.phase, state.elapsedSeconds, reset])
@@ -231,6 +241,10 @@ export default function App() {
       if (e.key === 'Escape') {
         if (settingsOpen) {
           setSettingsOpen(false)
+          return
+        }
+        if (confirmAction) {
+          setConfirmAction(null)
           return
         }
         if (isActive(state.phase)) {
@@ -257,6 +271,7 @@ export default function App() {
   }, [
     state.phase,
     settingsOpen,
+    confirmAction,
     handleStart,
     handleResume,
     handleReset,
@@ -269,6 +284,7 @@ export default function App() {
     setSoundOn((v) => {
       const next = !v
       saveSoundEnabled(next)
+      if (next) playCompletionChime()
       return next
     })
   }
@@ -339,6 +355,15 @@ export default function App() {
           </h1>
 
           <div className="flex items-center gap-1.5" ref={settingsRef}>
+            <button
+              type="button"
+              onClick={cycleTheme}
+              className="btn-chrome min-w-11"
+              title={`المظهر: ${themeLabel}`}
+              aria-label={`المظهر الحالي: ${themeLabel}`}
+            >
+              {themeLabel === 'ليل' ? '◐' : themeLabel === 'نهار' ? '○' : '◎'}
+            </button>
             <button
               type="button"
               onClick={() => void toggleFs()}
@@ -491,27 +516,44 @@ export default function App() {
           </div>
         )}
 
-        {showInstall && !sessionFocus && state.phase === 'idle' && (
-          <div className="install-banner w-full max-w-sm rounded-2xl px-4 py-3">
-            <div className="flex items-center justify-between gap-3">
-              <div className="min-w-0 text-start">
-                <p className="text-sm font-medium">ثبّت ناوي فوكاس</p>
-                <p className="mt-0.5 text-[11px] text-slate-500">
-                  {isIos
-                    ? 'من مشاركة Safari ← إضافة إلى الشاشة الرئيسية'
-                    : 'تطبيق سريع على جهازك بدون متجر'}
-                </p>
+        {showInstall &&
+          !installDismissed &&
+          !sessionFocus &&
+          state.phase === 'idle' && (
+            <div className="install-banner w-full max-w-sm rounded-2xl px-4 py-3">
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0 text-start">
+                  <p className="text-sm font-medium">ثبّت ناوي فوكاس</p>
+                  <p className="mt-0.5 text-[11px] text-slate-500">
+                    {isIos
+                      ? 'من مشاركة Safari ← إضافة إلى الشاشة الرئيسية'
+                      : 'تطبيق سريع على جهازك بدون متجر'}
+                  </p>
+                </div>
+                <div className="flex shrink-0 items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => void installPwa()}
+                    className="btn-chrome border-brand-500/30 text-brand-500"
+                  >
+                    تثبيت
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      saveInstallBannerDismissed(true)
+                      setInstallDismissed(true)
+                    }}
+                    className="btn-chrome min-w-11 px-2"
+                    aria-label="إخفاء"
+                    title="إخفاء"
+                  >
+                    ×
+                  </button>
+                </div>
               </div>
-              <button
-                type="button"
-                onClick={() => void installPwa()}
-                className="btn-chrome shrink-0 border-brand-500/30 text-brand-500"
-              >
-                تثبيت
-              </button>
             </div>
-          </div>
-        )}
+          )}
 
         {iosHint && (
           <div
@@ -616,6 +658,7 @@ export default function App() {
             onChange={updateIntention}
             disabled={locked}
             suggestions={recentIntentions}
+            onSubmit={handleStart}
           />
         )}
 
@@ -644,7 +687,7 @@ export default function App() {
 
         {state.phase === 'idle' && (
           <p className="hidden text-center text-[11px] text-slate-600 sm:block">
-            مفتاح المسافة للبدء · F لملء الشاشة · Esc للإنهاء
+            مفتاح المسافة للبدء · Enter من النية · F لملء الشاشة · Esc للإنهاء
           </p>
         )}
 
@@ -681,6 +724,30 @@ export default function App() {
           </footer>
         )}
       </main>
+
+      <ConfirmDialog
+        open={confirmAction === 'stop'}
+        title="إنهاء الجلسة؟"
+        body="سيُحفظ الوقت الذي قضيته حتى الآن."
+        confirmLabel="إنهاء وحفظ"
+        onCancel={() => setConfirmAction(null)}
+        onConfirm={() => {
+          setConfirmAction(null)
+          stop()
+        }}
+      />
+      <ConfirmDialog
+        open={confirmAction === 'reset'}
+        title="إعادة التعيين؟"
+        body="سيُفقد الوقت الحالي لهذه الجلسة."
+        confirmLabel="إعادة تعيين"
+        danger
+        onCancel={() => setConfirmAction(null)}
+        onConfirm={() => {
+          setConfirmAction(null)
+          reset()
+        }}
+      />
     </div>
   )
 }
