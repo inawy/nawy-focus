@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { formatDateTime, formatDurationShort } from '../lib/format'
 import {
   formatHourLabel,
@@ -5,6 +6,7 @@ import {
 } from '../lib/insights'
 import type { HistoryFilter } from '../lib/prefs'
 import type { FocusSession } from '../types'
+import { ConfirmDialog } from './ConfirmDialog'
 
 interface Props {
   sessions: FocusSession[]
@@ -49,12 +51,14 @@ export function HistoryList({
   onCopySession,
   backupMessage,
 }: Props) {
+  const [pendingDelete, setPendingDelete] = useState<string | null>(null)
+
   return (
     <section className="w-full max-w-md" aria-labelledby="history-heading">
-      <details className="group surface-panel open:border-white/10" open>
+      <details className="group surface-panel" open>
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-3 [&::-webkit-details-marker]:hidden">
           <div className="flex items-center gap-2">
-            <h2 id="history-heading" className="text-sm font-medium text-slate-200">
+            <h2 id="history-heading" className="text-sm font-medium">
               السجل والملخص
             </h2>
             <span className="text-[11px] text-slate-500 transition group-open:rotate-0">
@@ -67,135 +71,137 @@ export function HistoryList({
               اليوم {formatDurationShort(todaySeconds)}
               {todayFocusCount > 0 ? ` · ${todayFocusCount} جلسة` : ''}
             </p>
-            <p className="text-slate-600">
+            <p className="text-slate-500 opacity-80">
               الأسبوع {formatDurationShort(weekSeconds)}
               {weekFocusCount > 0 ? ` · ${weekFocusCount} جلسة` : ''}
               {bestHour ? ` · أفضل ${formatHourLabel(bestHour.hour)}` : ''}
             </p>
           </div>
         </summary>
-        <div className="border-t border-slate-800/80 px-3.5 pb-3.5 pt-3">
-
-      <div className="mb-3 flex flex-wrap gap-1 rounded-xl border border-white/[0.05] bg-black/25 p-1">
-        {FILTERS.map((f) => (
-          <button
-            key={f.id}
-            type="button"
-            onClick={() => onFilterChange(f.id)}
-            className={`min-h-11 flex-1 rounded-lg px-1 py-1.5 text-xs font-medium transition ${
-              filter === f.id
-                ? 'bg-white text-slate-950 shadow-sm'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            {f.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="mb-3 flex flex-wrap gap-2">
-        <button type="button" onClick={onExport} className="btn-chrome">
-          تصدير JSON
-        </button>
-        <button type="button" onClick={onExportCsv} className="btn-chrome">
-          تصدير CSV
-        </button>
-        <label className="btn-chrome flex cursor-pointer items-center">
-          استيراد
-          <input
-            type="file"
-            accept="application/json,.json"
-            className="sr-only"
-            onChange={(e) => {
-              const file = e.target.files?.[0]
-              if (file) onImportFile(file)
-              e.target.value = ''
-            }}
-          />
-        </label>
-      </div>
-
-      {backupMessage && (
-        <p className="mb-3 text-xs text-brand-400/90" role="status">
-          {backupMessage}
-        </p>
-      )}
-
-      {loading && (
-        <div className="flex flex-col items-center gap-2 py-8 text-center">
-          <div className="h-1 w-16 overflow-hidden rounded-full bg-white/10">
-            <div className="h-full w-1/2 animate-pulse rounded-full bg-brand-500/60" />
+        <div className="border-t border-current/5 px-3.5 pb-3.5 pt-3">
+          <div className="mb-3 flex flex-wrap gap-1.5">
+            {FILTERS.map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => onFilterChange(f.id)}
+                className={`min-h-9 rounded-full px-3 text-xs font-medium transition ${
+                  filter === f.id
+                    ? 'bg-brand-500 text-white'
+                    : 'surface-chip text-slate-500 hover:text-inherit'
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
           </div>
-          <p className="text-sm text-slate-500">جاري التحميل…</p>
-        </div>
-      )}
 
-      {!loading && sessions.length === 0 && (
-        <div className="rounded-xl border border-dashed border-white/10 bg-black/15 px-4 py-8 text-center">
-          <p className="text-sm text-slate-400">لا جلسات بعد في هذا النطاق</p>
-          <p className="mt-1 text-[11px] text-slate-600">
-            ابدأ جلسة تركيز لتظهر هنا
-          </p>
-        </div>
-      )}
+          <div className="mb-3 flex flex-wrap gap-1.5">
+            <button type="button" onClick={onExport} className="btn-chrome text-[11px]">
+              تصدير JSON
+            </button>
+            <button type="button" onClick={onExportCsv} className="btn-chrome text-[11px]">
+              تصدير CSV
+            </button>
+            <label className="btn-chrome cursor-pointer text-[11px]">
+              استيراد
+              <input
+                type="file"
+                accept="application/json,.json"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) onImportFile(file)
+                  e.target.value = ''
+                }}
+              />
+            </label>
+          </div>
 
-      <ul className="flex flex-col gap-2">
-        {sessions.map((s) => (
-          <li
-            key={s.id}
-            className="rounded-xl border border-white/[0.05] bg-black/20 px-3.5 py-2.5 transition hover:border-white/10"
-          >
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm text-slate-200">
-                  {s.intention || (s.kind === 'focus' ? 'تركيز' : 'راحة')}
-                </p>
-                <p className="mt-0.5 text-xs text-slate-500">
-                  {formatDateTime(s.startedAt)}
-                  <span className="mx-1 text-slate-600">·</span>
-                  {s.kind === 'focus' ? 'تركيز' : 'راحة'}
-                </p>
-              </div>
-              <div className="flex shrink-0 items-start gap-1">
-                <div className="text-end">
-                  <p className="text-sm font-medium tabular-nums text-slate-200">
-                    {formatDurationShort(s.actualSeconds)}
-                  </p>
-                  <p className="text-[11px] text-slate-500">
-                    {s.status === 'completed'
-                      ? 'مكتملة'
-                      : s.status === 'stopped'
-                        ? 'مُنهَاة'
-                        : 'متروكة'}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => onCopySession(s)}
-                  className="min-h-11 min-w-11 rounded-lg px-1.5 text-xs text-slate-500 transition hover:bg-slate-800 hover:text-slate-200"
-                  title="نسخ ملخص الجلسة"
-                  aria-label="نسخ ملخص الجلسة"
-                >
-                  نسخ
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (window.confirm('حذف هذه الجلسة؟')) onDelete(s.id)
-                  }}
-                  className="min-h-11 min-w-11 rounded-lg px-2 text-slate-500 transition hover:bg-slate-800 hover:text-rose-400"
-                  title="حذف"
-                  aria-label="حذف الجلسة"
-                >
-                  ×
-                </button>
-              </div>
+          {backupMessage && (
+            <p className="mb-2 text-xs text-brand-500" role="status">
+              {backupMessage}
+            </p>
+          )}
+
+          {loading && (
+            <p className="py-6 text-center text-sm text-slate-500">جاري التحميل…</p>
+          )}
+
+          {!loading && sessions.length === 0 && (
+            <div className="surface-row rounded-xl border-dashed px-4 py-10 text-center">
+              <p className="text-sm text-slate-500">لا جلسات بعد</p>
+              <p className="mt-1.5 text-[12px] text-slate-500 opacity-80">
+                ابدأ جلسة تركيز — السجل يبقى على جهازك فقط
+              </p>
             </div>
-          </li>
-        ))}
-      </ul>
+          )}
+
+          <ul className="flex flex-col gap-2">
+            {sessions.map((s) => (
+              <li key={s.id} className="surface-row rounded-xl px-3.5 py-2.5 transition">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm">
+                      {s.intention || (s.kind === 'focus' ? 'تركيز' : 'راحة')}
+                    </p>
+                    <p className="mt-0.5 text-xs text-slate-500">
+                      {formatDateTime(s.startedAt)}
+                      <span className="mx-1 opacity-50">·</span>
+                      {s.kind === 'focus' ? 'تركيز' : 'راحة'}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-start gap-1">
+                    <div className="text-end">
+                      <p className="text-sm font-medium tabular-nums">
+                        {formatDurationShort(s.actualSeconds)}
+                      </p>
+                      <p className="text-[11px] text-slate-500">
+                        {s.status === 'completed'
+                          ? 'مكتملة'
+                          : s.status === 'stopped'
+                            ? 'مُنهَاة'
+                            : 'متروكة'}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => onCopySession(s)}
+                      className="min-h-11 min-w-11 rounded-lg px-1.5 text-xs text-slate-500 transition hover:bg-black/5 hover:opacity-100"
+                      title="نسخ ملخص الجلسة"
+                      aria-label="نسخ ملخص الجلسة"
+                    >
+                      نسخ
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPendingDelete(s.id)}
+                      className="min-h-11 min-w-11 rounded-lg px-2 text-slate-500 transition hover:bg-rose-500/10 hover:text-rose-500"
+                      title="حذف"
+                      aria-label="حذف الجلسة"
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       </details>
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title="حذف الجلسة؟"
+        body="لا يمكن التراجع عن هذا الإجراء."
+        confirmLabel="حذف"
+        danger
+        onCancel={() => setPendingDelete(null)}
+        onConfirm={() => {
+          if (pendingDelete) onDelete(pendingDelete)
+          setPendingDelete(null)
+        }}
+      />
     </section>
   )
 }
