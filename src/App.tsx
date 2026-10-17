@@ -95,6 +95,9 @@ export default function App() {
   const [confirmAction, setConfirmAction] = useState<'stop' | 'reset' | null>(
     null,
   )
+  const [notice, setNotice] = useState<{ title: string; body: string } | null>(
+    null,
+  )
   const [installDismissed, setInstallDismissed] = useState(() =>
     loadInstallBannerDismissed(),
   )
@@ -247,6 +250,10 @@ export default function App() {
           setConfirmAction(null)
           return
         }
+        if (notice) {
+          setNotice(null)
+          return
+        }
         if (isActive(state.phase)) {
           e.preventDefault()
           requestStop()
@@ -272,6 +279,7 @@ export default function App() {
     state.phase,
     settingsOpen,
     confirmAction,
+    notice,
     handleStart,
     handleResume,
     handleReset,
@@ -307,11 +315,13 @@ export default function App() {
       const granted = await requestNotificationPermission()
       if (!granted) {
         const perm = getNotificationPermission()
-        window.alert(
-          perm === 'denied'
-            ? 'الإشعارات محظورة من إعدادات المتصفح'
-            : 'لم يتم منح إذن الإشعارات',
-        )
+        setNotice({
+          title: 'تعذر تفعيل الإشعارات',
+          body:
+            perm === 'denied'
+              ? 'الإشعارات محظورة من إعدادات المتصفح. يمكنك تفعيلها لاحقاً من إعدادات الموقع.'
+              : 'لم يتم منح إذن الإشعارات.',
+        })
         return
       }
     }
@@ -747,6 +757,15 @@ export default function App() {
           setConfirmAction(null)
           reset()
         }}
+      />
+      <ConfirmDialog
+        open={notice !== null}
+        title={notice?.title ?? ''}
+        body={notice?.body}
+        confirmLabel="حسناً"
+        notice
+        onCancel={() => setNotice(null)}
+        onConfirm={() => setNotice(null)}
       />
     </div>
   )
