@@ -12,18 +12,18 @@ function phaseTheme(phase: TimerPhase, kind: SessionKind) {
   if (phase === 'paused') {
     return {
       stroke: 'stroke-amber-400/90',
-      label: 'text-amber-300/90',
+      label: 'text-amber-500',
       glow: 'shadow-[0_0_36px_-14px_rgba(251,191,36,0.3)]',
-      track: 'stroke-white/[0.06]',
+      track: 'stroke-current opacity-10',
     }
   }
   if (phase === 'finished') {
     const focus = kind === 'focus'
     return {
       stroke: focus ? 'stroke-brand-400/70' : 'stroke-brand-300/50',
-      label: focus ? 'text-brand-300/80' : 'text-brand-300/60',
+      label: focus ? 'text-brand-500' : 'text-brand-500/70',
       glow: 'shadow-[0_0_28px_-16px_rgba(61,123,255,0.2)]',
-      track: 'stroke-white/[0.05]',
+      track: 'stroke-current opacity-10',
     }
   }
   if (phase === 'running') {
@@ -31,19 +31,19 @@ function phaseTheme(phase: TimerPhase, kind: SessionKind) {
     return {
       stroke: focus
         ? 'stroke-brand-500 transition-[stroke-dashoffset] duration-1000 linear'
-        : 'stroke-brand-300/80 transition-[stroke-dashoffset] duration-1000 linear',
-      label: focus ? 'text-brand-300' : 'text-brand-300/70',
+        : 'stroke-brand-400/80 transition-[stroke-dashoffset] duration-1000 linear',
+      label: focus ? 'text-brand-500' : 'text-brand-500/80',
       glow: focus
         ? 'shadow-[0_0_64px_-14px_rgba(61,123,255,0.5)]'
         : 'shadow-[0_0_40px_-14px_rgba(61,123,255,0.22)]',
-      track: 'stroke-white/[0.06]',
+      track: 'stroke-current opacity-10',
     }
   }
   return {
-    stroke: kind === 'break' ? 'stroke-brand-400/35' : 'stroke-slate-600',
-    label: kind === 'break' ? 'text-brand-300/50' : 'text-slate-500',
+    stroke: kind === 'break' ? 'stroke-brand-400/35' : 'stroke-slate-500',
+    label: kind === 'break' ? 'text-brand-500/50' : 'text-slate-500',
     glow: '',
-    track: 'stroke-white/[0.06]',
+    track: 'stroke-current opacity-10',
   }
 }
 
@@ -86,15 +86,15 @@ export function TimerDisplay({
     phase === 'finished'
       ? 'text-[2.35rem] sm:text-[2.6rem] leading-none'
       : sessionFocus
-        ? 'text-[3.35rem] sm:text-[3.85rem] leading-none'
+        ? 'text-[3rem] sm:text-[3.35rem] leading-none'
         : 'text-[2.75rem] sm:text-[3.15rem] leading-none'
 
   return (
     <div
-      className={`relative mx-auto flex items-center justify-center transition-all duration-500 ease-[var(--ease-out)] ${sizeClass}`}
+      className={`relative mx-auto flex items-center justify-center transition-all duration-500 ease-[var(--ease-out)] ${sizeClass} ${phase === 'paused' ? 'animate-pulse-ring' : ''}`}
     >
       <div
-        className={`absolute inset-[8%] rounded-full bg-gradient-to-b from-white/[0.04] to-transparent ${theme.glow}`}
+        className={`absolute inset-[8%] rounded-full bg-gradient-to-b from-current/[0.04] to-transparent ${theme.glow}`}
         aria-hidden
       />
       <svg
@@ -126,7 +126,7 @@ export function TimerDisplay({
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
         <span
-          className={`font-mono font-medium tracking-tight text-white tabular-nums transition-all duration-500 ${timeClass}`}
+          className={`font-mono font-medium tracking-tight tabular-nums transition-all duration-500 ${timeClass}`}
           aria-live="polite"
         >
           {formatTime(remainingSeconds)}
@@ -137,7 +137,7 @@ export function TimerDisplay({
           {phaseLabel}
         </span>
         {phase === 'idle' && (
-          <span className="mt-1.5 text-[11px] text-slate-600">
+          <span className="mt-1.5 text-[11px] text-slate-500">
             {isBreak ? 'راحة' : 'تركيز'} · {Math.round(plannedSeconds / 60)} د
           </span>
         )}
