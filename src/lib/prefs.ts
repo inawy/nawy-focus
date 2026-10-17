@@ -133,3 +133,11 @@ export function loadThemeMode(): ThemeMode {
 export function saveThemeMode(mode: ThemeMode): void {
   write('themeMode', mode)
 }
+
+export function loadInstallBannerDismissed(): boolean {
+  return read('installBannerDismissed') === '1'
+}
+
+export function saveInstallBannerDismissed(dismissed: boolean): void {
+  write('installBannerDismissed', dismissed ? '1' : '0')
+}
