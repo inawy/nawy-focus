@@ -5,7 +5,9 @@ import { IntentionInput } from './components/IntentionInput'
 import { SessionControls } from './components/SessionControls'
 import { TimerDisplay } from './components/TimerDisplay'
 import { useFullscreen } from './hooks/useFullscreen'
+import { usePwaInstall } from './hooks/usePwaInstall'
 import { useSessions } from './hooks/useSessions'
+import { useTheme } from './hooks/useTheme'
 import { useTimer } from './hooks/useTimer'
 import { useWakeLock } from './hooks/useWakeLock'
 import { formatDurationShort } from './lib/format'
@@ -65,6 +67,15 @@ export default function App() {
 
   const { active: fullscreen, enter: enterFs, exit: exitFs, toggle: toggleFs } =
     useFullscreen()
+
+  const { cycleTheme, label: themeLabel } = useTheme()
+  const {
+    showInstall,
+    install: installPwa,
+    iosHint,
+    dismissIosHint,
+    isIos,
+  } = usePwaInstall()
 
   const [soundOn, setSoundOn] = useState(() => loadSoundEnabled())
   const [vibrateOn, setVibrateOn] = useState(() => loadVibrateEnabled())
@@ -181,7 +192,6 @@ export default function App() {
   const locked = isActive(state.phase) || state.phase === 'finished'
   const sessionFocus = isActive(state.phase)
 
-  // Prevent screen sleep during an active session (mobile-friendly)
   useWakeLock(state.phase === 'running')
 
   const handleStart = useCallback(() => {
@@ -208,11 +218,14 @@ export default function App() {
     void enterFs()
   }, [resume, enterFs])
 
-  // Global shortcuts: Space start/pause/resume, Esc stop/close, F fullscreen
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement | null)?.tagName
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || (e.target as HTMLElement)?.isContentEditable) {
+      if (
+        tag === 'INPUT' ||
+        tag === 'TEXTAREA' ||
+        (e.target as HTMLElement)?.isContentEditable
+      ) {
         return
       }
       if (e.key === 'Escape') {
@@ -300,15 +313,15 @@ export default function App() {
     (notifyOn ? 1 : 0)
 
   return (
-    <div className="min-h-dvh text-slate-100">
+    <div className="app-shell min-h-dvh">
       <header
-        className={`sticky top-0 z-20 border-b border-white/[0.06] bg-[#0e0e10]/70 px-4 pt-[max(0.5rem,env(safe-area-inset-top))] backdrop-blur-xl transition-all duration-300 ${
+        className={`app-header sticky top-0 z-20 px-4 pt-[max(0.5rem,env(safe-area-inset-top))] transition-all duration-300 ${
           sessionFocus ? 'pb-2.5' : 'pb-3.5'
         }`}
       >
         <div className="mx-auto flex max-w-md items-center justify-between gap-2">
           <h1
-            className={`flex items-center gap-2 font-semibold tracking-tight text-slate-50 transition-all duration-300 ${
+            className={`flex items-center gap-2 font-semibold tracking-tight transition-all duration-300 ${
               sessionFocus ? 'text-[15px] opacity-60' : 'text-base'
             }`}
           >
@@ -341,7 +354,7 @@ export default function App() {
                 type="button"
                 onClick={() => setSettingsOpen((v) => !v)}
                 className={`btn-chrome relative min-w-11 px-2 text-base ${
-                  settingsOpen ? 'border-white/25 bg-white/10 text-slate-50' : ''
+                  settingsOpen ? 'ring-1 ring-brand-500/40' : ''
                 }`}
                 title="الإعدادات"
                 aria-label="الإعدادات"
@@ -359,20 +372,20 @@ export default function App() {
 
               {settingsOpen && (
                 <div
-                  className="absolute end-0 top-full z-30 mt-2 w-56 rounded-2xl border border-white/10 bg-[#1c1c1e]/95 p-1.5 shadow-2xl shadow-black/50 backdrop-blur-xl"
+                  className="app-menu absolute end-0 top-full z-30 mt-2 w-56 rounded-2xl p-1.5"
                   role="menu"
                 >
                   <button
                     type="button"
                     role="menuitem"
                     onClick={toggleSound}
-                    className="flex min-h-11 w-full items-center justify-between gap-2 rounded-xl px-3 text-sm text-slate-200 transition hover:bg-white/[0.06]"
+                    className="flex min-h-11 w-full items-center justify-between gap-2 rounded-xl px-3 text-sm transition hover:opacity-90"
                     aria-pressed={soundOn}
                   >
                     <span>الصوت</span>
                     <span
                       className={`text-xs font-medium ${
-                        soundOn ? 'text-brand-300' : 'text-slate-500'
+                        soundOn ? 'text-brand-500' : 'text-slate-500'
                       }`}
                     >
                       {soundOn ? 'تشغيل' : 'إيقاف'}
@@ -382,13 +395,13 @@ export default function App() {
                     type="button"
                     role="menuitem"
                     onClick={toggleVibrate}
-                    className="flex min-h-11 w-full items-center justify-between gap-2 rounded-xl px-3 text-sm text-slate-200 transition hover:bg-white/[0.06]"
+                    className="flex min-h-11 w-full items-center justify-between gap-2 rounded-xl px-3 text-sm transition hover:opacity-90"
                     aria-pressed={vibrateOn}
                   >
                     <span>الاهتزاز</span>
                     <span
                       className={`text-xs font-medium ${
-                        vibrateOn ? 'text-brand-300' : 'text-slate-500'
+                        vibrateOn ? 'text-brand-500' : 'text-slate-500'
                       }`}
                     >
                       {vibrateOn ? 'تشغيل' : 'إيقاف'}
@@ -398,8 +411,8 @@ export default function App() {
                     type="button"
                     role="menuitem"
                     onClick={toggleAutoBreak}
-                    className={`flex min-h-11 w-full items-center justify-between gap-2 rounded-xl px-3 text-sm transition hover:bg-white/[0.06] ${
-                      autoBreak === 'auto' ? 'text-brand-300' : 'text-slate-200'
+                    className={`flex min-h-11 w-full items-center justify-between gap-2 rounded-xl px-3 text-sm transition hover:opacity-90 ${
+                      autoBreak === 'auto' ? 'text-brand-500' : ''
                     }`}
                     aria-pressed={autoBreak === 'auto'}
                   >
@@ -412,8 +425,8 @@ export default function App() {
                     type="button"
                     role="menuitem"
                     onClick={() => void toggleNotifications()}
-                    className={`flex min-h-11 w-full items-center justify-between gap-2 rounded-xl px-3 text-sm transition hover:bg-white/[0.06] ${
-                      notifyOn ? 'text-amber-300' : 'text-slate-200'
+                    className={`flex min-h-11 w-full items-center justify-between gap-2 rounded-xl px-3 text-sm transition hover:opacity-90 ${
+                      notifyOn ? 'text-amber-500' : ''
                     }`}
                     aria-pressed={notifyOn}
                   >
@@ -422,6 +435,30 @@ export default function App() {
                       {notifyOn ? 'تشغيل' : 'إيقاف'}
                     </span>
                   </button>
+                  <div className="my-1 h-px bg-current opacity-10" />
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={cycleTheme}
+                    className="flex min-h-11 w-full items-center justify-between gap-2 rounded-xl px-3 text-sm transition hover:opacity-90"
+                    title="ليل / نهار / تلقائي"
+                  >
+                    <span>المظهر</span>
+                    <span className="text-xs font-medium text-brand-500">
+                      {themeLabel}
+                    </span>
+                  </button>
+                  {showInstall && (
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={() => void installPwa()}
+                      className="flex min-h-11 w-full items-center justify-between gap-2 rounded-xl px-3 text-sm transition hover:opacity-90"
+                    >
+                      <span>تثبيت التطبيق</span>
+                      <span className="text-xs text-brand-500">PWA</span>
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -448,6 +485,46 @@ export default function App() {
               type="button"
               onClick={dismissFinishedBanner}
               className="ms-2 underline opacity-80 hover:opacity-100"
+            >
+              حسناً
+            </button>
+          </div>
+        )}
+
+        {showInstall && !sessionFocus && state.phase === 'idle' && (
+          <div className="install-banner w-full max-w-sm rounded-2xl px-4 py-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0 text-start">
+                <p className="text-sm font-medium">ثبّت ناوي فوكاس</p>
+                <p className="mt-0.5 text-[11px] text-slate-500">
+                  {isIos
+                    ? 'من مشاركة Safari ← إضافة إلى الشاشة الرئيسية'
+                    : 'تطبيق سريع على جهازك بدون متجر'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => void installPwa()}
+                className="btn-chrome shrink-0 border-brand-500/30 text-brand-500"
+              >
+                تثبيت
+              </button>
+            </div>
+          </div>
+        )}
+
+        {iosHint && (
+          <div
+            className="install-banner w-full max-w-sm rounded-2xl px-4 py-3 text-sm"
+            role="status"
+          >
+            <p>
+              على آيفون: اضغط مشاركة في Safari ثم «إضافة إلى الشاشة الرئيسية».
+            </p>
+            <button
+              type="button"
+              className="mt-2 text-xs text-brand-500 underline"
+              onClick={dismissIosHint}
             >
               حسناً
             </button>
