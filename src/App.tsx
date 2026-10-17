@@ -7,6 +7,8 @@ import { TimerDisplay } from './components/TimerDisplay'
 import { useFullscreen } from './hooks/useFullscreen'
 import { useSessions } from './hooks/useSessions'
 import { useTimer } from './hooks/useTimer'
+import { useWakeLock } from './hooks/useWakeLock'
+import { formatDurationShort } from './lib/format'
 import { isActive } from './lib/timer'
 import {
   loadAutoBreakDelaySeconds,
@@ -179,22 +181,76 @@ export default function App() {
   const locked = isActive(state.phase) || state.phase === 'finished'
   const sessionFocus = isActive(state.phase)
 
-  const handleStart = () => {
+  // Prevent screen sleep during an active session (mobile-friendly)
+  useWakeLock(state.phase === 'running')
+
+  const handleStart = useCallback(() => {
     start()
     void enterFs()
-  }
-  const handleStartBreak = () => {
+  }, [start, enterFs])
+
+  const handleStartBreak = useCallback(() => {
     clearAutoBreakTimer()
     startBreak()
     void enterFs()
-  }
-  const handleReset = () => {
+  }, [clearAutoBreakTimer, startBreak, enterFs])
+
+  const handleReset = useCallback(() => {
     if (isActive(state.phase) || state.elapsedSeconds > 0) {
       const ok = window.confirm('إعادة تعيين المؤقت؟ سيُفقد الوقت الحالي.')
       if (!ok) return
     }
     reset()
-  }
+  }, [state.phase, state.elapsedSeconds, reset])
+
+  const handleResume = useCallback(() => {
+    resume()
+    void enterFs()
+  }, [resume, enterFs])
+
+  // Global shortcuts: Space start/pause/resume, Esc stop/close, F fullscreen
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement | null)?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || (e.target as HTMLElement)?.isContentEditable) {
+        return
+      }
+      if (e.key === 'Escape') {
+        if (settingsOpen) {
+          setSettingsOpen(false)
+          return
+        }
+        if (isActive(state.phase)) {
+          e.preventDefault()
+          requestStop()
+        }
+        return
+      }
+      if (e.key === 'f' || e.key === 'F' || e.key === 'ء') {
+        e.preventDefault()
+        void toggleFs()
+        return
+      }
+      if (e.key === ' ' || e.code === 'Space') {
+        e.preventDefault()
+        if (state.phase === 'idle') handleStart()
+        else if (state.phase === 'running') pause()
+        else if (state.phase === 'paused') handleResume()
+        else if (state.phase === 'finished') handleReset()
+      }
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [
+    state.phase,
+    settingsOpen,
+    handleStart,
+    handleResume,
+    handleReset,
+    pause,
+    requestStop,
+    toggleFs,
+  ])
 
   const toggleSound = () => {
     setSoundOn((v) => {
@@ -433,11 +489,18 @@ export default function App() {
                 }}
               />
             </div>
-            <div className="mt-3 flex justify-end">
+            <div className="mt-3 flex flex-wrap justify-end gap-2">
+              <button
+                type="button"
+                onClick={handleStartBreak}
+                className="btn-chrome border-brand-500/40 text-brand-200"
+              >
+                ابدأ الآن
+              </button>
               <button
                 type="button"
                 onClick={clearAutoBreakTimer}
-                className="btn-chrome border-brand-500/30 text-brand-200"
+                className="btn-chrome"
               >
                 إلغاء
               </button>
@@ -451,6 +514,13 @@ export default function App() {
           phase={state.phase}
           kind={state.kind}
         />
+
+        {state.phase === 'idle' && todaySeconds > 0 && (
+          <p className="text-center text-[12px] text-slate-500" aria-live="polite">
+            اليوم {formatDurationShort(todaySeconds)}
+            {todayFocusCount > 0 ? ` · ${todayFocusCount} جلسة` : ''}
+          </p>
+        )}
 
         {sessionFocus ? (
           state.intention ? (
@@ -489,14 +559,17 @@ export default function App() {
           elapsedSeconds={state.elapsedSeconds}
           onStart={handleStart}
           onPause={pause}
-          onResume={() => {
-            resume()
-            void enterFs()
-          }}
+          onResume={handleResume}
           onStop={requestStop}
           onReset={handleReset}
           onStartBreak={handleStartBreak}
         />
+
+        {state.phase === 'idle' && (
+          <p className="hidden text-center text-[11px] text-slate-600 sm:block">
+            مفتاح المسافة للبدء · F لملء الشاشة · Esc للإنهاء
+          </p>
+        )}
 
         {!sessionFocus && (
           <HistoryList
@@ -519,8 +592,15 @@ export default function App() {
         )}
 
         {!sessionFocus && (
-          <footer className="mt-2 pb-2 text-center text-[11px] text-slate-600">
+          <footer className="mt-2 pb-4 text-center text-[11px] text-slate-600">
             <p className="mb-1">جزء من منظومة ناوي للإنتاجية</p>
+            <a
+              href="https://nawy.to/focus"
+              className="text-slate-500 underline-offset-2 transition hover:text-slate-400 hover:underline"
+              rel="noopener noreferrer"
+            >
+              nawy.to/focus
+            </a>
           </footer>
         )}
       </main>
