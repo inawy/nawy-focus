@@ -317,6 +317,7 @@ button {
     align-items: center;
     justify-content: center;
     border-radius: 1rem;
+    animation: motion-pop 0.42s var(--ease-out) 0.05s both;
   }
   .confirm-tone-default .confirm-icon-wrap {
     color: #3d7bff;
@@ -346,6 +347,7 @@ button {
       transform 0.15s var(--ease-out),
       background 0.15s var(--ease-out),
       box-shadow 0.15s var(--ease-out);
+    animation: motion-fade-up 0.3s var(--ease-out) 0.12s both;
   }
 
   .confirm-btn-primary {
@@ -403,12 +405,8 @@ button {
   }
 
   @keyframes confirm-fade-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
   @keyframes confirm-rise {
     from {
@@ -428,6 +426,123 @@ button {
     to {
       opacity: 1;
       transform: scale(1) translateY(0);
+    }
+  }
+
+  /* Advanced motion */
+  .motion-fade-in {
+    animation: motion-fade-in 0.35s var(--ease-out) both;
+  }
+  .motion-fade-up {
+    animation: motion-fade-up 0.32s var(--ease-out) both;
+  }
+  .motion-pop {
+    animation: motion-pop 0.4s var(--ease-out) both;
+  }
+  .motion-finish-card {
+    animation: motion-finish-card 0.45s var(--ease-out) both;
+  }
+
+  .timer-aura {
+    pointer-events: none;
+    position: absolute;
+    inset: -6%;
+    border-radius: 9999px;
+    border: 1px solid rgb(61 123 255 / 0.18);
+  }
+  .timer-aura-a {
+    animation: timer-aura-pulse 3.2s var(--ease-out) infinite;
+  }
+  .timer-aura-b {
+    inset: -12%;
+    border-color: rgb(61 123 255 / 0.1);
+    animation: timer-aura-pulse 3.2s var(--ease-out) 0.9s infinite;
+  }
+  .timer-running .timer-ring-live {
+    filter: drop-shadow(0 0 10px rgb(61 123 255 / 0.35));
+  }
+  .timer-finished {
+    animation: timer-finish-pop 0.55s var(--ease-out) both;
+  }
+  .timer-finished .timer-digits {
+    animation: timer-digits-glow 1.2s var(--ease-out) both;
+  }
+  .timer-idle {
+    animation: motion-fade-in 0.4s var(--ease-out) both;
+  }
+
+  .history-row-enter {
+    animation: motion-fade-up 0.3s var(--ease-out) both;
+  }
+
+  @keyframes motion-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes motion-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes motion-pop {
+    from {
+      opacity: 0;
+      transform: scale(0.92);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  @keyframes motion-finish-card {
+    from {
+      opacity: 0;
+      transform: translateY(14px) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  @keyframes timer-aura-pulse {
+    0%,
+    100% {
+      opacity: 0.35;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.85;
+      transform: scale(1.03);
+    }
+  }
+  @keyframes timer-finish-pop {
+    0% {
+      transform: scale(0.94);
+      opacity: 0.7;
+    }
+    55% {
+      transform: scale(1.03);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  @keyframes timer-digits-glow {
+    0% {
+      text-shadow: 0 0 0 transparent;
+    }
+    40% {
+      text-shadow: 0 0 24px rgb(61 123 255 / 0.45);
+    }
+    100% {
+      text-shadow: 0 0 0 transparent;
     }
   }
 }
