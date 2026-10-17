@@ -121,3 +121,15 @@ export function loadNotificationsEnabled(): boolean {
 export function saveNotificationsEnabled(enabled: boolean): void {
   write('notificationsEnabled', enabled ? '1' : '0')
 }
+
+export type ThemeMode = 'dark' | 'light' | 'system'
+
+export function loadThemeMode(): ThemeMode {
+  const raw = read('themeMode')
+  if (raw === 'light' || raw === 'dark' || raw === 'system') return raw
+  return 'dark'
+}
+
+export function saveThemeMode(mode: ThemeMode): void {
+  write('themeMode', mode)
+}
