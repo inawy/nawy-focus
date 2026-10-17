@@ -25,7 +25,6 @@
   --shadow-glow-brand: 0 0 60px -16px rgb(61 123 255 / 0.45);
 }
 
-/* —— Theme tokens (dark default) —— */
 :root,
 html[data-theme='dark'] {
   --app-bg: #0e0e10;
@@ -211,6 +210,37 @@ button {
     border: 1px solid var(--app-panel-border);
     background: var(--app-panel-bg);
     box-shadow: var(--shadow-soft);
+  }
+
+  .surface-field {
+    border: 1px solid var(--app-panel-border);
+    background: color-mix(in srgb, var(--app-fg) 4%, transparent);
+  }
+  html[data-theme='light'] .surface-field {
+    background: rgb(0 0 0 / 0.03);
+  }
+
+  .surface-chip {
+    border: 1px solid var(--app-panel-border);
+    background: color-mix(in srgb, var(--app-fg) 3%, transparent);
+  }
+
+  .surface-row {
+    border: 1px solid var(--app-panel-border);
+    background: color-mix(in srgb, var(--app-fg) 3%, transparent);
+  }
+
+  @keyframes pulse-ring {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.55;
+    }
+  }
+  .animate-pulse-ring {
+    animation: pulse-ring 1.8s ease-in-out infinite;
   }
 }
 
