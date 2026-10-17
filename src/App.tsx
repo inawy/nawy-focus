@@ -173,113 +173,61 @@ export default function App() {
       const ok = window.confirm('إنهاء الجلسة الآن وحفظ الوقت المقضي؟')
       if (!ok) return
     }
-    clearAutoBreakTimer()
-    void stop()
-  }, [state.elapsedSeconds, stop, clearAutoBreakTimer])
+    stop()
+  }, [state.elapsedSeconds, stop])
 
-  const handleStart = useCallback(() => {
-    clearAutoBreakTimer()
-    setSettingsOpen(false)
-    start()
-    void enterFs()
-  }, [start, enterFs, clearAutoBreakTimer])
-
-  const handleStartBreak = useCallback(() => {
-    clearAutoBreakTimer()
-    setSettingsOpen(false)
-    startBreak()
-    void enterFs()
-  }, [startBreak, enterFs, clearAutoBreakTimer])
-
-  const handleReset = useCallback(() => {
-    clearAutoBreakTimer()
-    reset()
-  }, [reset, clearAutoBreakTimer])
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      const tag = (e.target as HTMLElement | null)?.tagName
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
-      if (e.key === ' ' || e.key === 'Enter') {
-        e.preventDefault()
-        if (state.phase === 'idle') handleStart()
-        else if (state.phase === 'running') pause()
-        else if (state.phase === 'paused') resume()
-        else if (state.phase === 'finished') {
-          if (state.kind === 'focus') handleStartBreak()
-          else handleReset()
-        }
-      } else if (e.key === 'Escape' && isActive(state.phase)) {
-        if (fullscreen) {
-          void exitFs()
-          return
-        }
-        e.preventDefault()
-        requestStop()
-      } else if ((e.key === 'f' || e.key === 'F') && !e.metaKey && !e.ctrlKey) {
-        e.preventDefault()
-        void toggleFs()
-      }
+  const requestReset = useCallback(() => {
+    if (isActive(state.phase) || state.elapsedSeconds > 0) {
+      const ok = window.confirm('إعادة تعيين المؤقت؟ سيُفقد الوقت الحالي.')
+      if (!ok) return
     }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [
-    state.phase,
-    state.kind,
-    handleStart,
-    handleStartBreak,
-    handleReset,
-    pause,
-    resume,
-    requestStop,
-    fullscreen,
-    exitFs,
-    toggleFs,
-  ])
+    reset()
+  }, [state.phase, state.elapsedSeconds, reset])
 
-  const locked = isActive(state.phase)
-  const sessionFocus = state.phase === 'running' || state.phase === 'paused'
+  const toggleSound = useCallback(() => {
+    setSoundOn((v) => {
+      const next = !v
+      saveSoundEnabled(next)
+      return next
+    })
+  }, [])
 
-  const toggleSound = () => {
-    const next = !soundOn
-    setSoundOn(next)
-    saveSoundEnabled(next)
-  }
+  const toggleVibrate = useCallback(() => {
+    setVibrateOn((v) => {
+      const next = !v
+      saveVibrateEnabled(next)
+      return next
+    })
+  }, [])
 
-  const toggleVibrate = () => {
-    const next = !vibrateOn
-    setVibrateOn(next)
-    saveVibrateEnabled(next)
-  }
+  const toggleAutoBreak = useCallback(() => {
+    setAutoBreak((v) => {
+      const next: AutoBreakMode = v === 'auto' ? 'off' : 'auto'
+      saveAutoBreakMode(next)
+      return next
+    })
+  }, [])
 
-  const toggleAutoBreak = () => {
-    const next: AutoBreakMode = autoBreak === 'auto' ? 'off' : 'auto'
-    setAutoBreak(next)
-    saveAutoBreakMode(next)
-  }
-
-  const toggleNotifications = async () => {
+  const toggleNotifications = useCallback(async () => {
     if (!notifyOn) {
       const granted = await requestNotificationPermission()
       if (!granted) {
-        const perm = getNotificationPermission()
-        if (perm === 'denied') {
-          window.alert(
-            'الإشعارات مرفوضة من المتصفح. فعّلها من إعدادات الموقع إن أردت.',
-          )
-        } else if (perm === 'unsupported') {
-          window.alert('هذا المتصفح لا يدعم إشعارات سطح المكتب.')
-        }
+        window.alert(
+          getNotificationPermission() === 'denied'
+            ? 'الإشعارات محظورة من إعدادات المتصفح'
+            : 'لم يتم منح إذن الإشعارات',
+        )
         return
       }
-      setNotifyOn(true)
-      saveNotificationsEnabled(true)
-    } else {
-      setNotifyOn(false)
-      saveNotificationsEnabled(false)
     }
-  }
+    setNotifyOn((v) => {
+      const next = !v
+      saveNotificationsEnabled(next)
+      return next
+    })
+  }, [notifyOn])
 
+  const sessionFocus = isActive(state.phase)
   const settingsActiveCount =
     (soundOn ? 0 : 1) +
     (vibrateOn ? 0 : 1) +
@@ -299,8 +247,14 @@ export default function App() {
               sessionFocus ? 'text-[15px] opacity-60' : 'text-base'
             }`}
           >
-            <span
-              className="inline-block h-2 w-2 rounded-full bg-brand-500 shadow-[0_0_12px_rgba(61,123,255,0.8)]"
+            <img
+              src="./icons/icon.svg"
+              alt=""
+              width={28}
+              height={28}
+              className={`rounded-[7px] shadow-[0_0_16px_rgba(61,123,255,0.35)] transition-all duration-300 ${
+                sessionFocus ? 'h-5 w-5' : 'h-7 w-7'
+              }`}
               aria-hidden
             />
             ناوي فوكاس
@@ -421,14 +375,14 @@ export default function App() {
       >
         {finishedWhileHidden && state.phase === 'finished' && (
           <div
-            className="w-full max-w-sm rounded-2xl border border-amber-500/30 bg-amber-950/30 px-4 py-3 text-center text-sm text-amber-100"
+            className="w-full max-w-sm rounded-2xl border border-amber-500/20 bg-amber-950/30 px-4 py-3 text-sm text-amber-100/90"
             role="status"
           >
-            انتهت الجلسة أثناء غيابك عن التبويب.
+            انتهت الجلسة أثناء كون التطبيق في الخلفية.
             <button
               type="button"
+              className="ms-2 underline"
               onClick={dismissFinishedBanner}
-              className="ms-2 underline opacity-80 hover:opacity-100"
             >
               حسناً
             </button>
@@ -441,9 +395,9 @@ export default function App() {
             role="status"
             aria-live="polite"
           >
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex items-baseline justify-between gap-3">
               <p className="text-sm font-medium text-brand-100">
-                ستبدأ الراحة خلال
+                تبدأ الراحة خلال
               </p>
               <span className="font-mono text-2xl font-semibold tabular-nums text-brand-200">
                 {autoBreakCountdown}
@@ -452,29 +406,33 @@ export default function App() {
                 </span>
               </span>
             </div>
-            <div
-              className="mt-3 h-1.5 overflow-hidden rounded-full bg-black/40"
-              aria-hidden
-            >
+            <div className="mt-3 h-2 overflow-hidden rounded-full bg-brand-950">
               <div
                 className="h-full rounded-full bg-brand-500 transition-[width] duration-1000 linear"
                 style={{
                   width: `${Math.max(
                     0,
-                    Math.min(
-                      100,
-                      (autoBreakCountdown / Math.max(1, autoBreakDelayTotal)) *
-                        100,
-                    ),
+                    (autoBreakCountdown / autoBreakDelayTotal) * 100,
                   )}%`,
                 }}
               />
             </div>
-            <div className="mt-3 flex justify-end">
+            <div className="mt-3 flex gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  clearAutoBreakTimer()
+                  startBreak()
+                  void enterFs()
+                }}
+                className="btn-chrome border-brand-500/30 text-brand-200"
+              >
+                ابدأ الآن
+              </button>
               <button
                 type="button"
                 onClick={clearAutoBreakTimer}
-                className="btn-chrome border-brand-500/30 text-brand-200"
+                className="btn-chrome"
               >
                 إلغاء
               </button>
@@ -482,113 +440,70 @@ export default function App() {
           </div>
         )}
 
-        <TimerDisplay
-          remainingSeconds={state.remainingSeconds}
-          plannedSeconds={state.plannedSeconds}
-          phase={state.phase}
-          kind={state.kind}
-        />
+        <TimerDisplay state={state} />
 
-        {sessionFocus ? (
-          state.intention ? (
-            <p className="max-w-sm text-center text-xs text-slate-500">
-              {state.intention}
-            </p>
-          ) : null
-        ) : state.phase === 'finished' ? null : locked && state.intention ? (
-          <p className="max-w-sm text-center text-sm text-slate-400">
-            <span className="text-slate-500">النية: </span>
-            {state.intention}
-          </p>
-        ) : (
+        {!sessionFocus && (
           <IntentionInput
             value={state.intention}
             onChange={updateIntention}
-            disabled={locked}
-            suggestions={recentIntentions}
+            recent={recentIntentions}
+            disabled={sessionFocus}
           />
         )}
 
-        {!sessionFocus && state.phase !== 'finished' && (
+        {!sessionFocus && (
           <DurationPicker
-            kind={state.kind}
             plannedSeconds={state.plannedSeconds}
-            onKindChange={updateKind}
-            onSecondsChange={updatePlanned}
-            disabled={locked}
+            kind={state.kind}
+            onChangePlanned={updatePlanned}
+            onChangeKind={updateKind}
+            disabled={sessionFocus}
           />
         )}
 
         <SessionControls
-          phase={state.phase}
-          kind={state.kind}
-          plannedSeconds={state.plannedSeconds}
-          elapsedSeconds={state.elapsedSeconds}
-          onStart={handleStart}
+          state={state}
+          onStart={() => {
+            start()
+            void enterFs()
+          }}
           onPause={pause}
-          onResume={resume}
+          onResume={() => {
+            resume()
+            void enterFs()
+          }}
           onStop={requestStop}
-          onReset={handleReset}
-          onStartBreak={handleStartBreak}
+          onReset={requestReset}
+          onStartBreak={() => {
+            clearAutoBreakTimer()
+            startBreak()
+            void enterFs()
+          }}
         />
 
         {!sessionFocus && (
-          <p className="text-center text-[11px] tracking-wide text-slate-600">
-            مسافة · F · Esc
-          </p>
+          <HistoryList
+            sessions={sessions}
+            filter={filter}
+            onFilterChange={setFilter}
+            todaySeconds={todaySeconds}
+            weekSeconds={weekSeconds}
+            todayFocusCount={todayFocusCount}
+            weekFocusCount={weekFocusCount}
+            bestHour={bestHour}
+            loading={loading}
+            onExport={downloadBackup}
+            onExportCsv={downloadCsv}
+            onImportFile={uploadBackup}
+            onDelete={removeSession}
+            onCopySession={copySessionText}
+            backupMessage={backupMessage}
+          />
         )}
 
         {!sessionFocus && (
-          <div className="w-full border-t border-white/[0.05] pt-6">
-            <HistoryList
-              sessions={sessions}
-              filter={filter}
-              onFilterChange={setFilter}
-              todaySeconds={todaySeconds}
-              weekSeconds={weekSeconds}
-              todayFocusCount={todayFocusCount}
-              weekFocusCount={weekFocusCount}
-              bestHour={bestHour}
-              loading={loading}
-              onExport={() => void downloadBackup()}
-              onExportCsv={() => void downloadCsv()}
-              onImportFile={(f) => void uploadBackup(f)}
-              onDelete={(id) => void removeSession(id)}
-              onCopySession={(s) => void copySessionText(s)}
-              backupMessage={backupMessage}
-            />
-          </div>
-        )}
-
-        {!sessionFocus && (
-          <footer className="w-full max-w-sm border-t border-white/[0.05] pt-4 pb-2 text-center text-[11px] text-slate-600">
+          <footer className="mt-2 pb-2 text-center text-[11px] text-slate-600">
             <p className="mb-1">جزء من منظومة ناوي للإنتاجية</p>
-            <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
-              <a
-                className="text-slate-500 underline-offset-2 hover:text-slate-300 hover:underline"
-                href="https://github.com/inawy"
-                target="_blank"
-                rel="noreferrer"
-              >
-                GitHub
-              </a>
-              <a
-                className="text-slate-500 underline-offset-2 hover:text-slate-300 hover:underline"
-                href="https://nawy.to/focus"
-                target="_blank"
-                rel="noreferrer"
-              >
-                nawy.to/focus
-              </a>
-              <a
-                className="text-slate-500 underline-offset-2 hover:text-slate-300 hover:underline"
-                href="https://inawy.github.io/nawy-focus/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                التطبيق المباشر
-              </a>
-            </p>
           </footer>
         )}
       </main>
