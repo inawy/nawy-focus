@@ -34,8 +34,8 @@ export function SessionControls({
           onClick={onStart}
           className={
             kind === 'break'
-              ? 'btn-secondary-quiet w-full sm:w-auto sm:min-w-[15rem]'
-              : 'btn-primary-brand w-full sm:w-auto sm:min-w-[15rem]'
+              ? 'btn-secondary-quiet motion-pop w-full sm:w-auto sm:min-w-[15rem]'
+              : 'btn-primary-brand motion-pop w-full sm:w-auto sm:min-w-[15rem]'
           }
           title="مفتاح المسافة"
         >
@@ -44,7 +44,7 @@ export function SessionControls({
       )}
 
       {phase === 'running' && (
-        <div className="flex w-full flex-wrap items-center justify-center gap-2.5">
+        <div className="motion-fade-up flex w-full flex-wrap items-center justify-center gap-2.5">
           <button
             type="button"
             onClick={onPause}
@@ -63,7 +63,7 @@ export function SessionControls({
       )}
 
       {phase === 'paused' && (
-        <div className="flex w-full flex-wrap items-center justify-center gap-2.5">
+        <div className="motion-fade-up flex w-full flex-wrap items-center justify-center gap-2.5">
           <button
             type="button"
             onClick={onResume}
@@ -86,23 +86,27 @@ export function SessionControls({
       )}
 
       {phase === 'finished' && (
-        <div className="surface-panel w-full px-5 py-5">
+        <div className="surface-panel motion-finish-card w-full px-5 py-5">
           <div className="text-center">
-            <p className="text-[15px] font-medium text-slate-100">
+            <p className="text-[15px] font-medium">
               {kind === 'focus' ? 'أحسنت' : 'انتهت الراحة'}
             </p>
-            <p className="mt-1 text-sm text-slate-400">
-              {kind === 'focus' ? 'انتهت جلسة التركيز' : 'جاهز لجلسة جديدة'}
+            <p className="mt-1 text-sm text-slate-500">
+              {kind === 'focus'
+                ? 'جلسة تركيز مكتملة'
+                : 'يمكنك العودة للتركيز'}
             </p>
-            {(elapsedSeconds > 0 || plannedSeconds > 0) && (
-              <p className="mt-3 font-mono text-2xl font-medium tabular-nums text-brand-300">
-                {formatDurationShort(
-                  elapsedSeconds > 0 ? elapsedSeconds : plannedSeconds,
+            {elapsedSeconds > 0 && (
+              <p className="mt-3 font-mono text-2xl font-medium tabular-nums text-brand-500">
+                {formatDurationShort(elapsedSeconds)}
+                {plannedSeconds > 0 && elapsedSeconds < plannedSeconds && (
+                  <span className="ms-1 text-sm font-normal text-slate-500">
+                    / {formatDurationShort(plannedSeconds)}
+                  </span>
                 )}
               </p>
             )}
           </div>
-
           <div className="mt-5 flex w-full flex-col items-stretch gap-2.5">
             {kind === 'focus' && onStartBreak && (
               <button
@@ -118,11 +122,11 @@ export function SessionControls({
               onClick={onReset}
               className={
                 kind === 'focus'
-                  ? 'btn-chrome min-h-12 w-full rounded-full border-brand-500/30 text-sm font-medium text-brand-300 hover:border-brand-400/50 hover:text-brand-200'
+                  ? 'btn-chrome min-h-12 w-full rounded-full text-sm'
                   : 'btn-primary-brand w-full'
               }
             >
-              جلسة تركيز جديدة
+              {kind === 'focus' ? 'جلسة جديدة' : 'العودة للتركيز'}
             </button>
           </div>
         </div>

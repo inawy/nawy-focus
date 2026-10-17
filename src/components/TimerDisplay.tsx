@@ -89,16 +89,32 @@ export function TimerDisplay({
         ? 'text-[3rem] sm:text-[3.35rem] leading-none'
         : 'text-[2.75rem] sm:text-[3.15rem] leading-none'
 
+  const motionClass =
+    phase === 'running'
+      ? 'timer-running'
+      : phase === 'paused'
+        ? 'animate-pulse-ring'
+        : phase === 'finished'
+          ? 'timer-finished'
+          : 'timer-idle'
+
   return (
     <div
-      className={`relative mx-auto flex items-center justify-center transition-all duration-500 ease-[var(--ease-out)] ${sizeClass} ${phase === 'paused' ? 'animate-pulse-ring' : ''}`}
+      className={`relative mx-auto flex items-center justify-center transition-all duration-500 ease-[var(--ease-out)] ${sizeClass} ${motionClass}`}
     >
+      {phase === 'running' && (
+        <>
+          <div className="timer-aura timer-aura-a" aria-hidden />
+          <div className="timer-aura timer-aura-b" aria-hidden />
+        </>
+      )}
+
       <div
         className={`absolute inset-[8%] rounded-full bg-gradient-to-b from-current/[0.04] to-transparent ${theme.glow}`}
         aria-hidden
       />
       <svg
-        className="-rotate-90 drop-shadow-sm"
+        className={`-rotate-90 drop-shadow-sm ${phase === 'running' ? 'timer-ring-live' : ''}`}
         width="100%"
         height="100%"
         viewBox="0 0 240 240"
@@ -126,18 +142,18 @@ export function TimerDisplay({
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
         <span
-          className={`font-mono font-medium tracking-tight tabular-nums transition-all duration-500 ${timeClass}`}
+          className={`timer-digits font-mono font-medium tracking-tight tabular-nums transition-all duration-500 ${timeClass}`}
           aria-live="polite"
         >
           {formatTime(remainingSeconds)}
         </span>
         <span
-          className={`mt-2.5 text-[11px] font-medium uppercase tracking-[0.18em] ${theme.label}`}
+          className={`mt-2.5 text-[11px] font-medium uppercase tracking-[0.18em] transition-colors duration-300 ${theme.label}`}
         >
           {phaseLabel}
         </span>
         {phase === 'idle' && (
-          <span className="mt-1.5 text-[11px] text-slate-500">
+          <span className="motion-fade-in mt-1.5 text-[11px] text-slate-500">
             {isBreak ? 'راحة' : 'تركيز'} · {Math.round(plannedSeconds / 60)} د
           </span>
         )}
