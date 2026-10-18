@@ -341,13 +341,13 @@ export default function App() {
   return (
     <div className="app-shell min-h-dvh">
       <header
-        className={`app-header sticky top-0 z-20 px-4 pt-[max(0.5rem,env(safe-area-inset-top))] transition-all duration-300 ${
-          sessionFocus ? 'pb-2.5' : 'pb-3.5'
+        className={`app-header sticky top-0 z-20 w-full overflow-x-clip px-3 pt-[max(0.5rem,env(safe-area-inset-top))] transition-all duration-300 sm:px-4 ${
+          sessionFocus ? 'pb-2' : 'pb-3'
         }`}
       >
-        <div className="mx-auto flex max-w-md items-center justify-between gap-2">
+        <div className="mx-auto flex w-full min-w-0 max-w-md items-center justify-between gap-1.5">
           <h1
-            className={`flex items-center gap-2 font-semibold tracking-tight transition-all duration-300 ${
+            className={`flex min-w-0 items-center gap-2 font-semibold tracking-tight transition-all duration-300 ${
               sessionFocus ? 'text-[15px] opacity-60' : 'text-base'
             }`}
           >
@@ -356,15 +356,15 @@ export default function App() {
               alt=""
               width={28}
               height={28}
-              className={`rounded-[7px] shadow-[0_0_16px_rgba(61,123,255,0.35)] transition-all duration-300 ${
+              className={`shrink-0 rounded-[7px] shadow-[0_0_16px_rgba(61,123,255,0.35)] transition-all duration-300 ${
                 sessionFocus ? 'h-5 w-5' : 'h-7 w-7'
               }`}
               aria-hidden
             />
-            ناوي فوكاس
+            <span className="truncate">ناوي فوكاس</span>
           </h1>
 
-          <div className="flex items-center gap-1.5" ref={settingsRef}>
+          <div className="flex shrink-0 items-center gap-1" ref={settingsRef}>
             <button
               type="button"
               onClick={cycleTheme}
@@ -377,7 +377,7 @@ export default function App() {
             <button
               type="button"
               onClick={() => void toggleFs()}
-              className="btn-chrome"
+              className="btn-chrome hidden min-[380px]:inline-flex"
               title="ملء الشاشة (F)"
               aria-label={fullscreen ? 'خروج من ملء الشاشة' : 'ملء الشاشة'}
             >
@@ -407,9 +407,20 @@ export default function App() {
 
               {settingsOpen && (
                 <div
-                  className="app-menu absolute end-0 top-full z-30 mt-2 w-56 rounded-2xl p-1.5"
+                  className="app-menu absolute end-0 top-full z-30 mt-2 w-[min(14rem,calc(100vw-1.5rem))] rounded-2xl p-1.5"
                   role="menu"
                 >
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => void toggleFs()}
+                    className="flex min-h-11 w-full items-center justify-between gap-2 rounded-xl px-3 text-sm transition hover:opacity-90 min-[380px]:hidden"
+                  >
+                    <span>ملء الشاشة</span>
+                    <span className="text-xs text-slate-500">
+                      {fullscreen ? 'تشغيل' : 'إيقاف'}
+                    </span>
+                  </button>
                   <button
                     type="button"
                     role="menuitem"
@@ -502,12 +513,12 @@ export default function App() {
       </header>
 
       <main
-        className={`mx-auto flex max-w-md flex-col items-center px-5 pb-[max(2rem,env(safe-area-inset-bottom))] pt-6 transition-all duration-300 ${
+        className={`mx-auto flex w-full min-w-0 max-w-md flex-col items-center px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4 transition-all duration-300 sm:px-5 sm:pt-6 ${
           state.phase === 'finished'
-            ? 'gap-5'
+            ? 'gap-4 sm:gap-5'
             : sessionFocus
               ? 'gap-3'
-              : 'gap-6'
+              : 'gap-5 sm:gap-6'
         }`}
       >
         {finishedWhileHidden && state.phase === 'finished' && (
@@ -585,7 +596,7 @@ export default function App() {
 
         {autoBreakCountdown !== null && (
           <div
-            className="w-full max-w-sm rounded-2xl border border-brand-500/25 bg-brand-950/40 px-5 py-4 shadow-[0_0_40px_-16px_rgba(61,123,255,0.35)]"
+            className="w-full max-w-sm rounded-2xl border border-brand-500/25 bg-brand-950/40 px-4 py-4 shadow-[0_0_40px_-16px_rgba(61,123,255,0.35)] sm:px-5"
             role="status"
             aria-live="polite"
           >
@@ -653,7 +664,7 @@ export default function App() {
 
         {sessionFocus ? (
           state.intention ? (
-            <p className="max-w-sm text-center text-xs text-slate-500">
+            <p className="max-w-sm px-1 text-center text-xs text-slate-500">
               {state.intention}
             </p>
           ) : null
