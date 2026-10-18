@@ -75,7 +75,7 @@ export function TimerDisplay({
           ? 'انتهت'
           : 'جاهز'
 
-  /* Compact on phones so auras + controls never force horizontal scroll */
+  /* Mobile-friendly sizes without overflowing decoration */
   const sizeClass =
     phase === 'finished'
       ? 'h-48 w-48 sm:h-56 sm:w-56'
@@ -91,75 +91,66 @@ export function TimerDisplay({
         : 'text-[2.45rem] sm:text-[3.1rem] leading-none'
 
   const motionClass =
-    phase === 'running'
-      ? 'timer-running'
-      : phase === 'paused'
-        ? 'animate-pulse-ring'
-        : phase === 'finished'
-          ? 'timer-finished'
-          : 'timer-idle'
+    phase === 'paused'
+      ? 'animate-pulse-ring'
+      : phase === 'finished'
+        ? 'timer-finished'
+        : phase === 'idle'
+          ? 'timer-idle'
+          : ''
 
   return (
-    <div className="timer-shell w-full">
+    <div
+      className={`relative mx-auto flex items-center justify-center transition-all duration-500 ease-[var(--ease-out)] ${sizeClass} ${motionClass}`}
+    >
       <div
-        className={`relative mx-auto flex items-center justify-center transition-all duration-500 ease-[var(--ease-out)] ${sizeClass} ${motionClass}`}
+        className={`absolute inset-[8%] rounded-full bg-gradient-to-b from-current/[0.04] to-transparent ${theme.glow}`}
+        aria-hidden
+      />
+      <svg
+        className="-rotate-90 drop-shadow-sm"
+        width="100%"
+        height="100%"
+        viewBox="0 0 240 240"
+        aria-hidden
       >
-        {phase === 'running' && (
-          <>
-            <div className="timer-aura timer-aura-a" aria-hidden />
-            <div className="timer-aura timer-aura-b" aria-hidden />
-          </>
-        )}
-
-        <div
-          className={`absolute inset-[8%] rounded-full bg-gradient-to-b from-current/[0.04] to-transparent ${theme.glow}`}
-          aria-hidden
+        <circle
+          cx="120"
+          cy="120"
+          r={radius}
+          fill="none"
+          className={theme.track}
+          strokeWidth="10"
         />
-        <svg
-          className={`-rotate-90 drop-shadow-sm ${phase === 'running' ? 'timer-ring-live' : ''}`}
-          width="100%"
-          height="100%"
-          viewBox="0 0 240 240"
-          aria-hidden
+        <circle
+          cx="120"
+          cy="120"
+          r={radius}
+          fill="none"
+          className={theme.stroke}
+          strokeWidth="10"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-3">
+        <span
+          className={`timer-digits font-mono font-medium tracking-tight tabular-nums transition-all duration-500 ${timeClass}`}
+          aria-live="polite"
         >
-          <circle
-            cx="120"
-            cy="120"
-            r={radius}
-            fill="none"
-            className={theme.track}
-            strokeWidth="10"
-          />
-          <circle
-            cx="120"
-            cy="120"
-            r={radius}
-            fill="none"
-            className={theme.stroke}
-            strokeWidth="10"
-            strokeLinecap="round"
-            strokeDasharray={circumference}
-            strokeDashoffset={offset}
-          />
-        </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-3">
-          <span
-            className={`timer-digits font-mono font-medium tracking-tight tabular-nums transition-all duration-500 ${timeClass}`}
-            aria-live="polite"
-          >
-            {formatTime(remainingSeconds)}
+          {formatTime(remainingSeconds)}
+        </span>
+        <span
+          className={`mt-2 text-[11px] font-medium uppercase tracking-[0.16em] transition-colors duration-300 ${theme.label}`}
+        >
+          {phaseLabel}
+        </span>
+        {phase === 'idle' && (
+          <span className="motion-fade-in mt-1 text-[11px] text-slate-500">
+            {isBreak ? 'راحة' : 'تركيز'} · {Math.round(plannedSeconds / 60)} د
           </span>
-          <span
-            className={`mt-2 text-[11px] font-medium uppercase tracking-[0.16em] transition-colors duration-300 ${theme.label}`}
-          >
-            {phaseLabel}
-          </span>
-          {phase === 'idle' && (
-            <span className="motion-fade-in mt-1 text-[11px] text-slate-500">
-              {isBreak ? 'راحة' : 'تركيز'} · {Math.round(plannedSeconds / 60)} د
-            </span>
-          )}
-        </div>
+        )}
       </div>
     </div>
   )
