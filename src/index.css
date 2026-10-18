@@ -81,6 +81,7 @@ html[data-theme='light'] {
 html {
   direction: rtl;
   color-scheme: dark;
+  overflow-x: clip;
 }
 
 html[data-theme='light'] {
@@ -90,6 +91,7 @@ html[data-theme='light'] {
 body {
   margin: 0;
   min-height: 100dvh;
+  overflow-x: clip;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -136,6 +138,9 @@ button {
 @layer components {
   .app-shell {
     color: var(--app-fg);
+    overflow-x: clip;
+    width: 100%;
+    max-width: 100vw;
   }
 
   .app-header {
@@ -172,7 +177,7 @@ button {
   }
 
   .btn-primary-brand {
-    @apply min-h-12 rounded-full bg-brand-500 px-10 py-3.5 text-base font-semibold text-white transition active:scale-[0.98];
+    @apply min-h-12 w-full max-w-sm rounded-full bg-brand-500 px-6 py-3.5 text-base font-semibold text-white transition active:scale-[0.98] sm:w-auto sm:px-10;
     box-shadow:
       0 1px 0 rgb(255 255 255 / 0.18) inset,
       0 10px 28px -8px rgb(61 123 255 / 0.55);
@@ -185,7 +190,7 @@ button {
   }
 
   .btn-secondary-quiet {
-    @apply min-h-12 rounded-full px-8 py-3.5 text-base font-semibold transition active:scale-[0.98];
+    @apply min-h-12 w-full max-w-sm rounded-full px-6 py-3.5 text-base font-semibold transition active:scale-[0.98] sm:w-auto sm:px-8;
     background: #ffffff;
     color: #0a0a0a;
     box-shadow: 0 1px 0 rgb(255 255 255 / 0.4) inset, 0 8px 24px -10px rgb(0 0 0 / 0.5);
@@ -405,8 +410,12 @@ button {
   }
 
   @keyframes confirm-fade-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
   @keyframes confirm-rise {
     from {
@@ -443,23 +452,40 @@ button {
     animation: motion-finish-card 0.45s var(--ease-out) both;
   }
 
+  /* Timer shell: contain auras so they never shift layout / buttons */
+  .timer-shell {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-radius: 9999px;
+    margin-inline: auto;
+    max-width: min(100%, 18.5rem);
+  }
+  @media (min-width: 640px) {
+    .timer-shell {
+      max-width: min(100%, 20.5rem);
+    }
+  }
+
   .timer-aura {
     pointer-events: none;
     position: absolute;
-    inset: -6%;
+    inset: 0;
     border-radius: 9999px;
-    border: 1px solid rgb(61 123 255 / 0.18);
+    border: 1px solid rgb(61 123 255 / 0.2);
+    /* no transform scale — that caused left/right shift on phones */
+    will-change: opacity;
   }
   .timer-aura-a {
-    animation: timer-aura-pulse 3.2s var(--ease-out) infinite;
+    animation: timer-aura-pulse 3.6s ease-in-out infinite;
   }
   .timer-aura-b {
-    inset: -12%;
-    border-color: rgb(61 123 255 / 0.1);
-    animation: timer-aura-pulse 3.2s var(--ease-out) 0.9s infinite;
+    inset: 6%;
+    border-color: rgb(61 123 255 / 0.12);
+    animation: timer-aura-pulse 3.6s ease-in-out 1.1s infinite;
   }
   .timer-running .timer-ring-live {
-    filter: drop-shadow(0 0 10px rgb(61 123 255 / 0.35));
+    filter: drop-shadow(0 0 8px rgb(61 123 255 / 0.3));
   }
   .timer-finished {
     animation: timer-finish-pop 0.55s var(--ease-out) both;
@@ -476,8 +502,12 @@ button {
   }
 
   @keyframes motion-fade-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
   @keyframes motion-fade-up {
     from {
@@ -512,25 +542,17 @@ button {
   @keyframes timer-aura-pulse {
     0%,
     100% {
-      opacity: 0.35;
-      transform: scale(1);
+      opacity: 0.25;
     }
     50% {
-      opacity: 0.85;
-      transform: scale(1.03);
+      opacity: 0.7;
     }
   }
   @keyframes timer-finish-pop {
     0% {
-      transform: scale(0.94);
-      opacity: 0.7;
-    }
-    55% {
-      transform: scale(1.03);
-      opacity: 1;
+      opacity: 0.65;
     }
     100% {
-      transform: scale(1);
       opacity: 1;
     }
   }
