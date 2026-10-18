@@ -27,15 +27,15 @@ export function SessionControls({
   onStartBreak,
 }: Props) {
   return (
-    <div className="flex w-full max-w-sm flex-col items-center gap-3">
+    <div className="flex w-full max-w-sm flex-col items-stretch gap-2.5 px-0 sm:items-center">
       {phase === 'idle' && (
         <button
           type="button"
           onClick={onStart}
           className={
             kind === 'break'
-              ? 'btn-secondary-quiet motion-pop w-full sm:w-auto sm:min-w-[15rem]'
-              : 'btn-primary-brand motion-pop w-full sm:w-auto sm:min-w-[15rem]'
+              ? 'btn-secondary-quiet motion-pop'
+              : 'btn-primary-brand motion-pop'
           }
           title="مفتاح المسافة"
         >
@@ -44,18 +44,18 @@ export function SessionControls({
       )}
 
       {phase === 'running' && (
-        <div className="motion-fade-up flex w-full flex-wrap items-center justify-center gap-2.5">
+        <div className="motion-fade-up flex w-full flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center">
           <button
             type="button"
             onClick={onPause}
-            className="btn-secondary-quiet min-w-[8.5rem] px-7"
+            className="btn-secondary-quiet w-full sm:w-auto sm:min-w-[8.5rem] sm:px-7"
           >
             إيقاف مؤقت
           </button>
           <button
             type="button"
             onClick={onStop}
-            className="btn-chrome min-h-12 rounded-full px-5 text-sm"
+            className="btn-chrome min-h-12 w-full rounded-full px-5 text-sm sm:w-auto"
           >
             إنهاء
           </button>
@@ -63,14 +63,14 @@ export function SessionControls({
       )}
 
       {phase === 'paused' && (
-        <div className="motion-fade-up flex w-full flex-wrap items-center justify-center gap-2.5">
+        <div className="motion-fade-up flex w-full flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center">
           <button
             type="button"
             onClick={onResume}
             className={
               kind === 'break'
-                ? 'btn-secondary-quiet min-w-[8.5rem] px-7'
-                : 'btn-primary-brand min-w-[8.5rem] px-7'
+                ? 'btn-secondary-quiet w-full sm:w-auto sm:min-w-[8.5rem] sm:px-7'
+                : 'btn-primary-brand w-full sm:w-auto sm:min-w-[8.5rem] sm:px-7'
             }
           >
             متابعة
@@ -78,7 +78,7 @@ export function SessionControls({
           <button
             type="button"
             onClick={onStop}
-            className="btn-chrome min-h-12 rounded-full px-5 text-sm"
+            className="btn-chrome min-h-12 w-full rounded-full px-5 text-sm sm:w-auto"
           >
             إنهاء
           </button>
@@ -86,7 +86,7 @@ export function SessionControls({
       )}
 
       {phase === 'finished' && (
-        <div className="surface-panel motion-finish-card w-full px-5 py-5">
+        <div className="surface-panel motion-finish-card w-full px-4 py-5 sm:px-5">
           <div className="text-center">
             <p className="text-[15px] font-medium">
               {kind === 'focus' ? 'أحسنت' : 'انتهت الراحة'}
