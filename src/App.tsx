@@ -3,11 +3,17 @@ import { ConfirmDialog } from './components/ConfirmDialog'
 import { DurationPicker } from './components/DurationPicker'
 import { HistoryList } from './components/HistoryList'
 import { IntentionInput } from './components/IntentionInput'
+import { ModeTabs, type AppMode } from './components/ModeTabs'
 import { SessionControls } from './components/SessionControls'
+import {
+  SessionTypeChips,
+  type SessionPreset,
+} from './components/SessionTypeChips'
 import { TimerDisplay } from './components/TimerDisplay'
 import { useFullscreen } from './hooks/useFullscreen'
 import { usePwaInstall } from './hooks/usePwaInstall'
 import { useSessions } from './hooks/useSessions'
+import { useStopwatch } from './hooks/useStopwatch'
 import { useTheme } from './hooks/useTheme'
 import { useTimer } from './hooks/useTimer'
 import { useWakeLock } from './hooks/useWakeLock'
@@ -47,6 +53,10 @@ export default function App() {
     finishedWhileHidden,
     dismissFinishedBanner,
   } = useTimer()
+
+  const [appMode, setAppMode] = useState<AppMode>('session')
+  const [presetId, setPresetId] = useState<string>('focus')
+  const stopwatch = useStopwatch()
 
   const {
     sessions,
@@ -204,7 +214,7 @@ export default function App() {
   const locked = isActive(state.phase) || state.phase === 'finished'
   const sessionFocus = isActive(state.phase)
 
-  useWakeLock(state.phase === 'running')
+  useWakeLock(state.phase === 'running' || stopwatch.phase === 'running')
 
   const handleStart = useCallback(() => {
     start()
@@ -229,6 +239,53 @@ export default function App() {
     resume()
     void enterFs()
   }, [resume, enterFs])
+
+  const handleModeChange = useCallback(
+    (mode: AppMode) => {
+      if (mode === appMode) return
+      if (
+        isActive(state.phase) ||
+        stopwatch.phase === 'running' ||
+        stopwatch.phase === 'paused'
+      ) {
+        return
+      }
+      setAppMode(mode)
+    },
+    [appMode, state.phase, stopwatch.phase],
+  )
+
+  const handlePreset = useCallback(
+    (preset: SessionPreset) => {
+      setPresetId(preset.id)
+      updateKind(preset.kind)
+      if (preset.minutes) updatePlanned(preset.minutes * 60)
+      if (preset.intention !== undefined) updateIntention(preset.intention)
+      else if (preset.id === 'focus') updateIntention('')
+    },
+    [updateKind, updatePlanned, updateIntention],
+  )
+
+  const handleTimerPrimary = useCallback(() => {
+    if (appMode === 'stopwatch') {
+      if (stopwatch.phase === 'running') stopwatch.pause()
+      else if (stopwatch.phase === 'paused') stopwatch.resume()
+      else stopwatch.start()
+      return
+    }
+    if (state.phase === 'idle') handleStart()
+    else if (state.phase === 'running') pause()
+    else if (state.phase === 'paused') handleResume()
+    else if (state.phase === 'finished') handleReset()
+  }, [
+    appMode,
+    stopwatch,
+    state.phase,
+    handleStart,
+    pause,
+    handleResume,
+    handleReset,
+  ])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -266,6 +323,12 @@ export default function App() {
       }
       if (e.key === ' ' || e.code === 'Space') {
         e.preventDefault()
+        if (appMode === 'stopwatch') {
+          if (stopwatch.phase === 'idle') stopwatch.start()
+          else if (stopwatch.phase === 'running') stopwatch.pause()
+          else if (stopwatch.phase === 'paused') stopwatch.resume()
+          return
+        }
         if (state.phase === 'idle') handleStart()
         else if (state.phase === 'running') pause()
         else if (state.phase === 'paused') handleResume()
@@ -276,6 +339,8 @@ export default function App() {
     return () => document.removeEventListener('keydown', onKey)
   }, [
     state.phase,
+    appMode,
+    stopwatch,
     settingsOpen,
     confirmAction,
     notice,
@@ -520,7 +585,7 @@ export default function App() {
               : 'gap-3.5 sm:gap-4'
         }`}
       >
-        {finishedWhileHidden && state.phase === 'finished' && (
+        {finishedWhileHidden && state.phase === 'finished' && appMode === 'session' && (
           <div
             className="w-full max-w-sm rounded-2xl border border-amber-500/30 bg-amber-950/30 px-4 py-3 text-center text-sm text-amber-100"
             role="status"
@@ -539,6 +604,7 @@ export default function App() {
         {showInstall &&
           !installDismissed &&
           !sessionFocus &&
+          appMode === 'session' &&
           state.phase === 'idle' && (
             <div className="install-banner flex w-full max-w-sm items-center gap-2 px-3 py-2">
               <p className="min-w-0 flex-1 text-start text-[12px] text-slate-500">
@@ -586,7 +652,7 @@ export default function App() {
           </div>
         )}
 
-        {autoBreakCountdown !== null && (
+        {autoBreakCountdown !== null && appMode === 'session' && (
           <div
             className="w-full max-w-sm rounded-2xl border border-brand-500/25 bg-brand-950/40 px-4 py-4 shadow-[0_0_40px_-16px_rgba(61,123,255,0.35)] sm:px-5"
             role="status"
@@ -640,64 +706,140 @@ export default function App() {
           </div>
         )}
 
-        <TimerDisplay
-          remainingSeconds={state.remainingSeconds}
-          plannedSeconds={state.plannedSeconds}
-          phase={state.phase}
-          kind={state.kind}
+        <ModeTabs
+          mode={appMode}
+          onChange={handleModeChange}
+          disabled={
+            isActive(state.phase) ||
+            stopwatch.phase === 'running' ||
+            stopwatch.phase === 'paused'
+          }
         />
 
-        {sessionFocus ? (
-          state.intention ? (
-            <p className="max-w-sm px-1 text-center text-xs text-slate-500">
-              {state.intention}
-            </p>
-          ) : null
-        ) : state.phase === 'finished' ? null : locked && state.intention ? (
-          <p className="max-w-sm text-center text-sm text-slate-400">
-            <span className="text-slate-500">النية: </span>
-            {state.intention}
-          </p>
+        {appMode === 'session' ? (
+          <>
+            <TimerDisplay
+              seconds={state.remainingSeconds}
+              phase={state.phase}
+              kind={state.kind}
+              progress={
+                state.plannedSeconds > 0
+                  ? 1 - state.remainingSeconds / state.plannedSeconds
+                  : 0
+              }
+              onPrimary={handleTimerPrimary}
+              primaryLabel={
+                state.phase === 'running'
+                  ? 'إيقاف مؤقت'
+                  : state.phase === 'paused'
+                    ? 'استئناف'
+                    : state.phase === 'finished'
+                      ? 'جلسة جديدة'
+                      : 'بدء'
+              }
+              onSecondary={
+                state.phase === 'running' || state.phase === 'paused'
+                  ? requestStop
+                  : undefined
+              }
+              secondaryIcon="■"
+              secondaryLabel="إنهاء"
+            />
+
+            {sessionFocus ? (
+              state.intention ? (
+                <p className="max-w-sm px-1 text-center text-xs text-slate-500">
+                  {state.intention}
+                </p>
+              ) : null
+            ) : state.phase === 'finished' ? null : locked && state.intention ? (
+              <p className="max-w-sm text-center text-sm text-slate-400">
+                <span className="text-slate-500">النية: </span>
+                {state.intention}
+              </p>
+            ) : (
+              <IntentionInput
+                value={state.intention}
+                onChange={updateIntention}
+                disabled={locked}
+                suggestions={recentIntentions}
+                onSubmit={handleStart}
+              />
+            )}
+
+            {!sessionFocus && state.phase !== 'finished' && (
+              <>
+                <SessionTypeChips
+                  kind={state.kind}
+                  intention={state.intention}
+                  selectedId={presetId}
+                  onSelect={handlePreset}
+                  disabled={locked}
+                />
+                <DurationPicker
+                  kind={state.kind}
+                  plannedSeconds={state.plannedSeconds}
+                  onKindChange={updateKind}
+                  onSecondsChange={updatePlanned}
+                  disabled={locked}
+                />
+              </>
+            )}
+
+            {(state.phase === 'finished' || state.phase === 'paused') && (
+              <SessionControls
+                phase={state.phase}
+                kind={state.kind}
+                plannedSeconds={state.plannedSeconds}
+                elapsedSeconds={state.elapsedSeconds}
+                onStart={handleStart}
+                onPause={pause}
+                onResume={handleResume}
+                onStop={requestStop}
+                onReset={handleReset}
+                onStartBreak={handleStartBreak}
+              />
+            )}
+          </>
         ) : (
-          <IntentionInput
-            value={state.intention}
-            onChange={updateIntention}
-            disabled={locked}
-            suggestions={recentIntentions}
-            onSubmit={handleStart}
-          />
+          <>
+            <TimerDisplay
+              seconds={stopwatch.elapsedSeconds}
+              phase={stopwatch.phase}
+              kind="stopwatch"
+              onPrimary={handleTimerPrimary}
+              primaryLabel={
+                stopwatch.phase === 'running'
+                  ? 'إيقاف مؤقت'
+                  : stopwatch.phase === 'paused'
+                    ? 'استئناف'
+                    : 'بدء'
+              }
+              onSecondary={
+                stopwatch.phase !== 'idle' ? stopwatch.reset : undefined
+              }
+              secondaryIcon="↺"
+              secondaryLabel="إعادة التعيين"
+            />
+            {stopwatch.phase !== 'idle' && (
+              <button
+                type="button"
+                onClick={stopwatch.reset}
+                className="btn-chrome min-h-11 rounded-full px-5 text-sm"
+              >
+                إعادة التعيين
+              </button>
+            )}
+          </>
         )}
 
-        {!sessionFocus && state.phase !== 'finished' && (
-          <DurationPicker
-            kind={state.kind}
-            plannedSeconds={state.plannedSeconds}
-            onKindChange={updateKind}
-            onSecondsChange={updatePlanned}
-            disabled={locked}
-          />
-        )}
-
-        <SessionControls
-          phase={state.phase}
-          kind={state.kind}
-          plannedSeconds={state.plannedSeconds}
-          elapsedSeconds={state.elapsedSeconds}
-          onStart={handleStart}
-          onPause={pause}
-          onResume={handleResume}
-          onStop={requestStop}
-          onReset={handleReset}
-          onStartBreak={handleStartBreak}
-        />
-
-        {state.phase === 'idle' && (
+        {appMode === 'session' && state.phase === 'idle' && (
           <p className="hidden text-center text-[11px] text-slate-600 opacity-60 sm:block">
             مسافة: بدء · F: ملء الشاشة · Esc: إنهاء
           </p>
         )}
 
-        {!sessionFocus && (
+        {appMode === 'session' && !sessionFocus && (
           <HistoryList
             sessions={sessions}
             filter={filter}
@@ -717,7 +859,7 @@ export default function App() {
           />
         )}
 
-        {!sessionFocus && state.phase === 'idle' && (
+        {appMode === 'session' && !sessionFocus && state.phase === 'idle' && (
           <footer className="mt-1 pb-3 text-center text-[11px] text-slate-600 opacity-70">
             <a
               href="https://nawy.to/focus"
