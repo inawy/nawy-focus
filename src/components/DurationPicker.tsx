@@ -64,7 +64,7 @@ export function DurationPicker({
               kind === value
                 ? value === 'focus'
                   ? 'bg-brand-500 text-white shadow-md shadow-brand-500/25'
-                  : 'bg-white text-slate-950 shadow-md'
+                  : 'break-toggle-active shadow-md'
                 : 'text-slate-500 hover:text-inherit'
             } disabled:opacity-40`}
           >
@@ -118,7 +118,7 @@ export function DurationPicker({
             disabled={disabled}
             onChange={(e) => applyCustom(e.target.value)}
             className="surface-field w-24 rounded-xl px-3 py-2.5 text-center text-sm tabular-nums outline-none focus:border-brand-500/40 focus:ring-2 focus:ring-brand-500/15 disabled:opacity-40"
-            aria-label="دقائق مخصصة"
+            aria-label="المدة بالدقائق"
           />
           <span className="text-sm text-slate-500">دقيقة</span>
         </div>
