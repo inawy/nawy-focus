@@ -37,9 +37,9 @@ export function SessionControls({
               ? 'btn-secondary-quiet motion-pop'
               : 'btn-primary-brand motion-pop'
           }
-          title="مفتاح المسافة"
+          title="اختصار: مفتاح المسافة"
         >
-          {kind === 'break' ? 'ابدأ الراحة' : 'ابدأ التركيز'}
+          {kind === 'break' ? 'بدء الراحة' : 'بدء التركيز'}
         </button>
       )}
 
@@ -73,7 +73,7 @@ export function SessionControls({
                 : 'btn-primary-brand w-full sm:w-auto sm:min-w-[8.5rem] sm:px-7'
             }
           >
-            متابعة
+            استئناف
           </button>
           <button
             type="button"
@@ -93,8 +93,8 @@ export function SessionControls({
             </p>
             <p className="mt-1 text-sm text-slate-500">
               {kind === 'focus'
-                ? 'جلسة تركيز مكتملة'
-                : 'يمكنك العودة للتركيز'}
+                ? 'أتممت جلسة التركيز'
+                : 'يمكنك بدء جلسة تركيز جديدة'}
             </p>
             {elapsedSeconds > 0 && (
               <p className="mt-3 font-mono text-2xl font-medium tabular-nums text-brand-500">
@@ -114,7 +114,7 @@ export function SessionControls({
                 onClick={onStartBreak}
                 className="btn-secondary-quiet w-full"
               >
-                ابدأ راحة
+                بدء الراحة
               </button>
             )}
             <button
@@ -126,7 +126,7 @@ export function SessionControls({
                   : 'btn-primary-brand w-full'
               }
             >
-              {kind === 'focus' ? 'جلسة جديدة' : 'العودة للتركيز'}
+              {kind === 'focus' ? 'جلسة جديدة' : 'بدء التركيز'}
             </button>
           </div>
         </div>

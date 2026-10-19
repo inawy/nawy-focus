@@ -26,7 +26,7 @@ export function IntentionInput({
       onSubmit={onForm}
     >
       <label className="type-caption px-0.5 text-end" htmlFor="intention">
-        نية اختيارية
+        نية الجلسة (اختياري)
       </label>
       <input
         id="intention"
@@ -34,7 +34,7 @@ export function IntentionInput({
         value={value}
         disabled={disabled}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="مثال: كتابة التقرير…"
+        placeholder="مثال: إعداد التقرير…"
         autoComplete="off"
         enterKeyHint="go"
         className="surface-field min-h-11 w-full rounded-xl px-3.5 text-sm outline-none transition focus:border-brand-500/40 focus:ring-2 focus:ring-brand-500/15 disabled:opacity-40"
