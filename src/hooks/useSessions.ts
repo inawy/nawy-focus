@@ -131,7 +131,7 @@ export function useSessions() {
     async (id: string) => {
       await dbDeleteSession(id)
       await refresh()
-      setBackupMessage('تم حذف الجلسة')
+      setBackupMessage('حُذفت الجلسة')
     },
     [refresh],
   )
@@ -140,9 +140,9 @@ export function useSessions() {
     const text = formatSessionShareText(session)
     try {
       await navigator.clipboard.writeText(text)
-      setBackupMessage('تم نسخ ملخص الجلسة')
+      setBackupMessage('نُسخ ملخص الجلسة')
     } catch {
-      setBackupMessage('تعذّر النسخ — انسخ يدوياً إن لزم')
+      setBackupMessage('تعذّر النسخ. يمكنك النسخ يدوياً.')
     }
   }, [])
 
@@ -186,11 +186,11 @@ export function useSessions() {
         await refresh()
         setBackupMessage(
           inserted === 0
-            ? 'لا جلسات جديدة للاستيراد'
+            ? 'لا توجد جلسات جديدة للاستيراد'
             : `تم استيراد ${inserted} جلسة جديدة`,
         )
       } catch (err) {
-        const msg = err instanceof Error ? err.message : 'فشل الاستيراد'
+        const msg = err instanceof Error ? err.message : 'تعذّر الاستيراد'
         setBackupMessage(msg)
       }
     },
