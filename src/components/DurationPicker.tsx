@@ -13,7 +13,6 @@ interface Props {
 export function DurationPicker({
   kind,
   plannedSeconds,
-  onKindChange,
   onSecondsChange,
   disabled,
 }: Props) {
@@ -44,35 +43,6 @@ export function DurationPicker({
 
   return (
     <div className="flex w-full max-w-sm flex-col gap-2.5">
-      <div className="surface-field flex gap-1 rounded-2xl p-1">
-        {(
-          [
-            ['focus', 'تركيز'],
-            ['break', 'راحة'],
-          ] as const
-        ).map(([value, label]) => (
-          <button
-            key={value}
-            type="button"
-            disabled={disabled}
-            onClick={() => {
-              onKindChange(value)
-              setShowCustom(false)
-              setCustomText('')
-            }}
-            className={`min-h-11 flex-1 rounded-xl py-2 text-sm font-medium transition ${
-              kind === value
-                ? value === 'focus'
-                  ? 'bg-brand-500 text-white shadow-md shadow-brand-500/25'
-                  : 'break-toggle-active shadow-md'
-                : 'text-slate-500 hover:text-inherit'
-            } disabled:opacity-40`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
       <div className="flex flex-wrap justify-center gap-2">
         {presets.map((m) => (
           <button
