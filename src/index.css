@@ -355,6 +355,16 @@ button {
     border-radius: var(--radius-2xl);
   }
 
+  /* Break segment — readable in both themes (avoids inverted slate-950) */
+  .break-toggle-active {
+    background: #ffffff;
+    color: #0a0a0a;
+  }
+  html[data-theme='light'] .break-toggle-active {
+    background: #1c1c1e;
+    color: #fafafa;
+  }
+
   .surface-field {
     border: 1px solid var(--app-panel-border);
     background: color-mix(in srgb, var(--app-fg) 4%, transparent);
