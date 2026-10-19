@@ -59,11 +59,11 @@ export function HistoryList({
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-2.5 [&::-webkit-details-marker]:hidden">
           <div className="flex items-center gap-2">
             <h2 id="history-heading" className="text-sm font-medium">
-              السجل والملخص
+              السجل
             </h2>
             <span className="text-[11px] text-slate-500 transition group-open:rotate-0">
-              <span className="group-open:hidden">إظهار</span>
-              <span className="hidden group-open:inline">إخفاء</span>
+              <span className="group-open:hidden">عرض</span>
+              <span className="hidden group-open:inline">طيّ</span>
             </span>
           </div>
           <div className="text-end text-[11px] leading-relaxed text-slate-500">
@@ -74,7 +74,7 @@ export function HistoryList({
             <p className="text-slate-500 opacity-80">
               الأسبوع {formatDurationShort(weekSeconds)}
               {weekFocusCount > 0 ? ` · ${weekFocusCount} جلسة` : ''}
-              {bestHour ? ` · أفضل ${formatHourLabel(bestHour.hour)}` : ''}
+              {bestHour ? ` · أفضل ساعة: ${formatHourLabel(bestHour.hour)}` : ''}
             </p>
           </div>
         </summary>
@@ -100,7 +100,7 @@ export function HistoryList({
                 type="button"
                 onClick={onExport}
                 className="min-h-9 rounded-lg px-2 text-[11px] text-slate-500 transition hover:text-inherit"
-                title="تصدير JSON"
+                title="تصدير بصيغة JSON"
               >
                 JSON
               </button>
@@ -108,7 +108,7 @@ export function HistoryList({
                 type="button"
                 onClick={onExportCsv}
                 className="min-h-9 rounded-lg px-2 text-[11px] text-slate-500 transition hover:text-inherit"
-                title="تصدير CSV"
+                title="تصدير بصيغة CSV"
               >
                 CSV
               </button>
@@ -138,10 +138,10 @@ export function HistoryList({
           )}
 
           {loading ? (
-            <p className="py-6 text-center text-sm text-slate-500">جاري التحميل…</p>
+            <p className="py-6 text-center text-sm text-slate-500">جارٍ التحميل…</p>
           ) : sessions.length === 0 ? (
             <p className="py-6 text-center text-sm text-slate-500">
-              لا جلسات بعد — ابدأ أول تركيز.
+              لا توجد جلسات بعد. ابدأ أول جلسة تركيز.
             </p>
           ) : (
             <ul className="max-h-72 space-y-2 overflow-y-auto overscroll-contain">
@@ -171,8 +171,8 @@ export function HistoryList({
                           {s.status === 'completed'
                             ? 'مكتملة'
                             : s.status === 'stopped'
-                              ? 'مُنهَاة'
-                              : 'متروكة'}
+                              ? 'مُنهاة'
+                              : 'غير مكتملة'}
                         </p>
                       </div>
                       <button
@@ -188,7 +188,7 @@ export function HistoryList({
                         type="button"
                         onClick={() => setPendingDelete(s.id)}
                         className="min-h-11 min-w-11 rounded-lg px-2 text-slate-500 transition hover:bg-rose-500/10 hover:text-rose-500"
-                        title="حذف"
+                        title="حذف الجلسة"
                         aria-label="حذف الجلسة"
                       >
                         ×
