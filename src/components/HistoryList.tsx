@@ -79,96 +79,125 @@ export function HistoryList({
           </div>
         </summary>
 
-        <div className="border-t border-current/5 px-3.5 pb-3.5 pt-3">
-          <div className="mb-3 flex flex-wrap gap-1.5">
-            {FILTERS.map(({ id, label }) => (
+        <div className="space-y-3 border-t border-current/10 px-3.5 pb-3.5 pt-3">
+          <div className="flex flex-wrap items-center gap-1.5">
+            {FILTERS.map((f) => (
               <button
-                key={id}
+                key={f.id}
                 type="button"
-                onClick={() => onFilterChange(id)}
+                onClick={() => onFilterChange(f.id)}
                 className={`min-h-9 rounded-full px-3 text-xs font-medium transition ${
-                  filter === id
-                    ? 'bg-brand-500 text-white'
-                    : 'surface-chip text-slate-500 hover:text-inherit'
+                  filter === f.id
+                    ? 'bg-brand-500/20 text-brand-500'
+                    : 'text-slate-500 hover:text-inherit'
                 }`}
               >
-                {label}
+                {f.label}
               </button>
             ))}
+            <div className="ms-auto flex items-center gap-1">
+              <button
+                type="button"
+                onClick={onExport}
+                className="min-h-9 rounded-lg px-2 text-[11px] text-slate-500 transition hover:text-inherit"
+                title="تصدير JSON"
+              >
+                JSON
+              </button>
+              <button
+                type="button"
+                onClick={onExportCsv}
+                className="min-h-9 rounded-lg px-2 text-[11px] text-slate-500 transition hover:text-inherit"
+                title="تصدير CSV"
+              >
+                CSV
+              </button>
+              <label
+                className="min-h-9 cursor-pointer rounded-lg px-2 text-[11px] text-slate-500 transition hover:text-inherit"
+                title="استيراد نسخة احتياطية"
+              >
+                استيراد
+                <input
+                  type="file"
+                  accept="application/json,.json"
+                  className="sr-only"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) onImportFile(file)
+                    e.target.value = ''
+                  }}
+                />
+              </label>
+            </div>
           </div>
+
+          {backupMessage && (
+            <p className="text-center text-xs text-brand-500" role="status">
+              {backupMessage}
+            </p>
+          )}
 
           {loading ? (
             <p className="py-6 text-center text-sm text-slate-500">جاري التحميل…</p>
           ) : sessions.length === 0 ? (
             <p className="py-6 text-center text-sm text-slate-500">
-              لا جلسات بعد. ابدأ أول تركيز.
+              لا جلسات بعد — ابدأ أول تركيز.
             </p>
           ) : (
-            <ul className="flex max-h-64 flex-col gap-2 overflow-y-auto">
-              {sessions.map((s, i) => (
+            <ul className="max-h-72 space-y-2 overflow-y-auto overscroll-contain">
+              {sessions.map((s, index) => (
                 <li
                   key={s.id}
-                  className="history-row-enter surface-row flex items-center justify-between gap-2 rounded-xl px-3 py-2.5"
-                  style={{ animationDelay: `${Math.min(i, 8) * 40}ms` }}
+                  className="history-row-enter surface-row rounded-xl px-3 py-2.5"
+                  style={{ animationDelay: `${Math.min(index, 6) * 35}ms` }}
                 >
-                  <div className="min-w-0 text-start">
-                    <p className="truncate text-sm font-medium">
-                      {s.intention || (s.kind === 'break' ? 'راحة' : 'تركيز')}
-                    </p>
-                    <p className="mt-0.5 text-[11px] text-slate-500">
-                      {formatDateTime(s.endedAt ?? s.startedAt)} ·{' '}
-                      {formatDurationShort(s.elapsedSeconds)}
-                      {s.kind === 'break' ? ' · راحة' : ''}
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-1">
-                    <button
-                      type="button"
-                      className="btn-chrome min-h-9 px-2 text-[11px]"
-                      onClick={() => onCopySession(s)}
-                      title="نسخ"
-                    >
-                      نسخ
-                    </button>
-                    <button
-                      type="button"
-                      className="btn-chrome min-h-9 px-2 text-[11px] text-rose-400"
-                      onClick={() => setPendingDelete(s.id)}
-                      title="حذف"
-                    >
-                      حذف
-                    </button>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm">
+                        {s.intention || (s.kind === 'focus' ? 'تركيز' : 'راحة')}
+                      </p>
+                      <p className="mt-0.5 text-xs text-slate-500">
+                        {formatDateTime(s.startedAt)}
+                        <span className="mx-1 opacity-50">·</span>
+                        {s.kind === 'focus' ? 'تركيز' : 'راحة'}
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 items-start gap-1">
+                      <div className="text-end">
+                        <p className="text-sm font-medium tabular-nums">
+                          {formatDurationShort(s.actualSeconds)}
+                        </p>
+                        <p className="text-[11px] text-slate-500">
+                          {s.status === 'completed'
+                            ? 'مكتملة'
+                            : s.status === 'stopped'
+                              ? 'مُنهَاة'
+                              : 'متروكة'}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => onCopySession(s)}
+                        className="min-h-11 min-w-11 rounded-lg px-1.5 text-xs text-slate-500 transition hover:bg-black/5 hover:opacity-100"
+                        title="نسخ ملخص الجلسة"
+                        aria-label="نسخ ملخص الجلسة"
+                      >
+                        نسخ
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPendingDelete(s.id)}
+                        className="min-h-11 min-w-11 rounded-lg px-2 text-slate-500 transition hover:bg-rose-500/10 hover:text-rose-500"
+                        title="حذف"
+                        aria-label="حذف الجلسة"
+                      >
+                        ×
+                      </button>
+                    </div>
                   </div>
                 </li>
               ))}
             </ul>
-          )}
-
-          <div className="mt-3 flex flex-wrap gap-2">
-            <button type="button" className="btn-chrome text-[11px]" onClick={onExport}>
-              تصدير JSON
-            </button>
-            <button type="button" className="btn-chrome text-[11px]" onClick={onExportCsv}>
-              CSV
-            </button>
-            <label className="btn-chrome cursor-pointer text-[11px]">
-              استيراد
-              <input
-                type="file"
-                accept="application/json,.json"
-                className="hidden"
-                onChange={(e) => {
-                  const f = e.target.files?.[0]
-                  if (f) onImportFile(f)
-                  e.target.value = ''
-                }}
-              />
-            </label>
-          </div>
-          {backupMessage && (
-            <p className="mt-2 text-center text-[11px] text-brand-500" role="status">
-              {backupMessage}
-            </p>
           )}
         </div>
       </details>
@@ -176,7 +205,7 @@ export function HistoryList({
       <ConfirmDialog
         open={pendingDelete !== null}
         title="حذف الجلسة؟"
-        body="لن يمكن التراجع عن هذا الإجراء."
+        body="لا يمكن التراجع عن هذا الإجراء."
         confirmLabel="حذف"
         danger
         onCancel={() => setPendingDelete(null)}

@@ -43,7 +43,7 @@ export function DurationPicker({
   }
 
   return (
-    <div className="flex w-full max-w-sm flex-col gap-3">
+    <div className="flex w-full max-w-sm flex-col gap-2.5">
       <div className="surface-field flex gap-1 rounded-2xl p-1">
         {(
           [
