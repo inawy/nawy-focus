@@ -6,7 +6,6 @@
    ============================================================================= */
 
 @theme {
-  /* Brand — Nawy identity */
   --color-brand-50: #eef4ff;
   --color-brand-100: #dbe7ff;
   --color-brand-300: #9dbfff;
@@ -15,28 +14,26 @@
   --color-brand-600: #2b63e6;
   --color-brand-950: #12275a;
 
-  /* Neutral slate (dark-theme defaults; light theme remaps below) */
   --color-slate-600: #636366;
   --color-slate-700: #3a3a3c;
   --color-slate-800: #2a2a2c;
   --color-slate-900: #1c1c1e;
   --color-slate-950: #121212;
 
-  /* Typography */
   --font-sans: 'IBM Plex Sans Arabic', system-ui, -apple-system, 'Segoe UI',
     sans-serif;
   --font-mono: 'ui-monospace', 'Cascadia Code', 'SF Mono', Menlo, monospace;
 
-  --text-2xs: 0.6875rem; /* 11px — captions, hints */
-  --text-xs: 0.75rem; /* 12px */
-  --text-sm: 0.875rem; /* 14px */
-  --text-base: 1rem; /* 16px */
-  --text-md: 1.0625rem; /* 17px — dialog titles */
-  --text-lg: 1.125rem; /* 18px */
+  --text-2xs: 0.6875rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-md: 1.0625rem;
+  --text-lg: 1.125rem;
   --text-xl: 1.25rem;
   --text-2xl: 1.5rem;
-  --text-timer: 2.65rem; /* primary timer digits on mobile */
-  --text-timer-lg: 3.2rem; /* timer on sm+ */
+  --text-timer: 2.65rem;
+  --text-timer-lg: 3.2rem;
 
   --leading-tight: 1.25;
   --leading-snug: 1.375;
@@ -46,41 +43,36 @@
   --tracking-tight: -0.02em;
   --tracking-label: 0.16em;
 
-  /* Spacing scale (4px base) */
   --spacing-0: 0;
-  --spacing-1: 0.25rem; /* 4 */
-  --spacing-2: 0.5rem; /* 8 */
-  --spacing-3: 0.75rem; /* 12 */
-  --spacing-4: 1rem; /* 16 */
-  --spacing-5: 1.25rem; /* 20 */
-  --spacing-6: 1.5rem; /* 24 */
-  --spacing-7: 1.75rem; /* 28 */
-  --spacing-8: 2rem; /* 32 */
-  --spacing-10: 2.5rem; /* 40 */
-  --spacing-12: 3rem; /* 48 */
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-7: 1.75rem;
+  --spacing-8: 2rem;
+  --spacing-10: 2.5rem;
+  --spacing-12: 3rem;
 
-  /* Radii */
-  --radius-sm: 0.5rem; /* 8 — chips */
-  --radius-md: 0.75rem; /* 12 — fields, chrome buttons */
-  --radius-lg: 1rem; /* 16 — cards */
-  --radius-xl: 1.25rem; /* 20 — panels */
-  --radius-2xl: 1.5rem; /* 24 — banners */
-  --radius-3xl: 1.75rem; /* 28 — dialogs */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 1.75rem;
   --radius-full: 9999px;
   --radius-shell: 1.25rem;
 
-  /* Touch targets */
-  --touch-sm: 2.75rem; /* 44 */
-  --touch-md: 3rem; /* 48 */
-  --touch-lg: 3.25rem; /* 52 */
+  --touch-sm: 2.75rem;
+  --touch-md: 3rem;
+  --touch-lg: 3.25rem;
 
-  /* Motion */
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   --duration-fast: 0.15s;
   --duration-normal: 0.25s;
   --duration-slow: 0.4s;
 
-  /* Shadows */
   --shadow-soft: 0 8px 30px -12px rgb(0 0 0 / 0.55);
   --shadow-glow-brand: 0 0 60px -16px rgb(61 123 255 / 0.45);
   --shadow-btn-brand:
@@ -88,7 +80,6 @@
     0 10px 28px -8px rgb(61 123 255 / 0.55);
 }
 
-/* Semantic surfaces & text — theme aware */
 :root,
 html[data-theme='dark'] {
   --app-bg: #0e0e10;
@@ -137,7 +128,6 @@ html[data-theme='light'] {
   --btn-chrome-hover-fg: #18181b;
   --shadow-soft: 0 8px 30px -12px rgb(0 0 0 / 0.12);
 
-  /* Invert slate utilities so existing text-slate-* stay readable on light bg */
   --color-slate-50: #18181b;
   --color-slate-100: #27272a;
   --color-slate-200: #3f3f46;
@@ -355,7 +345,6 @@ button {
     border-radius: var(--radius-2xl);
   }
 
-  /* Break segment — readable in both themes (avoids inverted slate-950) */
   .break-toggle-active {
     background: #ffffff;
     color: #0a0a0a;
@@ -635,6 +624,150 @@ button {
 
   .history-row-enter {
     animation: motion-fade-up 0.3s var(--ease-out) both;
+  }
+
+  .mode-tabs {
+    border: 1px solid var(--app-panel-border);
+    background: color-mix(in srgb, var(--app-fg) 4%, transparent);
+  }
+  .mode-tab-idle {
+    color: var(--text-muted);
+  }
+  .mode-tab-idle:hover {
+    color: var(--app-fg);
+  }
+  .mode-tab-active {
+    color: #fff;
+    background: linear-gradient(135deg, #3d7bff 0%, #2563eb 100%);
+    box-shadow: 0 6px 20px -6px rgb(61 123 255 / 0.55);
+  }
+  html[data-theme='light'] .mode-tab-active {
+    box-shadow: 0 6px 18px -6px rgb(61 123 255 / 0.4);
+  }
+
+  .timer-face {
+    width: 17rem;
+    height: 17rem;
+  }
+  @media (min-width: 640px) {
+    .timer-face {
+      width: 19.5rem;
+      height: 19.5rem;
+    }
+  }
+  .timer-disc {
+    background: radial-gradient(
+      circle at 50% 40%,
+      color-mix(in srgb, var(--app-fg) 8%, transparent) 0%,
+      color-mix(in srgb, var(--app-fg) 4%, transparent) 55%,
+      transparent 100%
+    );
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--app-fg) 6%, transparent),
+      0 24px 48px -20px rgb(0 0 0 / 0.45),
+      inset 0 1px 0 rgb(255 255 255 / 0.04);
+  }
+  html[data-theme='light'] .timer-disc {
+    background: radial-gradient(
+      circle at 50% 40%,
+      #ffffff 0%,
+      #f0f1f4 70%,
+      #e8eaef 100%
+    );
+    box-shadow:
+      0 0 0 1px rgb(0 0 0 / 0.06),
+      0 20px 40px -16px rgb(0 0 0 / 0.15),
+      inset 0 1px 0 rgb(255 255 255 / 0.9);
+  }
+  .timer-face-active .timer-disc {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--color-brand-500) 25%, transparent),
+      0 0 48px -12px rgb(61 123 255 / 0.35),
+      0 24px 48px -20px rgb(0 0 0 / 0.4);
+  }
+
+  .timer-play-btn {
+    background: linear-gradient(135deg, #3d7bff 0%, #2563eb 100%);
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.25) inset,
+      0 8px 20px -6px rgb(61 123 255 / 0.65);
+  }
+  .timer-play-btn:hover {
+    filter: brightness(1.06);
+  }
+  .timer-secondary-btn {
+    border: 1px solid var(--app-panel-border);
+    background: color-mix(in srgb, var(--app-fg) 6%, transparent);
+    color: var(--text-muted);
+  }
+  .timer-secondary-btn:hover {
+    color: var(--app-fg);
+  }
+
+  .session-chip {
+    border: 1px solid transparent;
+    background: color-mix(in srgb, var(--app-fg) 4%, transparent);
+    color: var(--text-muted);
+  }
+  .session-chip:hover {
+    color: var(--app-fg);
+  }
+  .session-chip-brand.session-chip-active {
+    background: linear-gradient(135deg, #3d7bff 0%, #2563eb 100%);
+    color: #fff;
+    box-shadow: 0 6px 18px -6px rgb(61 123 255 / 0.5);
+  }
+  .session-chip-orange {
+    color: #fb923c;
+  }
+  .session-chip-orange.session-chip-active {
+    background: color-mix(in srgb, #fb923c 18%, transparent);
+    color: #fb923c;
+    border-color: color-mix(in srgb, #fb923c 35%, transparent);
+  }
+  .session-chip-green {
+    color: #4ade80;
+  }
+  .session-chip-green.session-chip-active {
+    background: color-mix(in srgb, #4ade80 16%, transparent);
+    color: #4ade80;
+    border-color: color-mix(in srgb, #4ade80 35%, transparent);
+  }
+  .session-chip-purple {
+    color: #a78bfa;
+  }
+  .session-chip-purple.session-chip-active {
+    background: color-mix(in srgb, #a78bfa 16%, transparent);
+    color: #a78bfa;
+    border-color: color-mix(in srgb, #a78bfa 35%, transparent);
+  }
+  .session-chip-pink {
+    color: #f472b6;
+  }
+  .session-chip-pink.session-chip-active {
+    background: color-mix(in srgb, #f472b6 16%, transparent);
+    color: #f472b6;
+    border-color: color-mix(in srgb, #f472b6 35%, transparent);
+  }
+  .session-chip-teal {
+    color: #2dd4bf;
+  }
+  .session-chip-teal.session-chip-active {
+    background: color-mix(in srgb, #2dd4bf 16%, transparent);
+    color: #2dd4bf;
+    border-color: color-mix(in srgb, #2dd4bf 35%, transparent);
+  }
+  html[data-theme='light'] .session-chip-orange {
+    color: #ea580c;
+  }
+  html[data-theme='light'] .session-chip-green {
+    color: #16a34a;
+  }
+  html[data-theme='light'] .session-chip-purple {
+    color: #7c3aed;
+  }
+  html[data-theme='light'] .session-chip-pink {
+    color: #db2777;
   }
 
   @keyframes motion-fade-in {
