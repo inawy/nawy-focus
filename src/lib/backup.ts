@@ -1,77 +1,57 @@
 import type { FocusSession } from '../types'
 
-export const BACKUP_FORMAT = 'nawy-focus-backup' as const
 export const BACKUP_VERSION = 1 as const
 
-export interface FocusBackup {
-  format: typeof BACKUP_FORMAT
+export interface BackupPayload {
   version: typeof BACKUP_VERSION
-  exportedAt: number
+  exportedAt: string
   sessions: FocusSession[]
 }
 
-export function buildBackup(sessions: FocusSession[], exportedAt = Date.now()): FocusBackup {
+export function buildBackup(sessions: FocusSession[]): BackupPayload {
   return {
-    format: BACKUP_FORMAT,
     version: BACKUP_VERSION,
-    exportedAt,
+    exportedAt: new Date().toISOString(),
     sessions,
   }
 }
 
 export function parseBackup(raw: unknown): FocusSession[] {
   if (!raw || typeof raw !== 'object') {
-    throw new Error('ملف غير صالح')
+    throw new Error('الملف غير صالح')
   }
-  const obj = raw as Record<string, unknown>
-  if (obj.format !== BACKUP_FORMAT) {
-    throw new Error('هذا ليس ملف نسخ احتياطي لناوي فوكس')
+  const data = raw as Record<string, unknown>
+  if (data.version === undefined && !Array.isArray(data.sessions)) {
+    throw new Error('هذا ليس ملف نسخ احتياطي لناوي فوكاس')
   }
-  if (typeof obj.version !== 'number' || obj.version > BACKUP_VERSION) {
+  if (data.version !== undefined && data.version !== BACKUP_VERSION) {
     throw new Error('إصدار النسخة الاحتياطية غير مدعوم')
   }
-  if (!Array.isArray(obj.sessions)) {
+  const sessions = data.sessions
+  if (!Array.isArray(sessions) || sessions.length === 0) {
     throw new Error('لا توجد جلسات في الملف')
   }
-
-  const out: FocusSession[] = []
-  for (const item of obj.sessions) {
-    if (!item || typeof item !== 'object') continue
-    const s = item as Record<string, unknown>
-    if (typeof s.id !== 'string' || !s.id) continue
-    if (s.kind !== 'focus' && s.kind !== 'break') continue
-    if (typeof s.actualSeconds !== 'number' || s.actualSeconds < 0) continue
-    if (typeof s.plannedSeconds !== 'number' || s.plannedSeconds < 0) continue
-    if (typeof s.startedAt !== 'number') continue
-    if (typeof s.endedAt !== 'number') continue
-    const status =
-      s.status === 'completed' || s.status === 'stopped' || s.status === 'abandoned'
-        ? s.status
-        : 'completed'
-    out.push({
-      id: s.id,
-      intention: typeof s.intention === 'string' ? s.intention : '',
-      kind: s.kind,
-      plannedSeconds: s.plannedSeconds,
-      actualSeconds: s.actualSeconds,
-      status,
-      startedAt: s.startedAt,
-      endedAt: s.endedAt,
-      createdAt: typeof s.createdAt === 'number' ? s.createdAt : s.startedAt,
-    })
-  }
-  return out
+  return sessions as FocusSession[]
 }
 
-/** Merge by id: keep existing rows, add missing ones only (safe import). */
-export function mergeSessions(
-  existing: FocusSession[],
-  incoming: FocusSession[],
-): FocusSession[] {
-  const map = new Map<string, FocusSession>()
-  for (const s of existing) map.set(s.id, s)
-  for (const s of incoming) {
-    if (!map.has(s.id)) map.set(s.id, s)
-  }
-  return Array.from(map.values()).sort((a, b) => a.startedAt - b.startedAt)
+export function downloadJson(filename: string, data: unknown): void {
+  const blob = new Blob([JSON.stringify(data, null, 2)], {
+    type: 'application/json',
+  })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+export function downloadText(filename: string, text: string, type: string): void {
+  const blob = new Blob([text], { type })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(url)
 }

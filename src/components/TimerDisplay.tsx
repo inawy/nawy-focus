@@ -70,12 +70,11 @@ export function TimerDisplay({
         ? 'راحة'
         : 'تركيز'
       : phase === 'paused'
-        ? 'متوقف'
+        ? 'متوقف مؤقتاً'
         : phase === 'finished'
-          ? 'انتهت'
+          ? 'مكتملة'
           : 'جاهز'
 
-  /* Mobile-friendly sizes without overflowing decoration */
   const sizeClass =
     phase === 'finished'
       ? 'h-48 w-48 sm:h-56 sm:w-56'
