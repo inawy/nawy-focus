@@ -333,6 +333,14 @@ export default function App() {
         return
       }
       if (e.key === ' ' || e.code === 'Space') {
+        // Preserve native Space behavior for focused controls and disclosure widgets.
+        if (
+          (e.target as HTMLElement | null)?.closest(
+            'button, a, select, summary, [role="button"], [role="tab"], [role="menuitem"]',
+          )
+        ) {
+          return
+        }
         e.preventDefault()
         if (appMode === 'stopwatch') {
           if (stopwatch.phase === 'idle') stopwatch.start()
