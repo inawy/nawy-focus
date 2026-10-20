@@ -92,10 +92,16 @@ export default defineConfig({
             purpose: 'maskable',
           },
           {
-            src: 'icons/icon.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
-            purpose: 'any',
+            src: 'icons/icon-mono-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'monochrome',
+          },
+          {
+            src: 'icons/icon-mono-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'monochrome',
           },
         ],
       },
@@ -110,7 +116,7 @@ export default defineConfig({
             urlPattern: ({ request }) => request.mode === 'navigate',
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'nawy-focus-pages',
+              cacheName: 'nawy-focus-pages-v2',
               networkTimeoutSeconds: 4,
               expiration: {
                 maxEntries: 8,
@@ -124,7 +130,7 @@ export default defineConfig({
               request.destination === 'style',
             handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'nawy-focus-assets',
+              cacheName: 'nawy-focus-assets-v2',
               expiration: {
                 maxEntries: 32,
                 maxAgeSeconds: 60 * 60 * 24 * 7,
