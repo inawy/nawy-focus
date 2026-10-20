@@ -37,7 +37,8 @@ export default defineConfig({
           'مؤقت تركيز بسيط ومحلي أولاً ضمن منظومة ناوي للإنتاجية.',
         theme_color: '#121212',
         background_color: '#121212',
-        display: 'standalone',
+        // Keep the app in a normal browser tab instead of standalone/fullscreen.
+        display: 'browser',
         orientation: 'portrait',
         lang: 'ar',
         dir: 'rtl',
