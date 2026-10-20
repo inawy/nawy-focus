@@ -3,7 +3,9 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 export type StopwatchPhase = 'idle' | 'running' | 'paused'
 
 /**
- * Count-up stopwatch with millisecond precision (Avast-style MM:SS.MS).
+ * Count-up stopwatch with millisecond display precision.
+ * Wall-clock elapsed time prevents losing time when the browser throttles RAF
+ * or the user pauses the stopwatch while the tab is in the background.
  */
 export function useStopwatch() {
   const [phase, setPhase] = useState<StopwatchPhase>('idle')
@@ -20,19 +22,25 @@ export function useStopwatch() {
     }
   }, [])
 
+  const readElapsed = useCallback(() => {
+    if (phase !== 'running') return baseMsRef.current
+    return baseMsRef.current + Math.max(0, Date.now() - startedAtRef.current)
+  }, [phase])
+
   useEffect(() => {
     if (phase !== 'running') {
       clearRaf()
       return
     }
-    startedAtRef.current = performance.now()
+
+    startedAtRef.current = Date.now()
     const tick = () => {
-      const now = performance.now()
-      const next = baseMsRef.current + (now - startedAtRef.current)
+      const next = baseMsRef.current + Math.max(0, Date.now() - startedAtRef.current)
       liveMsRef.current = next
       setElapsedMs(next)
       rafRef.current = requestAnimationFrame(tick)
     }
+    liveMsRef.current = baseMsRef.current
     rafRef.current = requestAnimationFrame(tick)
     return clearRaf
   }, [phase, clearRaf])
@@ -45,10 +53,12 @@ export function useStopwatch() {
   }, [])
 
   const pause = useCallback(() => {
-    baseMsRef.current = liveMsRef.current
-    setElapsedMs(liveMsRef.current)
+    const exactElapsed = readElapsed()
+    baseMsRef.current = exactElapsed
+    liveMsRef.current = exactElapsed
+    setElapsedMs(exactElapsed)
     setPhase('paused')
-  }, [])
+  }, [readElapsed])
 
   const resume = useCallback(() => {
     setPhase('running')
@@ -58,6 +68,7 @@ export function useStopwatch() {
     clearRaf()
     baseMsRef.current = 0
     liveMsRef.current = 0
+    startedAtRef.current = 0
     setElapsedMs(0)
     setPhase('idle')
   }, [clearRaf])
