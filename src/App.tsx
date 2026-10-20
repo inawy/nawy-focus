@@ -204,7 +204,14 @@ export default function App() {
   const locked = isActive(state.phase) || state.phase === 'finished'
   const sessionFocus = isActive(state.phase)
   const activePreset =
-    SESSION_PRESETS.find((p) => p.id === presetId) ?? SESSION_PRESETS[0]
+    SESSION_PRESETS.find((p) => p.id === presetId) ?? {
+      id: 'focus',
+      label: 'تركيز',
+      kind: 'focus' as const,
+      minutes: 25,
+      tone: 'brand' as const,
+      icon: '◎',
+    }
 
   useWakeLock(state.phase === 'running' || stopwatch.phase === 'running')
 
