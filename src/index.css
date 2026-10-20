@@ -1,1 +1,386 @@
-/* Local copy after append — full file pushed below via read */
+@import 'tailwindcss';
+
+/* Nawy Focus — design tokens (restored) */
+
+@theme {
+  --color-brand-50: #eef4ff;
+  --color-brand-100: #d9e6ff;
+  --color-brand-200: #bcd4ff;
+  --color-brand-300: #8eb8ff;
+  --color-brand-400: #5a94ff;
+  --color-brand-500: #3d7bff;
+  --color-brand-600: #2a5fe6;
+  --color-brand-700: #2049b8;
+  --color-brand-800: #1c3d94;
+  --color-brand-900: #1a3575;
+
+  --font-sans: 'Segoe UI', 'Tahoma', 'Arial', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'Cascadia Code', 'Roboto Mono', ui-monospace, monospace;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 220ms;
+}
+
+:root,
+html[data-theme='dark'] {
+  color-scheme: dark;
+  --app-bg: #0e0e10;
+  --app-fg: #f4f4f5;
+  --app-muted: #a1a1aa;
+  --surface: #16161a;
+  --surface-2: #1c1c22;
+  --border: color-mix(in srgb, #fff 8%, transparent);
+  --timer-disc: #1a1a1f;
+}
+
+html[data-theme='light'] {
+  color-scheme: light;
+  --app-bg: #f4f5f7;
+  --app-fg: #18181b;
+  --app-muted: #52525b;
+  --surface: #ffffff;
+  --surface-2: #f0f1f4;
+  --border: color-mix(in srgb, #000 8%, transparent);
+  --timer-disc: #ffffff;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--app-bg);
+  color: var(--app-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100dvh;
+}
+
+.app-shell {
+  background: var(--app-bg);
+  color: var(--app-fg);
+}
+
+.app-header {
+  background: color-mix(in srgb, var(--app-bg) 88%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.btn-chrome {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  padding: 0 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--app-fg);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+.btn-chrome:hover {
+  background: var(--surface-2);
+}
+
+.btn-primary-brand {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0 1.25rem;
+  border-radius: 9999px;
+  border: none;
+  background: var(--color-brand-500);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-primary-brand:hover {
+  background: var(--color-brand-600);
+}
+
+.btn-secondary-quiet {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0 1.25rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--app-fg);
+  font-weight: 500;
+  cursor: pointer;
+}
+.btn-secondary-quiet:hover {
+  background: var(--surface);
+}
+
+.app-menu {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 16px 40px -20px rgb(0 0 0 / 0.55);
+}
+
+.install-banner {
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.mode-tabs {
+  display: flex;
+  width: 100%;
+  max-width: 24rem;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.mode-tab {
+  flex: 1;
+  min-height: 2.5rem;
+  border: none;
+  border-radius: 0.85rem;
+  background: transparent;
+  color: var(--app-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.mode-tab-active {
+  background: var(--color-brand-500);
+  color: #fff;
+}
+
+.timer-face {
+  position: relative;
+  width: min(16.5rem, calc(100vw - 4.5rem));
+  height: min(16.5rem, calc(100vw - 4.5rem));
+}
+.timer-disc {
+  background: var(--timer-disc);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--app-fg) 6%, transparent),
+    0 16px 40px -24px rgb(0 0 0 / 0.55);
+}
+.timer-secondary-btn {
+  background: color-mix(in srgb, var(--app-fg) 8%, transparent);
+  color: var(--app-muted);
+  border: none;
+  cursor: pointer;
+}
+.timer-secondary-btn:hover {
+  background: color-mix(in srgb, var(--app-fg) 12%, transparent);
+  color: var(--app-fg);
+}
+.timer-play-btn {
+  border: none;
+  cursor: pointer;
+}
+
+.surface-panel {
+  border-radius: 1.25rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.surface-field {
+  border-radius: 0.9rem;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+}
+.surface-chip {
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--app-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.surface-chip:hover {
+  color: var(--app-fg);
+}
+
+.break-toggle-active {
+  background: #ffffff;
+  color: #0a0a0a;
+}
+html[data-theme='light'] .break-toggle-active {
+  background: #1c1c1e;
+  color: #fafafa;
+}
+
+.session-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.35rem;
+  padding: 0 0.85rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.session-chip-active {
+  border-color: transparent;
+}
+
+.session-chip-brand { color: var(--color-brand-400); }
+.session-chip-brand.session-chip-active {
+  background: color-mix(in srgb, var(--color-brand-500) 16%, transparent);
+  color: var(--color-brand-300);
+  border-color: color-mix(in srgb, var(--color-brand-500) 35%, transparent);
+}
+.session-chip-orange { color: #fb923c; }
+.session-chip-orange.session-chip-active {
+  background: color-mix(in srgb, #fb923c 16%, transparent);
+  color: #fb923c;
+  border-color: color-mix(in srgb, #fb923c 35%, transparent);
+}
+.session-chip-green { color: #4ade80; }
+.session-chip-green.session-chip-active {
+  background: color-mix(in srgb, #4ade80 16%, transparent);
+  color: #4ade80;
+  border-color: color-mix(in srgb, #4ade80 35%, transparent);
+}
+.session-chip-purple { color: #a78bfa; }
+.session-chip-purple.session-chip-active {
+  background: color-mix(in srgb, #a78bfa 16%, transparent);
+  color: #a78bfa;
+  border-color: color-mix(in srgb, #a78bfa 35%, transparent);
+}
+.session-chip-pink { color: #f472b6; }
+.session-chip-pink.session-chip-active {
+  background: color-mix(in srgb, #f472b6 16%, transparent);
+  color: #f472b6;
+  border-color: color-mix(in srgb, #f472b6 35%, transparent);
+}
+.session-chip-teal { color: #2dd4bf; }
+.session-chip-teal.session-chip-active {
+  background: color-mix(in srgb, #2dd4bf 16%, transparent);
+  color: #2dd4bf;
+  border-color: color-mix(in srgb, #2dd4bf 35%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Nawy Focus UI/UX refresh
+   Focus: calmer hierarchy, responsive timer sizing, visible keyboard focus,
+   more consistent interactions, and reduced-motion support.
+*/
+.app-shell {
+  isolation: isolate;
+}
+.app-header {
+  border-bottom-color: color-mix(in srgb, var(--app-fg) 7%, transparent);
+}
+.app-header > div {
+  min-height: 3.25rem;
+}
+.app-header h1 {
+  letter-spacing: -0.025em;
+}
+.btn-chrome,
+.mode-tab,
+.session-chip,
+.surface-chip,
+.timer-play-btn {
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+button:focus-visible,
+summary:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 3px;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+.app-shell main {
+  padding-top: clamp(1rem, 3vh, 1.75rem);
+}
+.mode-tabs {
+  padding: 0.3rem;
+  border-radius: 1.1rem;
+}
+.mode-tab-active {
+  box-shadow: 0 4px 14px -5px rgb(61 123 255 / 0.48);
+}
+.timer-face {
+  width: min(17rem, calc(100vw - 5rem));
+  height: min(17rem, calc(100vw - 5rem));
+  flex-shrink: 0;
+}
+@media (min-width: 640px) {
+  .timer-face {
+    width: 18.5rem;
+    height: 18.5rem;
+  }
+}
+.timer-disc {
+  transition: box-shadow var(--duration-normal) var(--ease-out);
+}
+.timer-face-active .timer-disc {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-brand-500) 32%, transparent),
+    0 0 42px -18px rgb(61 123 255 / 0.48),
+    0 18px 42px -24px rgb(0 0 0 / 0.48);
+}
+.surface-panel {
+  box-shadow: 0 12px 34px -28px rgb(0 0 0 / 0.55);
+}
+html[data-theme='light'] .surface-panel {
+  box-shadow: 0 12px 34px -28px rgb(0 0 0 / 0.18);
+}
+.install-banner {
+  line-height: 1.6;
+}
+@media (max-width: 380px) {
+  .app-header {
+    padding-inline: 0.65rem;
+  }
+  .app-header > div {
+    gap: 0.35rem;
+  }
+  .app-header .btn-chrome {
+    min-width: 2.65rem;
+    padding-inline: 0.55rem;
+  }
+  .timer-face {
+    width: min(15.5rem, calc(100vw - 4rem));
+    height: min(15.5rem, calc(100vw - 4rem));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
