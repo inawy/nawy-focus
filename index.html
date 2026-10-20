@@ -2,10 +2,10 @@
 <html lang="ar" dir="rtl" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg?v=4" />
-    <link rel="icon" type="image/png" sizes="48x48" href="./icons/icon-48.png?v=4" />
-    <link rel="icon" type="image/png" sizes="96x96" href="./icons/icon-96.png?v=4" />
-    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=4" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg?v=5" />
+    <link rel="icon" type="image/png" sizes="48x48" href="./icons/icon-48.png?v=5" />
+    <link rel="icon" type="image/png" sizes="96x96" href="./icons/icon-96.png?v=5" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=5" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#0e0e10" />
     <meta name="apple-mobile-web-app-title" content="ناوي فوكاس" />
@@ -16,6 +16,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <title>ناوي فوكاس · Nawy Focus</title>
     <script>
+      /* Theme bootstrap */
       try {
         var m = localStorage.getItem('nawy-focus:themeMode');
         var dark = true;
@@ -26,6 +27,70 @@
         var meta = document.querySelector('meta[name="theme-color"]');
         if (meta) meta.setAttribute('content', dark ? '#0e0e10' : '#f4f5f7');
       } catch (e) {}
+
+      /*
+       * One-time hard reset for clients still on the old build that called
+       * requestFullscreen on Start. Forces SW unregister + cache wipe then reload.
+       */
+      (function () {
+        var TARGET = '0.2.0';
+        var KEY = 'nawy-focus:clientVersion';
+        try {
+          var cur = localStorage.getItem(KEY);
+          if (cur === TARGET) return;
+
+          var done = false;
+          function finish() {
+            if (done) return;
+            done = true;
+            try {
+              localStorage.setItem(KEY, TARGET);
+            } catch (e) {}
+            // Avoid reload loops: only reload if we actually cleared something
+            // or version was missing/old.
+            if (cur !== TARGET) {
+              window.location.replace(window.location.pathname + '?v=5');
+            }
+          }
+
+          var tasks = [];
+
+          if ('serviceWorker' in navigator) {
+            tasks.push(
+              navigator.serviceWorker.getRegistrations().then(function (regs) {
+                return Promise.all(regs.map(function (r) { return r.unregister(); }));
+              }),
+            );
+          }
+
+          if (typeof caches !== 'undefined' && caches.keys) {
+            tasks.push(
+              caches.keys().then(function (keys) {
+                return Promise.all(keys.map(function (k) { return caches.delete(k); }));
+              }),
+            );
+          }
+
+          // Also exit browser fullscreen if stuck from the old build
+          try {
+            if (document.fullscreenElement && document.exitFullscreen) {
+              document.exitFullscreen();
+            }
+          } catch (e) {}
+
+          if (tasks.length) {
+            Promise.all(tasks).then(finish).catch(finish);
+            // Safety timeout
+            setTimeout(finish, 2500);
+          } else {
+            finish();
+          }
+        } catch (e) {
+          try {
+            localStorage.setItem(KEY, TARGET);
+          } catch (e2) {}
+        }
+      })();
     </script>
   </head>
   <body>
