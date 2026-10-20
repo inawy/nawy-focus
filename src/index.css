@@ -4,18 +4,50 @@
 
 @theme {
   --color-brand-50: #eef4ff;
-  --color-brand-100: #d9e6ff;
-  --color-brand-200: #bcd4ff;
-  --color-brand-300: #8eb8ff;
-  --color-brand-400: #5a94ff;
+  --color-brand-100: #dbe7ff;
+  --color-brand-300: #9dbfff;
+  --color-brand-400: #6b9aff;
   --color-brand-500: #3d7bff;
-  --color-brand-600: #2a5fe6;
-  --color-brand-700: #2049b8;
-  --color-brand-800: #1c3d94;
-  --color-brand-900: #1a3575;
+  --color-brand-600: #2b63e6;
+  --color-brand-950: #12275a;
 
-  --font-sans: 'Segoe UI', 'Tahoma', 'Arial', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'SF Mono', 'Cascadia Code', 'Roboto Mono', ui-monospace, monospace;
+  --color-slate-600: #636366;
+  --color-slate-700: #3a3a3c;
+  --color-slate-800: #2a2a2c;
+  --color-slate-900: #1c1c1e;
+  --color-slate-950: #121212;
+
+  --font-sans: 'IBM Plex Sans Arabic', system-ui, -apple-system, 'Segoe UI',
+    sans-serif;
+  --font-mono: 'ui-monospace', 'Cascadia Code', 'SF Mono', Menlo, monospace;
+
+  --text-2xs: 0.6875rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.5rem;
+  --radius-full: 9999px;
+
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-10: 2.5rem;
+  --spacing-12: 3rem;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --duration-fast: 150ms;
@@ -32,6 +64,8 @@ html[data-theme='dark'] {
   --surface-2: #1c1c22;
   --border: color-mix(in srgb, #fff 8%, transparent);
   --timer-disc: #1a1a1f;
+  --text-muted: #a1a1aa;
+  --text-subtle: #71717a;
 }
 
 html[data-theme='light'] {
@@ -43,6 +77,8 @@ html[data-theme='light'] {
   --surface-2: #f0f1f4;
   --border: color-mix(in srgb, #000 8%, transparent);
   --timer-disc: #ffffff;
+  --text-muted: #52525b;
+  --text-subtle: #71717a;
 }
 
 html,
@@ -275,110 +311,6 @@ html[data-theme='light'] .break-toggle-active {
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* Nawy Focus UI/UX refresh
-   Focus: calmer hierarchy, responsive timer sizing, visible keyboard focus,
-   more consistent interactions, and reduced-motion support.
-*/
-.app-shell {
-  isolation: isolate;
-}
-.app-header {
-  border-bottom-color: color-mix(in srgb, var(--app-fg) 7%, transparent);
-}
-.app-header > div {
-  min-height: 3.25rem;
-}
-.app-header h1 {
-  letter-spacing: -0.025em;
-}
-.btn-chrome,
-.mode-tab,
-.session-chip,
-.surface-chip,
-.timer-play-btn {
-  transition:
-    background-color var(--duration-fast) var(--ease-out),
-    border-color var(--duration-fast) var(--ease-out),
-    color var(--duration-fast) var(--ease-out),
-    box-shadow var(--duration-fast) var(--ease-out),
-    transform var(--duration-fast) var(--ease-out);
-}
-button:focus-visible,
-summary:focus-visible,
-a:focus-visible,
-input:focus-visible {
-  outline: 2px solid var(--color-brand-500);
-  outline-offset: 3px;
-}
-button:disabled {
-  cursor: not-allowed;
-}
-.app-shell main {
-  padding-top: clamp(1rem, 3vh, 1.75rem);
-}
-.mode-tabs {
-  padding: 0.3rem;
-  border-radius: 1.1rem;
-}
-.mode-tab-active {
-  box-shadow: 0 4px 14px -5px rgb(61 123 255 / 0.48);
-}
-.timer-face {
-  width: min(17rem, calc(100vw - 5rem));
-  height: min(17rem, calc(100vw - 5rem));
-  flex-shrink: 0;
-}
-@media (min-width: 640px) {
-  .timer-face {
-    width: 18.5rem;
-    height: 18.5rem;
-  }
-}
-.timer-disc {
-  transition: box-shadow var(--duration-normal) var(--ease-out);
-}
-.timer-face-active .timer-disc {
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--color-brand-500) 32%, transparent),
-    0 0 42px -18px rgb(61 123 255 / 0.48),
-    0 18px 42px -24px rgb(0 0 0 / 0.48);
-}
-.surface-panel {
-  box-shadow: 0 12px 34px -28px rgb(0 0 0 / 0.55);
-}
-html[data-theme='light'] .surface-panel {
-  box-shadow: 0 12px 34px -28px rgb(0 0 0 / 0.18);
-}
-.install-banner {
-  line-height: 1.6;
-}
-@media (max-width: 380px) {
-  .app-header {
-    padding-inline: 0.65rem;
-  }
-  .app-header > div {
-    gap: 0.35rem;
-  }
-  .app-header .btn-chrome {
-    min-width: 2.65rem;
-    padding-inline: 0.55rem;
-  }
-  .timer-face {
-    width: min(15.5rem, calc(100vw - 4rem));
-    height: min(15.5rem, calc(100vw - 4rem));
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    scroll-behavior: auto !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
