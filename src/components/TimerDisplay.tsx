@@ -71,7 +71,7 @@ const ACCENT_BTN: Record<TimerAccent, string> = {
   teal: 'bg-teal-500',
 }
 
-/** Circular dial inspired by Avast Secure Browser Utilities → Focus */
+/** Calm circular session face (Avast-style): solid disc + progress arc — no clock ticks */
 export function TimerDisplay({
   seconds = 0,
   milliseconds,
@@ -135,21 +135,6 @@ export function TimerDisplay({
   const showRing =
     !isStopwatch && progress !== undefined && (progress > 0 || isActive)
 
-  const ticks = Array.from({ length: 60 }, (_, i) => {
-    const angle = (i / 60) * 360 - 90
-    const rad = (angle * Math.PI) / 180
-    const major = i % 5 === 0
-    const r1 = major ? 102 : 106
-    const r2 = 112
-    return {
-      x1: 120 + r1 * Math.cos(rad),
-      y1: 120 + r1 * Math.sin(rad),
-      x2: 120 + r2 * Math.cos(rad),
-      y2: 120 + r2 * Math.sin(rad),
-      major,
-    }
-  })
-
   const playIcon =
     phase === 'running' ? (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -195,20 +180,16 @@ export function TimerDisplay({
         viewBox="0 0 240 240"
         aria-hidden
       >
-        {ticks.map((t, i) => (
-          <line
-            key={i}
-            x1={t.x1}
-            y1={t.y1}
-            x2={t.x2}
-            y2={t.y2}
-            className={
-              t.major ? 'stroke-current opacity-25' : 'stroke-current opacity-10'
-            }
-            strokeWidth={t.major ? 1.5 : 1}
-            strokeLinecap="round"
+        {!isStopwatch && (
+          <circle
+            cx="120"
+            cy="120"
+            r={radius}
+            fill="none"
+            className="stroke-current opacity-[0.08]"
+            strokeWidth="8"
           />
-        ))}
+        )}
 
         {showRing && (
           <circle
@@ -221,7 +202,7 @@ export function TimerDisplay({
                 ? 'stroke-amber-400/90'
                 : ACCENT_RING[resolvedAccent]
             } transition-[stroke-dashoffset] duration-300 linear`}
-            strokeWidth="6"
+            strokeWidth="8"
             strokeLinecap="round"
             strokeDasharray={circumference}
             strokeDashoffset={offset}
