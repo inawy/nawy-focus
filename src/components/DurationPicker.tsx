@@ -43,7 +43,11 @@ export function DurationPicker({
 
   return (
     <div className="flex w-full max-w-sm flex-col gap-2.5">
-      <div className="flex flex-wrap justify-center gap-2">
+      <div
+        className="flex flex-wrap justify-center gap-2"
+        role="group"
+        aria-label={kind === 'focus' ? 'مدة التركيز' : 'مدة الراحة'}
+      >
         {presets.map((m) => (
           <button
             key={m}
@@ -54,6 +58,7 @@ export function DurationPicker({
               setShowCustom(false)
               setCustomText('')
             }}
+            aria-pressed={!showCustom && currentMinutes === m}
             className={`min-h-11 min-w-[3.5rem] rounded-full px-3.5 text-sm font-medium tabular-nums transition disabled:opacity-40 ${
               !showCustom && currentMinutes === m
                 ? 'bg-brand-500 text-white shadow-md shadow-brand-500/20'
@@ -67,6 +72,7 @@ export function DurationPicker({
           type="button"
           disabled={disabled}
           onClick={() => setShowCustom(true)}
+          aria-pressed={showCustom}
           className={`min-h-11 rounded-full px-3.5 text-sm font-medium transition disabled:opacity-40 ${
             showCustom
               ? 'bg-brand-500 text-white shadow-md shadow-brand-500/20'
