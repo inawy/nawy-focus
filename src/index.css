@@ -316,3 +316,122 @@ html[data-theme='light'] .break-toggle-active {
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* Calm interaction and accessibility refinements */
+:where(button, a, input, summary, [tabindex]):focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--color-brand-500) 78%, white);
+  outline-offset: 3px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+button,
+a,
+input {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-primary-brand,
+.btn-secondary-quiet,
+.btn-chrome,
+.timer-play-btn,
+.timer-secondary-btn,
+.session-chip,
+.mode-tab {
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+.btn-primary-brand {
+  box-shadow: 0 9px 24px -14px color-mix(in srgb, var(--color-brand-500) 80%, transparent);
+}
+
+.btn-primary-brand:active,
+.btn-secondary-quiet:active,
+.btn-chrome:active,
+.timer-play-btn:active,
+.timer-secondary-btn:active,
+.session-chip:not(:disabled):active,
+.mode-tab:not(:disabled):active {
+  transform: translateY(1px) scale(0.985);
+}
+
+.timer-face {
+  width: min(17rem, calc(100vw - 3rem));
+  height: min(17rem, calc(100vw - 3rem));
+}
+
+.timer-face-active .timer-disc {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--app-fg) 7%, transparent),
+    0 18px 44px -26px color-mix(in srgb, var(--color-brand-500) 34%, transparent);
+}
+
+.timer-play-btn {
+  min-width: 3.25rem;
+  min-height: 3.25rem;
+  box-shadow: 0 8px 18px -10px rgb(0 0 0 / 0.7);
+}
+
+.session-chip {
+  min-height: 2.75rem;
+}
+
+.session-chip-active {
+  box-shadow: 0 5px 16px -12px currentColor;
+}
+
+.mode-tab-active {
+  box-shadow: 0 5px 16px -10px color-mix(in srgb, var(--color-brand-500) 85%, transparent);
+}
+
+.surface-panel {
+  box-shadow: 0 12px 36px -32px rgb(0 0 0 / 0.6);
+}
+
+.surface-field {
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out);
+}
+
+.app-menu {
+  transform-origin: top right;
+  animation: nawy-menu-in 140ms var(--ease-out) both;
+}
+
+@keyframes nawy-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-brand-500) 32%, transparent);
+}
+
+@media (max-width: 360px) {
+  .timer-face {
+    width: min(15.5rem, calc(100vw - 2.5rem));
+    height: min(15.5rem, calc(100vw - 2.5rem));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-menu {
+    animation: none;
+  }
+}
