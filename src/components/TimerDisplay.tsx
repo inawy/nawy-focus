@@ -1,113 +1,184 @@
 import type { SessionKind, TimerPhase } from '../types'
 import type { StopwatchPhase } from '../hooks/useStopwatch'
 
+export type TimerAccent = 'brand' | 'orange' | 'green' | 'purple' | 'pink' | 'teal'
+
 interface Props {
-  /** Displayed seconds (remaining for session, elapsed for stopwatch) */
-  seconds: number
+  seconds?: number
+  milliseconds?: number
   phase: TimerPhase | StopwatchPhase
   kind: SessionKind | 'stopwatch'
-  /** Progress 0–1 for session countdown ring; omit for stopwatch */
   progress?: number
-  /** Optional primary control inside the circle (play / pause) */
+  accent?: TimerAccent
+  activityLabel?: string
+  activityIcon?: string
   onPrimary?: () => void
   primaryLabel?: string
-  /** Optional secondary circular action (e.g. sound / reset) */
   onSecondary?: () => void
   secondaryIcon?: string
   secondaryLabel?: string
+  onReset?: () => void
+  showMs?: boolean
 }
 
-function splitTime(totalSeconds: number): {
+function splitFromMs(totalMs: number): {
   hh: string | null
   mm: string
   ss: string
+  ms: string
 } {
-  const s = Math.max(0, Math.floor(totalSeconds))
-  const h = Math.floor(s / 3600)
-  const m = Math.floor((s % 3600) / 60)
-  const sec = s % 60
+  const t = Math.max(0, Math.floor(totalMs))
+  const h = Math.floor(t / 3_600_000)
+  const m = Math.floor((t % 3_600_000) / 60_000)
+  const s = Math.floor((t % 60_000) / 1000)
+  const ms = t % 1000
   return {
     hh: h > 0 ? String(h) : null,
     mm: String(m).padStart(2, '0'),
-    ss: String(sec).padStart(2, '0'),
+    ss: String(s).padStart(2, '0'),
+    ms: String(ms).padStart(3, '0'),
   }
 }
 
-function labelFor(kind: Props['kind'], phase: Props['phase']): string {
-  if (kind === 'stopwatch') {
-    if (phase === 'running') return 'جارٍ'
-    if (phase === 'paused') return 'متوقف'
-    return 'ساعة إيقاف'
-  }
-  if (phase === 'running') return kind === 'break' ? 'راحة' : 'تركيز'
-  if (phase === 'paused') return 'متوقف مؤقتاً'
-  if (phase === 'finished') return 'مكتملة'
-  return kind === 'break' ? 'راحة' : 'تركيز'
+function splitFromSeconds(totalSeconds: number) {
+  return splitFromMs(Math.max(0, Math.floor(totalSeconds)) * 1000)
 }
 
-/**
- * Circular timer face inspired by Avast Secure Browser Utilities → Focus.
- * Time digits always LTR (HH:MM:SS) even in RTL UI.
- */
+const ACCENT_TEXT: Record<TimerAccent, string> = {
+  brand: 'text-brand-500',
+  orange: 'text-orange-400',
+  green: 'text-emerald-400',
+  purple: 'text-violet-400',
+  pink: 'text-pink-400',
+  teal: 'text-teal-400',
+}
+
+const ACCENT_RING: Record<TimerAccent, string> = {
+  brand: 'stroke-brand-500',
+  orange: 'stroke-orange-400',
+  green: 'stroke-emerald-400',
+  purple: 'stroke-violet-400',
+  pink: 'stroke-pink-400',
+  teal: 'stroke-teal-400',
+}
+
+const ACCENT_BTN: Record<TimerAccent, string> = {
+  brand: 'bg-brand-500',
+  orange: 'bg-orange-500',
+  green: 'bg-emerald-500',
+  purple: 'bg-violet-500',
+  pink: 'bg-pink-500',
+  teal: 'bg-teal-500',
+}
+
+/** Circular dial inspired by Avast Secure Browser Utilities → Focus */
 export function TimerDisplay({
-  seconds,
+  seconds = 0,
+  milliseconds,
   phase,
   kind,
   progress,
+  accent = 'brand',
+  activityLabel,
+  activityIcon,
   onPrimary,
   primaryLabel,
   onSecondary,
   secondaryIcon = '🔔',
   secondaryLabel = 'تنبيه',
+  onReset,
+  showMs = false,
 }: Props) {
-  const { hh, mm, ss } = splitTime(seconds)
-  const title = labelFor(kind, phase)
+  const totalMs =
+    milliseconds !== undefined ? milliseconds : Math.max(0, seconds) * 1000
+  const { hh, mm, ss, ms } = showMs
+    ? splitFromMs(totalMs)
+    : splitFromSeconds(totalMs / 1000)
+
   const isBreak = kind === 'break'
   const isStopwatch = kind === 'stopwatch'
   const isActive = phase === 'running' || phase === 'paused'
+  const resolvedAccent: TimerAccent = isStopwatch
+    ? 'brand'
+    : isBreak && accent === 'brand'
+      ? 'orange'
+      : accent
+
+  const title =
+    activityLabel ??
+    (isStopwatch
+      ? phase === 'running'
+        ? 'جارٍ'
+        : phase === 'paused'
+          ? 'متوقف'
+          : 'ساعة إيقاف'
+      : phase === 'running'
+        ? isBreak
+          ? 'راحة'
+          : 'تركيز'
+        : phase === 'paused'
+          ? 'متوقف مؤقتاً'
+          : phase === 'finished'
+            ? 'مكتملة'
+            : isBreak
+              ? 'راحة'
+              : 'تركيز')
+
+  const icon =
+    activityIcon ?? (isStopwatch ? '⏱' : isBreak ? '☕' : '◎')
 
   const radius = 108
   const circumference = 2 * Math.PI * radius
-  const clampedProgress =
+  const clamped =
     progress === undefined ? 0 : Math.min(1, Math.max(0, progress))
-  const offset = circumference * (1 - clampedProgress)
+  const offset = circumference * (1 - clamped)
+  const showRing =
+    !isStopwatch && progress !== undefined && (progress > 0 || isActive)
 
-  const showRing = !isStopwatch && progress !== undefined && progress > 0
-
-  const ringClass =
-    phase === 'paused'
-      ? 'stroke-amber-400/90'
-      : isBreak
-        ? 'stroke-orange-400/90'
-        : 'stroke-brand-500'
+  const ticks = Array.from({ length: 60 }, (_, i) => {
+    const angle = (i / 60) * 360 - 90
+    const rad = (angle * Math.PI) / 180
+    const major = i % 5 === 0
+    const r1 = major ? 102 : 106
+    const r2 = 112
+    return {
+      x1: 120 + r1 * Math.cos(rad),
+      y1: 120 + r1 * Math.sin(rad),
+      x2: 120 + r2 * Math.cos(rad),
+      y2: 120 + r2 * Math.sin(rad),
+      major,
+    }
+  })
 
   const playIcon =
     phase === 'running' ? (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-        <rect x="6" y="5" width="4" height="14" rx="1" />
-        <rect x="14" y="5" width="4" height="14" rx="1" />
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+        <rect x="6" y="5" width="4" height="14" rx="1.2" />
+        <rect x="14" y="5" width="4" height="14" rx="1.2" />
       </svg>
     ) : (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
         <path d="M8 5.5v13l11-6.5-11-6.5z" />
       </svg>
     )
 
-  const digitClass = hh
-    ? 'text-[2.1rem] leading-none sm:text-[2.55rem]'
-    : 'text-[2.75rem] leading-none sm:text-[3.25rem]'
-  const colonClass = hh
-    ? 'pt-1 text-[1.9rem] leading-none text-slate-500 sm:text-[2.3rem]'
-    : 'pt-1 text-[2.4rem] leading-none text-slate-500 sm:text-[2.9rem]'
-  const unitClass = 'mt-1 text-[10px] font-medium tracking-[0.2em] text-slate-500'
+  const digitClass = showMs
+    ? 'text-[2rem] leading-none sm:text-[2.35rem]'
+    : hh
+      ? 'text-[2.1rem] leading-none sm:text-[2.5rem]'
+      : 'text-[2.75rem] leading-none sm:text-[3.2rem]'
+  const msClass = 'text-[1.35rem] leading-none text-slate-400 sm:text-[1.55rem]'
+  const colonClass = showMs
+    ? 'pt-0.5 text-[1.7rem] leading-none text-slate-500'
+    : 'pt-1 text-[2.3rem] leading-none text-slate-500 sm:text-[2.8rem]'
+  const unitClass =
+    'mt-1 text-[9px] font-medium uppercase tracking-[0.18em] text-slate-500'
 
-  const ariaParts = [
-    hh ? `${hh} ساعة` : null,
-    `${mm} دقيقة`,
-    `${ss} ثانية`,
-  ]
-    .filter(Boolean)
-    .join(' و ')
+  const aria = showMs
+    ? `${mm} دقيقة و ${ss} ثانية و ${ms}`
+    : [hh ? `${hh} ساعة` : null, `${mm} دقيقة`, `${ss} ثانية`]
+        .filter(Boolean)
+        .join(' و ')
 
   return (
     <div
@@ -118,88 +189,121 @@ export function TimerDisplay({
       <div className="timer-disc absolute inset-0 rounded-full" aria-hidden />
 
       <svg
-        className="-rotate-90"
+        className="absolute inset-0"
         width="100%"
         height="100%"
         viewBox="0 0 240 240"
         aria-hidden
       >
-        <circle
-          cx="120"
-          cy="120"
-          r={radius}
-          fill="none"
-          className="stroke-current opacity-[0.08]"
-          strokeWidth="8"
-        />
+        {ticks.map((t, i) => (
+          <line
+            key={i}
+            x1={t.x1}
+            y1={t.y1}
+            x2={t.x2}
+            y2={t.y2}
+            className={
+              t.major ? 'stroke-current opacity-25' : 'stroke-current opacity-10'
+            }
+            strokeWidth={t.major ? 1.5 : 1}
+            strokeLinecap="round"
+          />
+        ))}
+
         {showRing && (
           <circle
             cx="120"
             cy="120"
             r={radius}
             fill="none"
-            className={`${ringClass} transition-[stroke-dashoffset] duration-1000 linear`}
-            strokeWidth="8"
+            className={`${
+              phase === 'paused'
+                ? 'stroke-amber-400/90'
+                : ACCENT_RING[resolvedAccent]
+            } transition-[stroke-dashoffset] duration-300 linear`}
+            strokeWidth="6"
             strokeLinecap="round"
             strokeDasharray={circumference}
             strokeDashoffset={offset}
+            transform="rotate(-90 120 120)"
           />
+        )}
+
+        {isStopwatch && phase === 'running' && (
+          <circle cx="120" cy="12" r="4" className="fill-brand-500" />
         )}
       </svg>
 
-      <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-3">
         <div
-          className={`mb-1 flex items-center gap-1.5 text-sm font-semibold ${
-            isBreak
-              ? 'text-orange-400'
-              : isStopwatch
-                ? 'text-brand-400'
-                : 'text-brand-500'
-          }`}
+          className={`mb-0.5 flex items-center gap-1.5 text-sm font-semibold ${ACCENT_TEXT[resolvedAccent]}`}
         >
           <span aria-hidden className="text-base leading-none">
-            {isStopwatch ? '⏱' : isBreak ? '☕' : '◎'}
+            {icon}
           </span>
           {title}
         </div>
 
-        {/* Always LTR so HH:MM:SS reads left → right in RTL UI */}
         <div
           dir="ltr"
           className="timer-digits flex items-start justify-center gap-0.5 font-mono font-semibold tabular-nums tracking-tight"
           aria-live="polite"
-          aria-label={ariaParts}
+          aria-label={aria}
         >
-          {hh !== null && (
+          {hh !== null && !showMs && (
             <>
               <div className="flex flex-col items-center">
                 <span className={digitClass}>{hh}</span>
-                <span className={unitClass}>س</span>
+                <span className={unitClass}>HH</span>
               </div>
               <span className={colonClass}>:</span>
             </>
           )}
           <div className="flex flex-col items-center">
             <span className={digitClass}>{mm}</span>
-            <span className={unitClass}>د</span>
+            <span className={unitClass}>MM</span>
           </div>
           <span className={colonClass}>:</span>
           <div className="flex flex-col items-center">
             <span className={digitClass}>{ss}</span>
-            <span className={unitClass}>ث</span>
+            <span className={unitClass}>SS</span>
           </div>
+          {showMs && (
+            <>
+              <span className={`${colonClass} text-slate-600`}>.</span>
+              <div className="flex flex-col items-center">
+                <span className={`${msClass} font-semibold tabular-nums`}>{ms}</span>
+                <span className={unitClass}>MS</span>
+              </div>
+            </>
+          )}
         </div>
 
-        {onPrimary && (
-          <div className="mt-4 flex items-center gap-3" dir="ltr">
-            <button
-              type="button"
-              onClick={onPrimary}
-              className="timer-play-btn flex h-12 w-12 items-center justify-center rounded-full text-white shadow-lg transition active:scale-95"
-              aria-label={primaryLabel ?? (phase === 'running' ? 'إيقاف مؤقت' : 'بدء')}
-            >
-              {playIcon}
-            </button>
+        {(onPrimary || onReset || onSecondary) && (
+          <div className="mt-3.5 flex items-center gap-3" dir="ltr">
+            {onReset && (
+              <button
+                type="button"
+                onClick={onReset}
+                className="timer-secondary-btn flex h-10 w-10 items-center justify-center rounded-full text-base transition active:scale-95"
+                aria-label="إعادة التعيين"
+                title="إعادة التعيين"
+              >
+                ↺
+              </button>
+            )}
+            {onPrimary && (
+              <button
+                type="button"
+                onClick={onPrimary}
+                className={`timer-play-btn flex h-12 w-12 items-center justify-center rounded-full text-white shadow-lg transition active:scale-95 ${ACCENT_BTN[resolvedAccent]}`}
+                aria-label={
+                  primaryLabel ?? (phase === 'running' ? 'إيقاف مؤقت' : 'بدء')
+                }
+              >
+                {playIcon}
+              </button>
+            )}
             {onSecondary && (
               <button
                 type="button"

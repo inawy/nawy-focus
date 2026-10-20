@@ -3,58 +3,69 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 export type StopwatchPhase = 'idle' | 'running' | 'paused'
 
 /**
- * Count-up stopwatch — independent from session countdown timer.
+ * Count-up stopwatch with millisecond precision (Avast-style MM:SS.MS).
  */
 export function useStopwatch() {
   const [phase, setPhase] = useState<StopwatchPhase>('idle')
-  const [elapsedSeconds, setElapsedSeconds] = useState(0)
-  const intervalRef = useRef<number | null>(null)
-  const lastTickAtRef = useRef(Date.now())
+  const [elapsedMs, setElapsedMs] = useState(0)
+  const rafRef = useRef<number | null>(null)
+  const startedAtRef = useRef(0)
+  const baseMsRef = useRef(0)
+  const liveMsRef = useRef(0)
 
-  const clearTick = useCallback(() => {
-    if (intervalRef.current !== null) {
-      window.clearInterval(intervalRef.current)
-      intervalRef.current = null
+  const clearRaf = useCallback(() => {
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current)
+      rafRef.current = null
     }
   }, [])
 
   useEffect(() => {
-    if (phase === 'running') {
-      lastTickAtRef.current = Date.now()
-      intervalRef.current = window.setInterval(() => {
-        lastTickAtRef.current = Date.now()
-        setElapsedSeconds((s) => s + 1)
-      }, 1000)
-    } else {
-      clearTick()
+    if (phase !== 'running') {
+      clearRaf()
+      return
     }
-    return clearTick
-  }, [phase, clearTick])
-
-  useEffect(() => {
-    const onVisibility = () => {
-      if (document.visibilityState !== 'visible' || phase !== 'running') return
-      const gap = Math.floor((Date.now() - lastTickAtRef.current) / 1000)
-      if (gap >= 2) {
-        lastTickAtRef.current = Date.now()
-        setElapsedSeconds((s) => s + gap)
-      }
+    startedAtRef.current = performance.now()
+    const tick = () => {
+      const now = performance.now()
+      const next = baseMsRef.current + (now - startedAtRef.current)
+      liveMsRef.current = next
+      setElapsedMs(next)
+      rafRef.current = requestAnimationFrame(tick)
     }
-    document.addEventListener('visibilitychange', onVisibility)
-    return () => document.removeEventListener('visibilitychange', onVisibility)
-  }, [phase])
+    rafRef.current = requestAnimationFrame(tick)
+    return clearRaf
+  }, [phase, clearRaf])
 
-  const start = useCallback(() => setPhase('running'), [])
-  const pause = useCallback(() => setPhase('paused'), [])
-  const resume = useCallback(() => setPhase('running'), [])
+  const start = useCallback(() => {
+    baseMsRef.current = 0
+    liveMsRef.current = 0
+    setElapsedMs(0)
+    setPhase('running')
+  }, [])
+
+  const pause = useCallback(() => {
+    baseMsRef.current = liveMsRef.current
+    setElapsedMs(liveMsRef.current)
+    setPhase('paused')
+  }, [])
+
+  const resume = useCallback(() => {
+    setPhase('running')
+  }, [])
+
   const reset = useCallback(() => {
+    clearRaf()
+    baseMsRef.current = 0
+    liveMsRef.current = 0
+    setElapsedMs(0)
     setPhase('idle')
-    setElapsedSeconds(0)
-  }, [])
+  }, [clearRaf])
 
   return {
     phase,
-    elapsedSeconds,
+    elapsedMs,
+    elapsedSeconds: Math.floor(elapsedMs / 1000),
     start,
     pause,
     resume,
