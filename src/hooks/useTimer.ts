@@ -33,6 +33,8 @@ function initialState(): TimerState {
  */
 export function useTimer() {
   const [state, setState] = useState<TimerState>(initialState)
+  const stateRef = useRef(state)
+  stateRef.current = state
   const intervalRef = useRef<number | null>(null)
   const savedFinishedRef = useRef(false)
   const lastTickAtRef = useRef<number>(Date.now())
@@ -138,20 +140,19 @@ export function useTimer() {
 
   const stop = useCallback(async () => {
     setFinishedWhileHidden(false)
-    setState((prev) => {
-      if (prev.elapsedSeconds > 0) {
-        void addSession({
-          intention: prev.intention,
-          kind: prev.kind,
-          plannedSeconds: prev.plannedSeconds,
-          actualSeconds: prev.elapsedSeconds,
-          status: 'stopped',
-          startedAt: prev.startedAt ?? Date.now(),
-          endedAt: Date.now(),
-        })
-      }
-      return resetTimer(prev)
-    })
+    const prev = stateRef.current
+    if (prev.elapsedSeconds > 0) {
+      void addSession({
+        intention: prev.intention,
+        kind: prev.kind,
+        plannedSeconds: prev.plannedSeconds,
+        actualSeconds: prev.elapsedSeconds,
+        status: 'stopped',
+        startedAt: prev.startedAt ?? Date.now(),
+        endedAt: Date.now(),
+      })
+    }
+    setState(resetTimer(prev))
   }, [])
 
   const reset = useCallback(() => {
