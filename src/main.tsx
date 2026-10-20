@@ -15,35 +15,49 @@ createRoot(root).render(
 )
 
 /**
- * Auto-update PWA:
- * - checks for a new service worker on load and every hour
- * - when a new version is found, activates it and reloads once
- *   so the user always lands on the latest deploy
+ * Keep installed and open clients fresh:
+ * - activate updated service workers automatically
+ * - check on startup, tab return, focus, and every 30 seconds while visible
+ * - version the document URL after an update to avoid a stale HTML shell
  */
+let updateReloadStarted = false
+
+function reloadWithFreshDocumentUrl() {
+  if (updateReloadStarted) return
+  updateReloadStarted = true
+  const url = new URL(window.location.href)
+  url.searchParams.set('v', '6')
+  window.location.replace(url.toString())
+}
+
 registerSW({
   immediate: true,
-  onRegisteredSW(swUrl, registration) {
+  onRegisteredSW(_swUrl, registration) {
     if (!registration) return
 
-    const check = () => {
-      void registration.update()
+    const checkForUpdate = () => {
+      if (document.visibilityState === 'visible') {
+        void registration.update().catch(() => {
+          // Offline or temporarily unavailable: retry on the next visibility check.
+        })
+      }
     }
 
-    // Re-check when the tab becomes visible (common after a deploy)
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') check()
-    })
+    // Re-check immediately after registration and whenever the user returns.
+    checkForUpdate()
+    document.addEventListener('visibilitychange', checkForUpdate)
+    window.addEventListener('focus', checkForUpdate)
+    window.addEventListener('pageshow', checkForUpdate)
 
-    // Periodic check while the app stays open
-    window.setInterval(check, 60 * 60 * 1000)
+    // Keep an open tab current without waiting an hour.
+    window.setInterval(checkForUpdate, 30_000)
 
     if (import.meta.env.DEV) {
-      console.info('[pwa] registered', swUrl)
+      console.info('[pwa] registered', _swUrl)
     }
   },
   onNeedRefresh() {
-    // autoUpdate + skipWaiting: reload to pick up the new shell
-    window.location.reload()
+    reloadWithFreshDocumentUrl()
   },
   onOfflineReady() {
     if (import.meta.env.DEV) {
