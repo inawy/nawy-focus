@@ -17,11 +17,17 @@ interface Props {
   secondaryLabel?: string
 }
 
-function splitTime(totalSeconds: number): { mm: string; ss: string } {
+function splitTime(totalSeconds: number): {
+  hh: string | null
+  mm: string
+  ss: string
+} {
   const s = Math.max(0, Math.floor(totalSeconds))
-  const m = Math.floor(s / 60)
+  const h = Math.floor(s / 3600)
+  const m = Math.floor((s % 3600) / 60)
   const sec = s % 60
   return {
+    hh: h > 0 ? String(h) : null,
     mm: String(m).padStart(2, '0'),
     ss: String(sec).padStart(2, '0'),
   }
@@ -41,7 +47,7 @@ function labelFor(kind: Props['kind'], phase: Props['phase']): string {
 
 /**
  * Circular timer face inspired by Avast Secure Browser Utilities → Focus.
- * Solid disc + progress ring, MM:SS with unit captions, optional in-circle controls.
+ * Time digits always LTR (HH:MM:SS) even in RTL UI.
  */
 export function TimerDisplay({
   seconds,
@@ -54,7 +60,7 @@ export function TimerDisplay({
   secondaryIcon = '🔔',
   secondaryLabel = 'تنبيه',
 }: Props) {
-  const { mm, ss } = splitTime(seconds)
+  const { hh, mm, ss } = splitTime(seconds)
   const title = labelFor(kind, phase)
   const isBreak = kind === 'break'
   const isStopwatch = kind === 'stopwatch'
@@ -86,6 +92,22 @@ export function TimerDisplay({
         <path d="M8 5.5v13l11-6.5-11-6.5z" />
       </svg>
     )
+
+  const digitClass = hh
+    ? 'text-[2.1rem] leading-none sm:text-[2.55rem]'
+    : 'text-[2.75rem] leading-none sm:text-[3.25rem]'
+  const colonClass = hh
+    ? 'pt-1 text-[1.9rem] leading-none text-slate-500 sm:text-[2.3rem]'
+    : 'pt-1 text-[2.4rem] leading-none text-slate-500 sm:text-[2.9rem]'
+  const unitClass = 'mt-1 text-[10px] font-medium tracking-[0.2em] text-slate-500'
+
+  const ariaParts = [
+    hh ? `${hh} ساعة` : null,
+    `${mm} دقيقة`,
+    `${ss} ثانية`,
+  ]
+    .filter(Boolean)
+    .join(' و ')
 
   return (
     <div
@@ -141,30 +163,35 @@ export function TimerDisplay({
           {title}
         </div>
 
+        {/* Always LTR so HH:MM:SS reads left → right in RTL UI */}
         <div
-          className="timer-digits flex items-start justify-center gap-1 font-mono font-semibold tabular-nums tracking-tight"
+          dir="ltr"
+          className="timer-digits flex items-start justify-center gap-0.5 font-mono font-semibold tabular-nums tracking-tight"
           aria-live="polite"
-          aria-label={`${mm} دقيقة و ${ss} ثانية`}
+          aria-label={ariaParts}
         >
+          {hh !== null && (
+            <>
+              <div className="flex flex-col items-center">
+                <span className={digitClass}>{hh}</span>
+                <span className={unitClass}>س</span>
+              </div>
+              <span className={colonClass}>:</span>
+            </>
+          )}
           <div className="flex flex-col items-center">
-            <span className="text-[2.75rem] leading-none sm:text-[3.25rem]">{mm}</span>
-            <span className="mt-1 text-[10px] font-medium tracking-[0.2em] text-slate-500">
-              د
-            </span>
+            <span className={digitClass}>{mm}</span>
+            <span className={unitClass}>د</span>
           </div>
-          <span className="pt-1 text-[2.4rem] leading-none text-slate-500 sm:text-[2.9rem]">
-            :
-          </span>
+          <span className={colonClass}>:</span>
           <div className="flex flex-col items-center">
-            <span className="text-[2.75rem] leading-none sm:text-[3.25rem]">{ss}</span>
-            <span className="mt-1 text-[10px] font-medium tracking-[0.2em] text-slate-500">
-              ث
-            </span>
+            <span className={digitClass}>{ss}</span>
+            <span className={unitClass}>ث</span>
           </div>
         </div>
 
         {onPrimary && (
-          <div className="mt-4 flex items-center gap-3">
+          <div className="mt-4 flex items-center gap-3" dir="ltr">
             <button
               type="button"
               onClick={onPrimary}
