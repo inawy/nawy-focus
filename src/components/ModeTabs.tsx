@@ -7,8 +7,8 @@ interface Props {
 }
 
 const TABS: { id: AppMode; label: string; icon: string }[] = [
-  { id: 'stopwatch', label: 'ساعة إيقاف', icon: '⏱' },
   { id: 'session', label: 'جلسة', icon: '⌛' },
+  { id: 'stopwatch', label: 'ساعة إيقاف', icon: '⏱' },
 ]
 
 /** Segmented control inspired by Avast Utilities Focus UI */
