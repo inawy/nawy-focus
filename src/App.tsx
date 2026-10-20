@@ -706,15 +706,9 @@ export default function App() {
           </div>
         )}
 
-        <ModeTabs
-          mode={appMode}
-          onChange={handleModeChange}
-          disabled={
-            isActive(state.phase) ||
-            stopwatch.phase === 'running' ||
-            stopwatch.phase === 'paused'
-          }
-        />
+        {!(isActive(state.phase) || stopwatch.phase === 'running' || stopwatch.phase === 'paused') && (
+          <ModeTabs mode={appMode} onChange={handleModeChange} />
+        )}
 
         {appMode === 'session' ? (
           <>
@@ -746,26 +740,11 @@ export default function App() {
               secondaryLabel="إنهاء"
             />
 
-            {sessionFocus ? (
-              state.intention ? (
-                <p className="max-w-sm px-1 text-center text-xs text-slate-500">
-                  {state.intention}
-                </p>
-              ) : null
-            ) : state.phase === 'finished' ? null : locked && state.intention ? (
-              <p className="max-w-sm text-center text-sm text-slate-400">
-                <span className="text-slate-500">النية: </span>
+            {sessionFocus && state.intention ? (
+              <p className="max-w-sm px-1 text-center text-xs text-slate-500">
                 {state.intention}
               </p>
-            ) : (
-              <IntentionInput
-                value={state.intention}
-                onChange={updateIntention}
-                disabled={locked}
-                suggestions={recentIntentions}
-                onSubmit={handleStart}
-              />
-            )}
+            ) : null}
 
             {!sessionFocus && state.phase !== 'finished' && (
               <>
@@ -783,6 +762,15 @@ export default function App() {
                   onSecondsChange={updatePlanned}
                   disabled={locked}
                 />
+                {!locked && (
+                  <IntentionInput
+                    value={state.intention}
+                    onChange={updateIntention}
+                    disabled={locked}
+                    suggestions={recentIntentions}
+                    onSubmit={handleStart}
+                  />
+                )}
               </>
             )}
 
@@ -821,15 +809,6 @@ export default function App() {
               secondaryIcon="↺"
               secondaryLabel="إعادة التعيين"
             />
-            {stopwatch.phase !== 'idle' && (
-              <button
-                type="button"
-                onClick={stopwatch.reset}
-                className="btn-chrome min-h-11 rounded-full px-5 text-sm"
-              >
-                إعادة التعيين
-              </button>
-            )}
           </>
         )}
 
