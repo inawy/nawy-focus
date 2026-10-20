@@ -94,6 +94,7 @@ export function SessionTypeChips({
             type="button"
             disabled={disabled}
             onClick={() => onSelect(p)}
+            aria-pressed={active}
             className={`session-chip session-chip-${p.tone} min-h-10 rounded-xl px-3.5 text-sm font-medium transition disabled:opacity-40 ${
               active ? 'session-chip-active' : ''
             }`}
