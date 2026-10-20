@@ -13,7 +13,7 @@
       name="description"
       content="ناوي فوكاس — مؤقت تركيز بسيط ومحلي أولاً ضمن منظومة ناوي للإنتاجية."
     />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!-- Do not request iOS standalone/full-screen app presentation. -->
     <title>ناوي فوكاس · Nawy Focus</title>
     <script>
       /* Theme bootstrap */
@@ -46,8 +46,6 @@
             try {
               localStorage.setItem(KEY, TARGET);
             } catch (e) {}
-            // Avoid reload loops: only reload if we actually cleared something
-            // or version was missing/old.
             if (cur !== TARGET) {
               window.location.replace(window.location.pathname + '?v=5');
             }
@@ -71,7 +69,6 @@
             );
           }
 
-          // Also exit browser fullscreen if stuck from the old build
           try {
             if (document.fullscreenElement && document.exitFullscreen) {
               document.exitFullscreen();
@@ -80,7 +77,6 @@
 
           if (tasks.length) {
             Promise.all(tasks).then(finish).catch(finish);
-            // Safety timeout
             setTimeout(finish, 2500);
           } else {
             finish();
@@ -95,6 +91,6 @@
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="./src/main.tsx"></script>
   </body>
 </html>
