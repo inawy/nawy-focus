@@ -228,7 +228,7 @@ export function TimerDisplay({
         <div
           dir="ltr"
           className="timer-digits flex items-start justify-center gap-0.5 font-mono font-semibold tabular-nums tracking-tight"
-          aria-live="polite"
+          role="timer"
           aria-label={aria}
         >
           {hh !== null && !showMs && (
