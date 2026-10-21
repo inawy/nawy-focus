@@ -201,7 +201,6 @@ export default function App() {
     stop()
   }, [state.elapsedSeconds, stop])
 
-  const locked = isActive(state.phase) || state.phase === 'finished'
   const sessionFocus = isActive(state.phase)
   const activePreset =
     SESSION_PRESETS.find((p) => p.id === presetId) ?? {
@@ -723,52 +722,77 @@ export default function App() {
             />
 
             {state.phase !== 'finished' && (
-              <section className="session-editor surface-panel w-full max-w-sm p-4 sm:p-5" aria-label="إعداد الجلسة">
-                <div className="mb-4 flex items-start justify-between gap-3">
-                  <div>
-                    <h2 className="text-sm font-semibold">إعداد الجلسة</h2>
-                    <p className="mt-1 text-xs leading-5 text-slate-500">اختار نوع الجلسة ومدتها، وحدد ناوي تركز على إيه.</p>
+          sessionFocus ? (
+            <section
+              className="session-live-summary surface-panel w-full max-w-sm"
+              aria-label="ملخص الجلسة الحالية"
+              role="status"
+            >
+              <div className="flex items-center gap-3">
+                <span className={`session-live-mark ${state.kind === 'break' ? 'session-live-mark-break' : ''}`} aria-hidden>
+                  {state.kind === 'break' ? '☕' : '•/'}
+                </span>
+                <div className="min-w-0 flex-1 text-start">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-sm font-semibold">
+                      {state.kind === 'break' ? 'وقت الراحة' : 'جلسة تركيز'}
+                    </h2>
+                    <span className={`session-live-status ${state.phase === 'paused' ? 'session-live-status-paused' : ''}`}>
+                      {state.phase === 'paused' ? 'متوقفة مؤقتًا' : 'قيد التشغيل'}
+                    </span>
                   </div>
-                  <span className="session-editor-mark" aria-hidden>•/</span>
-                </div>
-                <div className="flex flex-col gap-4">
-                  <div className="session-editor-section">
-                    <p className="session-editor-label">نوع الجلسة</p>
-                    <SessionTypeChips
-                      kind={state.kind}
-                      intention={state.intention}
-                      selectedId={presetId}
-                      onSelect={handlePreset}
-                      disabled={locked}
-                    />
-                  </div>
-                  <div className="session-editor-section">
-                    <p className="session-editor-label">المدة</p>
-                    <DurationPicker
-                      kind={state.kind}
-                      plannedSeconds={state.plannedSeconds}
-                      onKindChange={updateKind}
-                      onSecondsChange={updatePlanned}
-                      disabled={locked}
-                    />
-                  </div>
-                  <div className="session-editor-section">
-                    <IntentionInput
-                      value={state.intention}
-                      onChange={updateIntention}
-                      disabled={locked}
-                      suggestions={recentIntentions}
-                      onSubmit={handleStart}
-                    />
-                  </div>
-                </div>
-                {locked && (
-                  <p className="mt-3 rounded-xl bg-brand-500/[0.07] px-3 py-2 text-xs leading-5 text-slate-500">
-                    إعدادات الجلسة مقفولة أثناء التشغيل. أوقف المؤقت مؤقتًا لتعديلها.
+                  <p className="mt-1 truncate text-xs text-slate-500">
+                    {state.intention.trim() || (state.kind === 'break' ? 'استراحة قصيرة لنفسك' : 'كل انتباهك للحاجة اللي اخترتها')}
                   </p>
-                )}
-              </section>
-            )}
+                </div>
+                <div className="shrink-0 text-end">
+                  <p className="font-mono text-sm font-semibold tabular-nums" dir="ltr">
+                    {Math.round(state.plannedSeconds / 60)} <span className="text-xs font-normal text-slate-500">د</span>
+                  </p>
+                  <p className="mt-0.5 text-[10px] text-slate-500">المدة</p>
+                </div>
+              </div>
+            </section>
+          ) : (
+            <section className="session-editor surface-panel w-full max-w-sm p-4 sm:p-5" aria-label="إعداد الجلسة">
+              <div className="mb-4 flex items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-sm font-semibold">جهّز جلستك</h2>
+                  <p className="mt-1 text-xs leading-5 text-slate-500">اختار نوع الجلسة ومدتها، وحدد ناوي تركز على إيه.</p>
+                </div>
+                <span className="session-editor-mark" aria-hidden>•/</span>
+              </div>
+              <div className="flex flex-col gap-4">
+                <div className="session-editor-section">
+                  <p className="session-editor-label">نوع الجلسة</p>
+                  <SessionTypeChips
+                    kind={state.kind}
+                    intention={state.intention}
+                    selectedId={presetId}
+                    onSelect={handlePreset}
+                  />
+                </div>
+                <div className="session-editor-section">
+                  <p className="session-editor-label">المدة</p>
+                  <DurationPicker
+                    kind={state.kind}
+                    plannedSeconds={state.plannedSeconds}
+                    onKindChange={updateKind}
+                    onSecondsChange={updatePlanned}
+                  />
+                </div>
+                <div className="session-editor-section">
+                  <IntentionInput
+                    value={state.intention}
+                    onChange={updateIntention}
+                    suggestions={recentIntentions}
+                    onSubmit={handleStart}
+                  />
+                </div>
+              </div>
+            </section>
+          )
+        )}
 
             {(state.phase === 'finished' || state.phase === 'paused') && (
               <SessionControls
