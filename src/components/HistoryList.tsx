@@ -96,11 +96,11 @@ export function HistoryList({
                 {f.label}
               </button>
             ))}
-            <div className="history-tools ms-auto flex items-center gap-1">
+            <div className="history-tools ms-auto flex flex-wrap items-center gap-1">
               <button
                 type="button"
                 onClick={onExport}
-                className="min-h-9 rounded-lg px-2 text-[11px] text-slate-500 transition hover:text-inherit"
+                className="min-h-10 min-w-10 rounded-lg px-2 text-[11px] text-slate-500 transition hover:text-inherit"
                 title="تصدير بصيغة JSON"
               >
                 JSON
@@ -114,7 +114,7 @@ export function HistoryList({
                 CSV
               </button>
               <label
-                className="min-h-9 cursor-pointer rounded-lg px-2 text-[11px] text-slate-500 transition hover:text-inherit"
+                className="inline-flex min-h-10 items-center rounded-lg px-2 text-[11px] text-slate-500 transition hover:text-inherit"
                 title="استيراد نسخة احتياطية"
               >
                 استيراد
@@ -152,7 +152,7 @@ export function HistoryList({
                   className="history-row history-row-enter surface-row rounded-xl px-3 py-2.5"
                   style={{ animationDelay: `${Math.min(index, 6) * 35}ms` }}
                 >
-                  <div className="history-row-content flex items-start justify-between gap-2">
+                  <div className="history-row-content flex min-w-0 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
                     <div className="history-row-description min-w-0 flex-1">
                       <p className="truncate text-sm">
                         {s.intention || (s.kind === 'focus' ? 'تركيز' : 'راحة')}
@@ -163,7 +163,7 @@ export function HistoryList({
                         {s.kind === 'focus' ? 'تركيز' : 'راحة'}
                       </p>
                     </div>
-                    <div className="history-row-actions flex shrink-0 items-start gap-1">
+                    <div className="history-row-actions flex w-full min-w-0 items-center justify-between gap-1 sm:w-auto sm:shrink-0 sm:justify-start">
                       <div className="text-end">
                         <p className="text-sm font-medium tabular-nums">
                           {formatDurationShort(s.actualSeconds)}
@@ -179,7 +179,7 @@ export function HistoryList({
                       <button
                         type="button"
                         onClick={() => onCopySession(s)}
-                        className="min-h-11 min-w-11 rounded-lg px-1.5 text-xs text-slate-500 transition hover:bg-black/5 hover:opacity-100"
+                        className="min-h-11 min-w-11 shrink-0 rounded-lg px-1.5 text-xs text-slate-500 transition hover:bg-black/5 hover:opacity-100"
                         title="نسخ ملخص الجلسة"
                         aria-label="نسخ ملخص الجلسة"
                       >
@@ -188,7 +188,7 @@ export function HistoryList({
                       <button
                         type="button"
                         onClick={() => setPendingDelete(s.id)}
-                        className="history-delete min-h-11 min-w-11 rounded-lg px-2 text-slate-500 transition hover:bg-rose-500/10 hover:text-rose-500"
+                        className="history-delete min-h-11 min-w-11 shrink-0 rounded-lg px-2 text-slate-500 transition hover:bg-rose-500/10 hover:text-rose-500"
                         title="حذف الجلسة"
                         aria-label="حذف الجلسة"
                       >
