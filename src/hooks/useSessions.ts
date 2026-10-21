@@ -201,9 +201,27 @@ export function useSessions() {
 
   const uploadBackup = useCallback(
     async (file: File) => {
+      let raw: unknown
       try {
-        const text = await file.text()
-        const parsed = parseBackup(JSON.parse(text) as unknown)
+        raw = JSON.parse(await file.text()) as unknown
+      } catch {
+        setBackupMessage('تعذّرت قراءة الملف. تأكد أنه ملف JSON سليم وغير تالف.')
+        return
+      }
+
+      let parsed: FocusSession[]
+      try {
+        parsed = parseBackup(raw)
+      } catch (err) {
+        setBackupMessage(
+          err instanceof Error
+            ? err.message
+            : 'الملف غير صالح أو لا يتوافق مع نسخة ناوي فوكاس.',
+        )
+        return
+      }
+
+      try {
         const inserted = await importSessions(parsed)
         await refresh()
         setBackupMessage(
@@ -211,9 +229,10 @@ export function useSessions() {
             ? 'لا توجد جلسات جديدة للاستيراد'
             : `تم استيراد ${inserted} جلسة جديدة`,
         )
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : 'تعذّر الاستيراد'
-        setBackupMessage(msg)
+      } catch {
+        setBackupMessage(
+          'تعذّر استيراد الجلسات إلى التخزين المحلي. لم يتم تأكيد اكتمال الاستيراد؛ تحقق من السجل قبل إعادة المحاولة.',
+        )
       }
     },
     [refresh],
