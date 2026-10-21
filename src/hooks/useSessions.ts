@@ -9,6 +9,7 @@ import {
   totalFocusSeconds,
 } from '../db'
 import { buildBackup, parseBackup } from '../lib/backup'
+import { toCsv } from '../lib/csv'
 import { startOfToday, startOfWeek } from '../lib/format'
 import {
   bestFocusHour,
@@ -21,44 +22,6 @@ import {
   type HistoryFilter,
 } from '../lib/prefs'
 import type { FocusSession } from '../types'
-
-function toCsv(rows: FocusSession[]): string {
-  const header = [
-    'id',
-    'intention',
-    'kind',
-    'plannedSeconds',
-    'actualSeconds',
-    'status',
-    'startedAt',
-    'endedAt',
-    'createdAt',
-  ]
-  const escape = (v: string | number) => {
-    const s = String(v)
-    if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`
-    return s
-  }
-  const lines = [header.join(',')]
-  for (const r of rows) {
-    lines.push(
-      [
-        r.id,
-        r.intention,
-        r.kind,
-        r.plannedSeconds,
-        r.actualSeconds,
-        r.status,
-        r.startedAt,
-        r.endedAt,
-        r.createdAt,
-      ]
-        .map(escape)
-        .join(','),
-    )
-  }
-  return lines.join('\n')
-}
 
 export function useSessions() {
   const [sessions, setSessions] = useState<FocusSession[]>([])
