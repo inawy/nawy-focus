@@ -56,7 +56,7 @@ export function HistoryList({
   return (
     <section className="history-section w-full max-w-md" aria-labelledby="history-heading">
       <details className="history-disclosure group surface-panel">
-        <summary className="history-summary flex cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-3 [&::-webkit-details-marker]:hidden">
+        <summary className="history-summary flex cursor-pointer list-none flex-col items-stretch justify-between gap-2.5 px-3.5 py-3 sm:flex-row sm:items-center sm:gap-3 [&::-webkit-details-marker]:hidden">
           <div className="flex items-center gap-2">
             <span className="history-heading-mark" aria-hidden>•/</span>
             <h2 id="history-heading" className="text-sm font-semibold">
@@ -67,7 +67,7 @@ export function HistoryList({
               <span className="hidden group-open:inline">طيّ</span>
             </span>
           </div>
-          <div className="text-end text-[11px] leading-relaxed text-slate-500">
+          <div className="text-start text-[11px] leading-relaxed text-slate-500 sm:text-end">
             <p>
               اليوم {formatDurationShort(todaySeconds)}
               {todayFocusCount > 0 ? ` · ${todayFocusCount} جلسة` : ''}
@@ -81,7 +81,7 @@ export function HistoryList({
         </summary>
 
         <div className="space-y-3 border-t border-current/10 px-3.5 pb-3.5 pt-3">
-          <div className="history-toolbar flex flex-wrap items-center gap-1.5">
+          <div className="history-toolbar flex flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-1.5">
             {FILTERS.map((f) => (
               <button
                 key={f.id}
@@ -96,7 +96,7 @@ export function HistoryList({
                 {f.label}
               </button>
             ))}
-            <div className="history-tools ms-auto flex flex-wrap items-center gap-1">
+            <div className="history-tools flex flex-wrap items-center justify-end gap-1 border-t border-current/10 pt-1 sm:ms-auto sm:border-0 sm:pt-0">
               <button
                 type="button"
                 onClick={onExport}
