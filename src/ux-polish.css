@@ -272,3 +272,71 @@ main {
     height: 19rem;
   }
 }
+
+
+/* Session editor — clear, compact setup card that stays visible during a session */
+.session-editor {
+  text-align: start;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, #3d7bff 4%, var(--surface)), var(--surface) 42%);
+}
+.session-editor-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2.2rem;
+  height: 2.2rem;
+  border: 1px solid color-mix(in srgb, #3d7bff 22%, var(--border));
+  border-radius: .8rem;
+  background: color-mix(in srgb, #3d7bff 8%, var(--surface));
+  color: #3d7bff;
+  font-size: .9rem;
+  font-weight: 700;
+  letter-spacing: -.08em;
+}
+.session-editor-section {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: .65rem;
+}
+.session-editor-label {
+  color: var(--app-muted);
+  font-size: .75rem;
+  font-weight: 600;
+}
+.session-editor .session-chip {
+  min-height: 2.65rem;
+  padding-inline: .85rem;
+  border-radius: .9rem;
+  font-size: .78rem;
+}
+.session-editor .surface-chip,
+.session-editor button[aria-pressed] {
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
+}
+.session-editor .surface-field {
+  min-height: 2.85rem;
+}
+.session-editor input:disabled,
+.session-editor button:disabled {
+  opacity: .58;
+}
+.session-editor form {
+  max-width: none;
+}
+.session-editor form label {
+  color: var(--app-muted);
+  font-size: .75rem;
+  font-weight: 600;
+}
+.session-editor form input {
+  border-radius: .9rem;
+}
+@media (max-width: 380px) {
+  .session-editor { padding: 1rem; }
+  .session-editor .session-chip { padding-inline: .7rem; }
+}
