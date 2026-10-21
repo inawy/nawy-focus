@@ -533,3 +533,63 @@ html[data-theme='light'] .confirm-panel {
   .confirm-btn-cancel,
   .confirm-btn-danger { transition: none; }
 }
+
+/* Session history: clear disclosure, readable rows, quieter actions */
+.history-disclosure {
+  overflow: clip;
+  border-radius: 1.15rem;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+.history-disclosure[open] {
+  border-color: color-mix(in srgb, #3d7bff 16%, var(--border));
+}
+.history-summary {
+  min-height: 3.9rem;
+  gap: .85rem;
+  transition: background-color 150ms ease;
+}
+.history-summary:hover {
+  background: color-mix(in srgb, var(--app-fg) 2.5%, transparent);
+}
+.history-summary:focus-visible {
+  outline: 2px solid color-mix(in srgb, #3d7bff 70%, transparent);
+  outline-offset: -3px;
+}
+.history-heading-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  border-radius: .7rem;
+  border: 1px solid color-mix(in srgb, #3d7bff 18%, transparent);
+  background: color-mix(in srgb, #3d7bff 8%, var(--surface));
+  color: #5d91ff;
+  font-size: .7rem;
+  font-weight: 750;
+  letter-spacing: -.06em;
+}
+.history-row {
+  border: 1px solid color-mix(in srgb, var(--app-fg) 5%, transparent);
+  background: color-mix(in srgb, var(--surface-2) 56%, transparent);
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+.history-row:hover {
+  border-color: color-mix(in srgb, #3d7bff 14%, var(--border));
+  background: color-mix(in srgb, var(--surface-2) 88%, transparent);
+}
+.history-row button {
+  border-radius: .7rem;
+}
+.history-row button:focus-visible {
+  outline: 2px solid color-mix(in srgb, #3d7bff 65%, transparent);
+  outline-offset: 1px;
+}
+.history-delete:hover {
+  background: color-mix(in srgb, #f43f5e 11%, transparent);
+  color: #fb7185;
+}
+@media (max-width: 390px) {
+  .history-summary { align-items: flex-start; }
+  .history-summary > div:last-child { max-width: 66%; }
+}
