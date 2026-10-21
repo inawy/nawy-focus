@@ -18,8 +18,8 @@ import {
   saveDefaultBreakSeconds,
   saveDefaultFocusSeconds,
 } from '../lib/prefs'
-import type { SessionKind, TimerState } from '../types'
-import { addSession } from '../db'
+import type { FocusSession, SessionKind, TimerState } from '../types'
+import { saveSession } from '../db'
 import { formatTime } from '../lib/format'
 
 function initialState(): TimerState {
@@ -42,7 +42,7 @@ export function useTimer() {
   const [persistenceError, setPersistenceError] = useState<string | null>(null)
   const pendingSessionsRef = useRef<
     Array<{
-      session: Parameters<typeof addSession>[0]
+      session: FocusSession
       resetAfterSave: boolean
     }>
   >([])
@@ -56,7 +56,7 @@ export function useTimer() {
         const pending = pendingSessionsRef.current[0]
         if (!pending) break
         try {
-          await addSession(pending.session)
+          await saveSession(pending.session)
         } catch {
           setPersistenceError(
             'تعذّر حفظ الجلسة في التخزين المحلي. الجلسة محفوظة مؤقتًا في الصفحة؛ حاول الحفظ مرة أخرى قبل إغلاقها.',
@@ -82,8 +82,14 @@ export function useTimer() {
   }, [])
 
   const persistSession = useCallback(
-    async (session: Parameters<typeof addSession>[0], resetAfterSave = false) => {
-      pendingSessionsRef.current.push({ session, resetAfterSave })
+    async (
+      session: Omit<FocusSession, 'id' | 'createdAt'>,
+      resetAfterSave = false,
+    ) => {
+      pendingSessionsRef.current.push({
+        session: { ...session, id: crypto.randomUUID(), createdAt: Date.now() },
+        resetAfterSave,
+      })
       await flushPendingSessions()
     },
     [flushPendingSessions],
