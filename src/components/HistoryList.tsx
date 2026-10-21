@@ -81,13 +81,13 @@ export function HistoryList({
         </summary>
 
         <div className="space-y-3 border-t border-current/10 px-3.5 pb-3.5 pt-3">
-          <div className="flex flex-wrap items-center gap-1.5">
+          <div className="history-toolbar flex flex-wrap items-center gap-1.5">
             {FILTERS.map((f) => (
               <button
                 key={f.id}
                 type="button"
                 onClick={() => onFilterChange(f.id)}
-                className={`min-h-9 rounded-full px-3 text-xs font-medium transition ${
+                className={`history-filter-btn min-h-9 rounded-full px-3 text-xs font-medium transition ${
                   filter === f.id
                     ? 'bg-brand-500/20 text-brand-500'
                     : 'text-slate-500 hover:text-inherit'
@@ -96,7 +96,7 @@ export function HistoryList({
                 {f.label}
               </button>
             ))}
-            <div className="ms-auto flex items-center gap-1">
+            <div className="history-tools ms-auto flex items-center gap-1">
               <button
                 type="button"
                 onClick={onExport}
@@ -152,23 +152,23 @@ export function HistoryList({
                   className="history-row history-row-enter surface-row rounded-xl px-3 py-2.5"
                   style={{ animationDelay: `${Math.min(index, 6) * 35}ms` }}
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1">
+                  <div className="history-row-content flex items-start justify-between gap-2">
+                    <div className="history-row-description min-w-0 flex-1">
                       <p className="truncate text-sm">
                         {s.intention || (s.kind === 'focus' ? 'تركيز' : 'راحة')}
                       </p>
-                      <p className="mt-0.5 text-xs text-slate-500">
+                      <p className="history-row-meta mt-0.5 text-xs text-slate-500">
                         {formatDateTime(s.startedAt)}
                         <span className="mx-1 opacity-50">·</span>
                         {s.kind === 'focus' ? 'تركيز' : 'راحة'}
                       </p>
                     </div>
-                    <div className="flex shrink-0 items-start gap-1">
+                    <div className="history-row-actions flex shrink-0 items-start gap-1">
                       <div className="text-end">
                         <p className="text-sm font-medium tabular-nums">
                           {formatDurationShort(s.actualSeconds)}
                         </p>
-                        <p className="text-[11px] text-slate-500">
+                        <p className={`history-status history-status-${s.status} text-[11px] text-slate-500`}>
                           {s.status === 'completed'
                             ? 'مكتملة'
                             : s.status === 'stopped'
