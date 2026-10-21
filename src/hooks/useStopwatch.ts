@@ -1,12 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { createStopwatchLap, type StopwatchLap } from '../lib/stopwatch'
 
 export type StopwatchPhase = 'idle' | 'running' | 'paused'
-
-export interface StopwatchLap {
-  number: number
-  elapsedMs: number
-  splitMs: number
-}
 
 /**
  * Count-up stopwatch with millisecond display precision and lap/split tracking.
@@ -76,12 +71,7 @@ export function useStopwatch() {
   const recordLap = useCallback(() => {
     if (phase === 'idle') return
     const exactElapsed = readElapsed()
-    const previousElapsed = lapsRef.current[lapsRef.current.length - 1]?.elapsedMs ?? 0
-    const lap: StopwatchLap = {
-      number: lapsRef.current.length + 1,
-      elapsedMs: exactElapsed,
-      splitMs: Math.max(0, exactElapsed - previousElapsed),
-    }
+    const lap = createStopwatchLap(exactElapsed, lapsRef.current)
     const nextLaps = [lap, ...lapsRef.current]
     lapsRef.current = nextLaps
     setLaps(nextLaps)
