@@ -660,12 +660,13 @@ html[data-theme='light'] .confirm-panel {
 }
 @media (max-width: 380px) {
   .mode-tabs {
-    min-height: 3rem;
-    padding: .2rem;
+    min-height: 3.25rem;
+    padding: .25rem;
     border-radius: .9rem;
   }
   .mode-tab {
-    min-height: 2.65rem;
+    /* Keep a comfortable 48px touch target even on narrow phones. */
+    min-height: 3rem;
     gap: .35rem;
     padding-inline: .4rem;
     font-size: .8125rem;
