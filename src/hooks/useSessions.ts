@@ -133,9 +133,13 @@ export function useSessions() {
 
   const removeSession = useCallback(
     async (id: string) => {
-      await dbDeleteSession(id)
-      await refresh()
-      setBackupMessage('حُذفت الجلسة')
+      try {
+        await dbDeleteSession(id)
+        await refresh()
+        setBackupMessage('حُذفت الجلسة')
+      } catch {
+        setBackupMessage('تعذّر حذف الجلسة من التخزين المحلي. لم يتم تأكيد الحذف.')
+      }
     },
     [refresh],
   )
@@ -151,34 +155,46 @@ export function useSessions() {
   }, [])
 
   const downloadBackup = useCallback(async () => {
-    const rows = await exportSessions()
-    const backup = buildBackup(rows)
-    const blob = new Blob([JSON.stringify(backup, null, 2)], {
-      type: 'application/json',
-    })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    const stamp = new Date().toISOString().slice(0, 10)
-    a.href = url
-    a.download = `nawy-focus-backup-${stamp}.json`
-    a.click()
-    URL.revokeObjectURL(url)
-    setBackupMessage(`تم تصدير ${rows.length} جلسة`)
+    let url: string | null = null
+    try {
+      const rows = await exportSessions()
+      const backup = buildBackup(rows)
+      const blob = new Blob([JSON.stringify(backup, null, 2)], {
+        type: 'application/json',
+      })
+      url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      const stamp = new Date().toISOString().slice(0, 10)
+      a.href = url
+      a.download = `nawy-focus-backup-${stamp}.json`
+      a.click()
+      setBackupMessage(`تم تجهيز النسخة الاحتياطية (${rows.length} جلسة)`)
+    } catch {
+      setBackupMessage('تعذّر إنشاء النسخة الاحتياطية. بياناتك المحلية لم يتم حذفها.')
+    } finally {
+      if (url) window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+    }
   }, [])
 
   const downloadCsv = useCallback(async () => {
-    const rows = await exportSessions()
-    const blob = new Blob(['\ufeff' + toCsv(rows)], {
-      type: 'text/csv;charset=utf-8',
-    })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    const stamp = new Date().toISOString().slice(0, 10)
-    a.href = url
-    a.download = `nawy-focus-${stamp}.csv`
-    a.click()
-    URL.revokeObjectURL(url)
-    setBackupMessage(`تم تصدير CSV (${rows.length} صف)`)
+    let url: string | null = null
+    try {
+      const rows = await exportSessions()
+      const blob = new Blob(['\\ufeff' + toCsv(rows)], {
+        type: 'text/csv;charset=utf-8',
+      })
+      url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      const stamp = new Date().toISOString().slice(0, 10)
+      a.href = url
+      a.download = `nawy-focus-${stamp}.csv`
+      a.click()
+      setBackupMessage(`تم تجهيز ملف CSV (${rows.length} صف)`)
+    } catch {
+      setBackupMessage('تعذّر تجهيز ملف CSV. بياناتك المحلية لم يتم حذفها.')
+    } finally {
+      if (url) window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+    }
   }, [])
 
   const uploadBackup = useCallback(
