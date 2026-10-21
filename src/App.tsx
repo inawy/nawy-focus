@@ -61,6 +61,7 @@ export default function App() {
     finishedWhileHidden,
     dismissFinishedBanner,
     persistenceError,
+    hasUnsavedSessions,
     retrySave,
   } = useTimer()
 
@@ -171,14 +172,14 @@ export default function App() {
 
   useEffect(() => {
     // Protect both an active timer and unsaved sessions waiting for a storage retry.
-    if (!isActive(state.phase) && !persistenceError) return
+    if (!isActive(state.phase) && !hasUnsavedSessions) return
     const onBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault()
       e.returnValue = ''
     }
     window.addEventListener('beforeunload', onBeforeUnload)
     return () => window.removeEventListener('beforeunload', onBeforeUnload)
-  }, [state.phase, persistenceError])
+  }, [state.phase, hasUnsavedSessions])
 
   useEffect(() => {
     if (!settingsOpen) return

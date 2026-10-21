@@ -40,6 +40,7 @@ export function useTimer() {
   /** Set when we finish while the tab is hidden — App can show a banner. */
   const [finishedWhileHidden, setFinishedWhileHidden] = useState(false)
   const [persistenceError, setPersistenceError] = useState<string | null>(null)
+  const [hasUnsavedSessions, setHasUnsavedSessions] = useState(false)
   const pendingSessionsRef = useRef<
     Array<{
       session: FocusSession
@@ -64,6 +65,7 @@ export function useTimer() {
           return
         }
         pendingSessionsRef.current.shift()
+        setHasUnsavedSessions(pendingSessionsRef.current.length > 0)
         setPersistenceError(null)
         if (pending.resetAfterSave) {
           setState((current) => {
@@ -90,6 +92,7 @@ export function useTimer() {
         session: { ...session, id: crypto.randomUUID(), createdAt: Date.now() },
         resetAfterSave,
       })
+      setHasUnsavedSessions(true)
       await flushPendingSessions()
     },
     [flushPendingSessions],
@@ -301,6 +304,7 @@ export function useTimer() {
     finishedWhileHidden,
     dismissFinishedBanner,
     persistenceError,
+    hasUnsavedSessions,
     retrySave,
   }
 }
