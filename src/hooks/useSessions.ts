@@ -172,7 +172,8 @@ export function useSessions() {
     } catch {
       setBackupMessage('تعذّر إنشاء النسخة الاحتياطية. بياناتك المحلية لم يتم حذفها.')
     } finally {
-      if (url) window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+      const objectUrl = url
+      if (objectUrl) window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000)
     }
   }, [])
 
@@ -193,7 +194,8 @@ export function useSessions() {
     } catch {
       setBackupMessage('تعذّر تجهيز ملف CSV. بياناتك المحلية لم يتم حذفها.')
     } finally {
-      if (url) window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+      const objectUrl = url
+      if (objectUrl) window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000)
     }
   }, [])
 
