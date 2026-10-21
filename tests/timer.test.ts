@@ -31,6 +31,14 @@ describe('timer state machine', () => {
     expect(s.elapsedSeconds).toBe(3)
   })
 
+  it('ignores invalid or negative tick deltas', () => {
+    const running = startTimer(createIdleState('focus', 30))
+    expect(tick(running, -5)).toEqual(running)
+    expect(tick(running, Number.NaN)).toEqual(running)
+    expect(tick(running, Number.POSITIVE_INFINITY)).toEqual(running)
+    expect(catchUp(running, Number.NaN)).toEqual(running)
+  })
+
   it('pause and resume', () => {
     let s = startTimer(createIdleState('focus', 60))
     s = tick(s, 5)
@@ -44,9 +52,8 @@ describe('timer state machine', () => {
   })
 
   it('does not change planned duration while active', () => {
-    let s = startTimer(createIdleState('focus', 1500))
-    s = setPlannedSeconds(s, 600)
-    expect(s.plannedSeconds).toBe(1500)
+    const s = startTimer(createIdleState('focus', 1500))
+    expect(setPlannedSeconds(s, 600).plannedSeconds).toBe(1500)
   })
 
   it('catchUp advances by wall-clock seconds', () => {
