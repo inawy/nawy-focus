@@ -15,7 +15,7 @@ const TABS: { id: AppMode; label: string; icon: string }[] = [
 export function ModeTabs({ mode, onChange, disabled }: Props) {
   const moveFocus = (current: AppMode, direction: -1 | 1) => {
     const index = TABS.findIndex((tab) => tab.id === current)
-    const next = TABS[(index + direction + TABS.length) % TABS.length]
+    const next = TABS[(index + direction + TABS.length) % TABS.length]!
     onChange(next.id)
     document.getElementById(`mode-tab-${next.id}`)?.focus()
   }
@@ -48,11 +48,11 @@ export function ModeTabs({ mode, onChange, disabled }: Props) {
                 moveFocus(tab.id, -1)
               } else if (event.key === 'Home') {
                 event.preventDefault()
-                onChange(TABS[0].id)
+                onChange(TABS[0]!.id)
                 document.getElementById(`mode-tab-${TABS[0].id}`)?.focus()
               } else if (event.key === 'End') {
                 event.preventDefault()
-                onChange(TABS[TABS.length - 1].id)
+                onChange(TABS[TABS.length - 1]!.id)
                 document.getElementById(`mode-tab-${TABS[TABS.length - 1].id}`)?.focus()
               }
             }}
