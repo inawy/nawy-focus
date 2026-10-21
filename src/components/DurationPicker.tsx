@@ -35,9 +35,14 @@ export function DurationPicker({
 
   const applyCustom = (raw: string) => {
     setCustomText(raw)
+    if (raw.trim() === '') return
+
     const n = Number(raw)
     if (!Number.isFinite(n) || n < 1) return
+
     const minutes = Math.max(1, Math.min(180, Math.floor(n)))
+    // Keep the field consistent with the actual duration applied to the timer.
+    if (minutes !== n) setCustomText(String(minutes))
     onSecondsChange(minutes * 60)
   }
 
