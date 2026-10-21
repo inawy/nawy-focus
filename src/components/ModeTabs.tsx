@@ -36,7 +36,6 @@ export function ModeTabs({ mode, onChange, disabled }: Props) {
             type="button"
             role="tab"
             aria-selected={active}
-            aria-controls="timer-mode-panel"
             tabIndex={active ? 0 : -1}
             disabled={disabled}
             onClick={() => onChange(tab.id)}
