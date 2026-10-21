@@ -49,11 +49,11 @@ export function ModeTabs({ mode, onChange, disabled }: Props) {
               } else if (event.key === 'Home') {
                 event.preventDefault()
                 onChange(TABS[0]!.id)
-                document.getElementById(`mode-tab-${TABS[0].id}`)?.focus()
+                document.getElementById(`mode-tab-${TABS[0]!.id}`)?.focus()
               } else if (event.key === 'End') {
                 event.preventDefault()
                 onChange(TABS[TABS.length - 1]!.id)
-                document.getElementById(`mode-tab-${TABS[TABS.length - 1].id}`)?.focus()
+                document.getElementById(`mode-tab-${TABS[TABS.length - 1]!.id}`)?.focus()
               }
             }}
             className={`mode-tab flex min-h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-xl px-3 text-sm font-semibold transition-colors ${active ? 'mode-tab-active' : 'mode-tab-idle'} disabled:opacity-40`}
