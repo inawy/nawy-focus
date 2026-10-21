@@ -1119,3 +1119,14 @@ html[data-theme='light'] .confirm-panel {
 @media (prefers-reduced-motion: reduce) {
   .history-filter-btn { transition: none; }
 }
+
+
+/* Keep the setup and history cards on the same visual grid. */
+.session-editor,
+.history-section {
+  width: 100%;
+  max-width: 28rem;
+}
+.session-editor {
+  border-radius: 1.15rem;
+}
