@@ -60,6 +60,8 @@ export default function App() {
     updateKind,
     finishedWhileHidden,
     dismissFinishedBanner,
+    persistenceError,
+    retrySave,
   } = useTimer()
 
   const [appMode, setAppMode] = useState<AppMode>('session')
@@ -559,6 +561,22 @@ export default function App() {
       <main
         className="mx-auto flex w-full min-w-0 max-w-md flex-col items-center gap-4 px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4 sm:gap-5 sm:px-5 sm:pt-6"
       >
+
+        {persistenceError && (
+          <div
+            className="w-full max-w-sm rounded-2xl border border-amber-500/30 bg-amber-950/20 px-4 py-3 text-start text-sm text-amber-200"
+            role="alert"
+          >
+            <p>{persistenceError}</p>
+            <button
+              type="button"
+              onClick={() => void retrySave()}
+              className="mt-2 min-h-10 rounded-xl border border-amber-500/30 px-3 text-xs font-medium transition hover:bg-amber-500/10"
+            >
+              إعادة محاولة الحفظ
+            </button>
+          </div>
+        )}
         {finishedWhileHidden && state.phase === 'finished' && appMode === 'session' && (
           <div
             className="w-full max-w-sm rounded-2xl border border-amber-500/30 bg-amber-950/30 px-4 py-3 text-center text-sm text-amber-100"
