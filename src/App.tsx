@@ -722,12 +722,6 @@ export default function App() {
               secondaryLabel="إنهاء"
             />
 
-            {sessionFocus && state.intention ? (
-              <p className="max-w-sm px-1 text-center text-xs text-slate-500">
-                {state.intention}
-              </p>
-            ) : null}
-
             {state.phase !== 'finished' && (
               <section className="session-editor surface-panel w-full max-w-sm p-4 sm:p-5" aria-label="إعداد الجلسة">
                 <div className="mb-4 flex items-start justify-between gap-3">
