@@ -85,24 +85,54 @@ export function ConfirmDialog({
   useEffect(() => {
     if (!open) return
 
+    const previousFocus = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    const getFocusable = () =>
+      Array.from(
+        panelRef.current?.querySelectorAll<HTMLElement>(
+          'button:not(:disabled), [href], input:not(:disabled), [tabindex]:not([tabindex="-1"])',
+        ) ?? [],
+      ).filter((el) => el.getAttribute('aria-hidden') !== 'true')
+
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault()
         onCancel()
         return
       }
+
+      if (e.key === 'Tab') {
+        const focusable = getFocusable()
+        if (focusable.length === 0) {
+          e.preventDefault()
+          panelRef.current?.focus()
+          return
+        }
+        const first = focusable[0]
+        const last = focusable[focusable.length - 1]
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault()
+          last?.focus()
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault()
+          first?.focus()
+        }
+        return
+      }
+
       if (e.key === 'Enter') {
-        const tag = (e.target as HTMLElement | null)?.tagName
-        if (tag === 'BUTTON') return
+        const target = e.target as HTMLElement | null
+        if (target?.tagName === 'BUTTON' || target?.tagName === 'INPUT') return
         e.preventDefault()
         onConfirm()
       }
     }
 
     document.addEventListener('keydown', onKey)
-    const prevOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-
     const t = window.setTimeout(() => {
       const btn = panelRef.current?.querySelector<HTMLButtonElement>(
         '[data-confirm-primary]',
@@ -114,6 +144,7 @@ export function ConfirmDialog({
       document.removeEventListener('keydown', onKey)
       document.body.style.overflow = prevOverflow
       window.clearTimeout(t)
+      previousFocus?.focus()
     }
   }, [open, onCancel, onConfirm])
 
