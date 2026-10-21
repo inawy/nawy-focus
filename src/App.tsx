@@ -403,24 +403,18 @@ export default function App() {
   return (
     <div className="app-shell min-h-dvh">
       <header
-        className={`app-header sticky top-0 z-20 w-full overflow-x-clip px-3 pt-[max(0.5rem,env(safe-area-inset-top))] transition-all duration-300 sm:px-4 ${
-          sessionFocus ? 'pb-2' : 'pb-3'
-        }`}
+        className="app-header sticky top-0 z-20 w-full overflow-x-clip px-3 pt-[max(0.5rem,env(safe-area-inset-top))] pb-3 sm:px-4"
       >
         <div className="mx-auto flex w-full min-w-0 max-w-md items-center justify-between gap-1.5">
           <h1
-            className={`flex min-w-0 items-center gap-2 font-semibold tracking-tight transition-all duration-300 ${
-              sessionFocus ? 'text-[15px] opacity-60' : 'text-base'
-            }`}
+            className="flex min-w-0 items-center gap-2 text-base font-semibold tracking-tight"
           >
             <img
               src="./icons/icon.svg"
               alt=""
               width={28}
               height={28}
-              className={`shrink-0 rounded-[7px] shadow-[0_0_16px_rgba(61,123,255,0.35)] transition-all duration-300 ${
-                sessionFocus ? 'h-5 w-5' : 'h-7 w-7'
-              }`}
+              className="h-7 w-7 shrink-0 rounded-[7px] shadow-[0_0_16px_rgba(61,123,255,0.35)]"
               aria-hidden
             />
             <span className="truncate">ناوي فوكاس</span>
@@ -555,13 +549,7 @@ export default function App() {
       </header>
 
       <main
-        className={`mx-auto flex w-full min-w-0 max-w-md flex-col items-center px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4 transition-all duration-300 sm:px-5 sm:pt-6 ${
-          state.phase === 'finished'
-            ? 'gap-4 sm:gap-5'
-            : sessionFocus
-              ? 'gap-3'
-              : 'gap-3.5 sm:gap-4'
-        }`}
+        className="mx-auto flex w-full min-w-0 max-w-md flex-col items-center gap-4 px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4 sm:gap-5 sm:px-5 sm:pt-6"
       >
         {finishedWhileHidden && state.phase === 'finished' && appMode === 'session' && (
           <div
@@ -684,9 +672,11 @@ export default function App() {
           </div>
         )}
 
-        {!(isActive(state.phase) || stopwatch.phase === 'running' || stopwatch.phase === 'paused') && (
-          <ModeTabs mode={appMode} onChange={handleModeChange} />
-        )}
+        <ModeTabs
+          mode={appMode}
+          onChange={handleModeChange}
+          disabled={isActive(state.phase) || stopwatch.phase === 'running' || stopwatch.phase === 'paused'}
+        />
 
         {appMode === 'session' ? (
           <>
@@ -738,32 +728,52 @@ export default function App() {
               </p>
             ) : null}
 
-            {!sessionFocus && state.phase !== 'finished' && (
-              <>
-                <SessionTypeChips
-                  kind={state.kind}
-                  intention={state.intention}
-                  selectedId={presetId}
-                  onSelect={handlePreset}
-                  disabled={locked}
-                />
-                <DurationPicker
-                  kind={state.kind}
-                  plannedSeconds={state.plannedSeconds}
-                  onKindChange={updateKind}
-                  onSecondsChange={updatePlanned}
-                  disabled={locked}
-                />
-                {!locked && (
-                  <IntentionInput
-                    value={state.intention}
-                    onChange={updateIntention}
-                    disabled={locked}
-                    suggestions={recentIntentions}
-                    onSubmit={handleStart}
-                  />
+            {state.phase !== 'finished' && (
+              <section className="session-editor surface-panel w-full max-w-sm p-4 sm:p-5" aria-label="إعداد الجلسة">
+                <div className="mb-4 flex items-start justify-between gap-3">
+                  <div>
+                    <h2 className="text-sm font-semibold">إعداد الجلسة</h2>
+                    <p className="mt-1 text-xs leading-5 text-slate-500">اختار نوع الجلسة ومدتها، وحدد ناوي تركز على إيه.</p>
+                  </div>
+                  <span className="session-editor-mark" aria-hidden>•/</span>
+                </div>
+                <div className="flex flex-col gap-4">
+                  <div className="session-editor-section">
+                    <p className="session-editor-label">نوع الجلسة</p>
+                    <SessionTypeChips
+                      kind={state.kind}
+                      intention={state.intention}
+                      selectedId={presetId}
+                      onSelect={handlePreset}
+                      disabled={locked}
+                    />
+                  </div>
+                  <div className="session-editor-section">
+                    <p className="session-editor-label">المدة</p>
+                    <DurationPicker
+                      kind={state.kind}
+                      plannedSeconds={state.plannedSeconds}
+                      onKindChange={updateKind}
+                      onSecondsChange={updatePlanned}
+                      disabled={locked}
+                    />
+                  </div>
+                  <div className="session-editor-section">
+                    <IntentionInput
+                      value={state.intention}
+                      onChange={updateIntention}
+                      disabled={locked}
+                      suggestions={recentIntentions}
+                      onSubmit={handleStart}
+                    />
+                  </div>
+                </div>
+                {locked && (
+                  <p className="mt-3 rounded-xl bg-brand-500/[0.07] px-3 py-2 text-xs leading-5 text-slate-500">
+                    إعدادات الجلسة مقفولة أثناء التشغيل. أوقف المؤقت مؤقتًا لتعديلها.
+                  </p>
                 )}
-              </>
+              </section>
             )}
 
             {(state.phase === 'finished' || state.phase === 'paused') && (
