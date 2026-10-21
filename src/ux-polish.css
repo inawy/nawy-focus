@@ -1130,3 +1130,55 @@ html[data-theme='light'] .confirm-panel {
 .session-editor {
   border-radius: 1.15rem;
 }
+
+
+/* Finished session: share the setup/history width and calm card language. */
+.session-controls {
+  display: flex;
+  min-width: 0;
+}
+.session-finish-card {
+  max-width: 28rem;
+  overflow: hidden;
+  border-radius: 1.15rem;
+  background: linear-gradient(145deg, color-mix(in srgb, #3d7bff 4%, var(--surface)), var(--surface) 52%);
+}
+.session-finish-mark {
+  display: inline-flex;
+  width: 2.7rem;
+  height: 2.7rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, #3d7bff 22%, var(--border));
+  border-radius: .9rem;
+  background: color-mix(in srgb, #3d7bff 9%, var(--surface));
+  color: #5d91ff;
+  font-size: .85rem;
+  font-weight: 700;
+}
+.session-finish-break .session-finish-mark {
+  border-color: color-mix(in srgb, #f59e0b 25%, var(--border));
+  background: color-mix(in srgb, #f59e0b 10%, var(--surface));
+  color: #f59e0b;
+}
+.session-finish-eyebrow {
+  color: #5d91ff;
+  font-size: .7rem;
+  font-weight: 650;
+  letter-spacing: .015em;
+}
+.session-finish-break .session-finish-eyebrow { color: #d97706; }
+.session-finish-duration {
+  border: 1px solid color-mix(in srgb, var(--app-fg) 6%, transparent);
+  background: color-mix(in srgb, var(--surface-2) 72%, transparent);
+}
+.session-finish-card button { min-height: 2.9rem; }
+@media (max-width: 380px) {
+  .session-finish-card { padding: 1rem; }
+  .session-finish-mark { width: 2.45rem; height: 2.45rem; }
+  .session-finish-card button { padding-inline: .8rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .motion-finish-card { animation: none; }
+}
