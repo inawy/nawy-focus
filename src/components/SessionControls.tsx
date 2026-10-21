@@ -27,7 +27,7 @@ export function SessionControls({
   onStartBreak,
 }: Props) {
   return (
-    <div className="session-controls w-full max-w-md min-w-0 flex-col items-stretch gap-2.5 px-0 sm:items-center">
+    <div className="session-controls flex w-full max-w-md min-w-0 flex-col items-stretch gap-2.5 px-0 sm:items-center">
       {phase === 'idle' && (
         <button
           type="button"
