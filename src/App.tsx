@@ -860,7 +860,7 @@ export default function App() {
                       className={`stopwatch-lap-row flex items-center justify-between gap-4 px-4 py-3 ${index === 0 ? 'stopwatch-lap-latest' : ''}`}
                     >
                       <div className="flex items-center gap-3">
-                        <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-white/5 px-2 text-xs font-semibold tabular-nums text-slate-400">
+                        <span className="stopwatch-lap-number flex h-7 min-w-7 items-center justify-center rounded-full bg-white/5 px-2 text-xs font-semibold tabular-nums text-slate-400">
                           {lap.number}
                         </span>
                         <span className="text-sm text-slate-500">اللفة {lap.number}</span>
