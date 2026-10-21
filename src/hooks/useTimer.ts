@@ -39,6 +39,37 @@ export function useTimer() {
   const lastTickAtRef = useRef<number>(Date.now())
   /** Set when we finish while the tab is hidden — App can show a banner. */
   const [finishedWhileHidden, setFinishedWhileHidden] = useState(false)
+  const [persistenceError, setPersistenceError] = useState<string | null>(null)
+  const pendingSessionRef = useRef<Parameters<typeof addSession>[0] | null>(null)
+  const pendingResetRef = useRef(false)
+
+  const persistSession = useCallback(
+    async (session: Parameters<typeof addSession>[0], resetAfterSave = false) => {
+      pendingSessionRef.current = session
+      pendingResetRef.current = resetAfterSave
+      try {
+        await addSession(session)
+        pendingSessionRef.current = null
+        const shouldReset = pendingResetRef.current
+        pendingResetRef.current = false
+        setPersistenceError(null)
+        if (shouldReset) setState((current) => resetTimer(current))
+        return true
+      } catch {
+        setPersistenceError(
+          'تعذّر حفظ الجلسة في التخزين المحلي. وقت الجلسة محفوظ مؤقتًا في الصفحة؛ حاول الحفظ مرة أخرى قبل إغلاقها.',
+        )
+        return false
+      }
+    },
+    [],
+  )
+
+  const retrySave = useCallback(async () => {
+    const pending = pendingSessionRef.current
+    if (!pending) return
+    await persistSession(pending, pendingResetRef.current)
+  }, [persistSession])
 
   const clearTick = useCallback(() => {
     if (intervalRef.current !== null) {
@@ -111,7 +142,7 @@ export function useTimer() {
       setFinishedWhileHidden(true)
     }
 
-    void addSession({
+    void persistSession({
       intention: state.intention,
       kind: state.kind,
       plannedSeconds: state.plannedSeconds,
@@ -127,6 +158,7 @@ export function useTimer() {
     state.plannedSeconds,
     state.elapsedSeconds,
     state.startedAt,
+    persistSession,
   ])
 
   const start = useCallback(() => {
@@ -148,8 +180,14 @@ export function useTimer() {
   const stop = useCallback(async () => {
     setFinishedWhileHidden(false)
     const prev = stateRef.current
-    if (prev.elapsedSeconds > 0) {
-      void addSession({
+    if (prev.elapsedSeconds <= 0) {
+      setState(resetTimer(prev))
+      return
+    }
+
+    setState((current) => pauseTimer(current))
+    await persistSession(
+      {
         intention: prev.intention,
         kind: prev.kind,
         plannedSeconds: prev.plannedSeconds,
@@ -157,10 +195,10 @@ export function useTimer() {
         status: 'stopped',
         startedAt: prev.startedAt ?? Date.now(),
         endedAt: Date.now(),
-      })
-    }
-    setState(resetTimer(prev))
-  }, [])
+      },
+      true,
+    )
+  }, [persistSession])
 
   const reset = useCallback(() => {
     savedFinishedRef.current = false
@@ -223,5 +261,7 @@ export function useTimer() {
     updateKind,
     finishedWhileHidden,
     dismissFinishedBanner,
+    persistenceError,
+    retrySave,
   }
 }
