@@ -340,3 +340,65 @@ main {
   .session-editor { padding: 1rem; }
   .session-editor .session-chip { padding-inline: .7rem; }
 }
+
+/* Compact session context while the timer is active — keep focus on the clock */
+.session-live-summary {
+  padding: .95rem 1rem;
+  border-radius: 1.15rem;
+  border-color: color-mix(in srgb, #3d7bff 13%, var(--border));
+  background: linear-gradient(120deg, color-mix(in srgb, #3d7bff 5%, var(--surface)), var(--surface) 65%);
+}
+.session-live-mark {
+  display: inline-flex;
+  width: 2.65rem;
+  height: 2.65rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, #3d7bff 22%, var(--border));
+  border-radius: .95rem;
+  background: color-mix(in srgb, #3d7bff 9%, var(--surface));
+  color: #5d91ff;
+  font-size: .85rem;
+  font-weight: 700;
+}
+.session-live-mark-break {
+  border-color: color-mix(in srgb, #f59e0b 24%, var(--border));
+  background: color-mix(in srgb, #f59e0b 9%, var(--surface));
+  color: #f59e0b;
+}
+.session-live-status {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  border-radius: 999px;
+  padding: .2rem .5rem;
+  background: color-mix(in srgb, #22c55e 10%, var(--surface));
+  color: #4ade80;
+  font-size: .65rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.session-live-status::before {
+  width: .35rem;
+  height: .35rem;
+  border-radius: 50%;
+  background: currentColor;
+  content: "";
+}
+.session-live-status-paused {
+  background: color-mix(in srgb, #f59e0b 10%, var(--surface));
+  color: #fbbf24;
+}
+.session-live-status-paused::before {
+  opacity: .8;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .session-live-status:not(.session-live-status-paused)::before {
+    animation: session-status-pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes session-status-pulse {
+    0%, 100% { opacity: .45; }
+    50% { opacity: 1; }
+  }
+}
