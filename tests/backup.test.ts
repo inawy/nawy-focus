@@ -28,6 +28,21 @@ describe('backup', () => {
     expect(() => parseBackup({ format: 'other', version: 1, sessions: [] })).toThrow()
   })
 
+  it('rejects unsupported older and newer backup versions', () => {
+    expect(() => parseBackup({ format: 'nawy-focus-backup', version: 0, sessions: [] })).toThrow()
+    expect(() => parseBackup({ format: 'nawy-focus-backup', version: 2, sessions: [] })).toThrow()
+  })
+
+  it('skips records with non-finite durations or timestamps', () => {
+    const backup = buildBackup([
+      sample,
+      { ...sample, id: 'nan-duration', actualSeconds: Number.NaN },
+      { ...sample, id: 'infinite-time', startedAt: Number.POSITIVE_INFINITY },
+      { ...sample, id: 'bad-created', createdAt: Number.NaN },
+    ])
+    expect(parseBackup(backup).map((row) => row.id)).toEqual(['a1'])
+  })
+
   it('merge keeps existing and adds new', () => {
     const other: FocusSession = { ...sample, id: 'b2', intention: 'قراءة' }
     const merged = mergeSessions([sample], [sample, other])
