@@ -52,8 +52,16 @@ export function useTimer() {
     if (state.phase === 'running') {
       lastTickAtRef.current = Date.now()
       intervalRef.current = window.setInterval(() => {
-        lastTickAtRef.current = Date.now()
-        setState((prev) => tick(prev, 1))
+        const now = Date.now()
+        const elapsedWholeSeconds = Math.floor(
+          (now - lastTickAtRef.current) / 1000,
+        )
+        if (elapsedWholeSeconds <= 0) return
+        // Advance by real elapsed time, not one assumed second. Background tabs
+        // can throttle intervals for minutes; resetting the timestamp blindly
+        // here would silently lose that time.
+        lastTickAtRef.current += elapsedWholeSeconds * 1000
+        setState((prev) => catchUp(prev, elapsedWholeSeconds))
       }, 1000)
     } else {
       clearTick()
