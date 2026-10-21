@@ -77,6 +77,7 @@ export default function App() {
     bestHour,
     recentIntentions,
     loading,
+    storageError,
     refresh,
     removeSession,
     copySessionText,
@@ -885,6 +886,22 @@ export default function App() {
           <p className="hidden text-center text-[11px] text-slate-600 opacity-60 sm:block">
             مسافة: بدء / إيقاف · Esc: إنهاء
           </p>
+        )}
+
+        {appMode === 'session' && !sessionFocus && storageError && (
+          <div
+            className="w-full max-w-sm rounded-2xl border border-amber-500/30 bg-amber-950/20 px-4 py-3 text-start text-sm text-amber-200"
+            role="alert"
+          >
+            <p>{storageError}</p>
+            <button
+              type="button"
+              onClick={() => void refresh()}
+              className="mt-2 min-h-10 rounded-xl border border-amber-500/30 px-3 text-xs font-medium transition hover:bg-amber-500/10"
+            >
+              إعادة المحاولة
+            </button>
+          </div>
         )}
 
         {appMode === 'session' && !sessionFocus && (
