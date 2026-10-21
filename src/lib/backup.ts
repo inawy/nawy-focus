@@ -39,10 +39,11 @@ export function parseBackup(raw: unknown): FocusSession[] {
   }
 
   const out: FocusSession[] = []
+  const seenIds = new Set<string>()
   for (const item of obj.sessions) {
     if (!item || typeof item !== 'object') continue
     const s = item as Record<string, unknown>
-    if (typeof s.id !== 'string' || !s.id.trim()) continue
+    if (typeof s.id !== 'string' || !s.id.trim() || seenIds.has(s.id)) continue
     if (s.kind !== 'focus' && s.kind !== 'break') continue
     if (!isFiniteNumber(s.actualSeconds) || s.actualSeconds < 0) continue
     if (!isFiniteNumber(s.plannedSeconds) || s.plannedSeconds < 0) continue
@@ -59,6 +60,7 @@ export function parseBackup(raw: unknown): FocusSession[] {
       s.status === 'completed' || s.status === 'stopped' || s.status === 'abandoned'
         ? s.status
         : 'completed'
+    seenIds.add(s.id)
     out.push({
       id: s.id,
       intention: typeof s.intention === 'string' ? s.intention : '',
