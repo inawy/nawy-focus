@@ -68,6 +68,7 @@ export function useSessions() {
   const [weekFocusCount, setWeekFocusCount] = useState(0)
   const [bestHour, setBestHour] = useState<BestHourResult | null>(null)
   const [loading, setLoading] = useState(true)
+  const [storageError, setStorageError] = useState<string | null>(null)
   const [backupMessage, setBackupMessage] = useState<string | null>(null)
   const [filter, setFilterState] = useState<HistoryFilter>(() =>
     loadHistoryFilter(),
@@ -91,6 +92,9 @@ export function useSessions() {
       setTodayFocusCount(focusToday)
       setWeekFocusCount(focusWeek)
       setBestHour(bestFocusHour(insightRows))
+      setStorageError(null)
+    } catch {
+      setStorageError('تعذّر تحميل سجل الجلسات من التخزين المحلي. بياناتك السابقة لم تُحذف؛ جرّب إعادة التحميل.')
     } finally {
       setLoading(false)
     }
@@ -208,6 +212,7 @@ export function useSessions() {
     bestHour,
     recentIntentions,
     loading,
+    storageError,
     refresh,
     removeSession,
     copySessionText,
