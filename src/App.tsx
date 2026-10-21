@@ -213,29 +213,11 @@ export default function App() {
       icon: '◎',
     }
 
-  /** Defensive: never stay in browser fullscreen (removed feature; kill stale state) */
-  const leaveFullscreen = useCallback(() => {
-    try {
-      const doc = document as Document & {
-        webkitExitFullscreen?: () => void
-        fullscreenElement?: Element | null
-        webkitFullscreenElement?: Element | null
-      }
-      if (doc.fullscreenElement || doc.webkitFullscreenElement) {
-        if (document.exitFullscreen) void document.exitFullscreen()
-        else if (doc.webkitExitFullscreen) doc.webkitExitFullscreen()
-      }
-    } catch {
-      /* ignore */
-    }
-  }, [])
-
   useWakeLock(state.phase === 'running' || stopwatch.phase === 'running')
 
   const handleStart = useCallback(() => {
-    leaveFullscreen()
     start()
-  }, [start, leaveFullscreen])
+  }, [start])
 
   const handleStartBreak = useCallback(() => {
     clearAutoBreakTimer()
@@ -281,7 +263,6 @@ export default function App() {
   )
 
   const handleTimerPrimary = useCallback(() => {
-    leaveFullscreen()
     if (appMode === 'stopwatch') {
       if (stopwatch.phase === 'running') stopwatch.pause()
       else if (stopwatch.phase === 'paused') stopwatch.resume()
@@ -300,7 +281,6 @@ export default function App() {
     pause,
     handleResume,
     handleReset,
-    leaveFullscreen,
   ])
 
   useEffect(() => {
