@@ -65,7 +65,16 @@ export function useTimer() {
         }
         pendingSessionsRef.current.shift()
         setPersistenceError(null)
-        if (pending.resetAfterSave) setState((current) => resetTimer(current))
+        if (pending.resetAfterSave) {
+          setState((current) => {
+            const isSameStoppedSession =
+              current.phase === 'paused' &&
+              current.kind === pending.session.kind &&
+              current.startedAt === pending.session.startedAt &&
+              current.elapsedSeconds === pending.session.actualSeconds
+            return isSameStoppedSession ? resetTimer(current) : current
+          })
+        }
       }
     } finally {
       savingSessionsRef.current = false
