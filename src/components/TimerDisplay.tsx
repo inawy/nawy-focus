@@ -148,7 +148,9 @@ export function TimerDisplay({
     )
 
   const digitClass = showMs
-    ? 'text-[2rem] leading-none sm:text-[2.35rem]'
+    ? hh
+      ? 'text-[1.45rem] leading-none sm:text-[1.8rem]'
+      : 'text-[2rem] leading-none sm:text-[2.35rem]'
     : hh
       ? 'text-[2.1rem] leading-none sm:text-[2.5rem]'
       : 'text-[2.75rem] leading-none sm:text-[3.2rem]'
@@ -160,7 +162,9 @@ export function TimerDisplay({
     'mt-1 text-[9px] font-medium uppercase tracking-[0.18em] text-slate-500'
 
   const aria = showMs
-    ? `${mm} دقيقة و ${ss} ثانية و ${ms}`
+    ? [hh ? `${hh} ساعة` : null, `${mm} دقيقة`, `${ss} ثانية`, `${ms} ملي ثانية`]
+        .filter(Boolean)
+        .join(' و ')
     : [hh ? `${hh} ساعة` : null, `${mm} دقيقة`, `${ss} ثانية`]
         .filter(Boolean)
         .join(' و ')
@@ -231,7 +235,7 @@ export function TimerDisplay({
           role="timer"
           aria-label={aria}
         >
-          {hh !== null && !showMs && (
+          {hh !== null && (
             <>
               <div className="flex flex-col items-center">
                 <span className={digitClass}>{hh}</span>
