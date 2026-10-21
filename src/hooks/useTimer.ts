@@ -54,6 +54,7 @@ export function useTimer() {
     try {
       while (pendingSessionsRef.current.length > 0) {
         const pending = pendingSessionsRef.current[0]
+        if (!pending) break
         try {
           await addSession(pending.session)
         } catch {
