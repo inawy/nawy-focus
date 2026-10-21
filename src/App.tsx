@@ -171,15 +171,17 @@ export default function App() {
   }, [state.phase, dismissFinishedBanner])
 
   useEffect(() => {
-    // Protect both an active timer and unsaved sessions waiting for a storage retry.
-    if (!isActive(state.phase) && !hasUnsavedSessions) return
+    // Protect active timing work and sessions waiting for a storage retry.
+    const stopwatchActive =
+      stopwatch.phase === 'running' || stopwatch.phase === 'paused'
+    if (!isActive(state.phase) && !hasUnsavedSessions && !stopwatchActive) return
     const onBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault()
       e.returnValue = ''
     }
     window.addEventListener('beforeunload', onBeforeUnload)
     return () => window.removeEventListener('beforeunload', onBeforeUnload)
-  }, [state.phase, hasUnsavedSessions])
+  }, [state.phase, hasUnsavedSessions, stopwatch.phase])
 
   useEffect(() => {
     if (!settingsOpen) return
