@@ -108,13 +108,13 @@ export function HistoryList({
               <button
                 type="button"
                 onClick={onExportCsv}
-                className="min-h-9 rounded-lg px-2 text-[11px] text-slate-500 transition hover:text-inherit"
+                className="min-h-10 min-w-10 rounded-lg px-2 text-[11px] text-slate-500 transition hover:text-inherit"
                 title="تصدير بصيغة CSV"
               >
                 CSV
               </button>
               <label
-                className="inline-flex min-h-10 items-center rounded-lg px-2 text-[11px] text-slate-500 transition hover:text-inherit"
+                className="inline-flex min-h-10 min-w-10 cursor-pointer items-center justify-center rounded-lg px-2 text-[11px] text-slate-500 transition hover:text-inherit"
                 title="استيراد نسخة احتياطية"
               >
                 استيراد
