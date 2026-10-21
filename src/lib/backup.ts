@@ -19,6 +19,10 @@ export function buildBackup(sessions: FocusSession[], exportedAt = Date.now()): 
   }
 }
 
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value)
+}
+
 export function parseBackup(raw: unknown): FocusSession[] {
   if (!raw || typeof raw !== 'object') {
     throw new Error('الملف غير صالح')
@@ -27,7 +31,7 @@ export function parseBackup(raw: unknown): FocusSession[] {
   if (obj.format !== BACKUP_FORMAT) {
     throw new Error('هذا ليس ملف نسخ احتياطي لناوي فوكاس')
   }
-  if (typeof obj.version !== 'number' || obj.version > BACKUP_VERSION) {
+  if (obj.version !== BACKUP_VERSION) {
     throw new Error('إصدار النسخة الاحتياطية غير مدعوم')
   }
   if (!Array.isArray(obj.sessions)) {
@@ -38,12 +42,19 @@ export function parseBackup(raw: unknown): FocusSession[] {
   for (const item of obj.sessions) {
     if (!item || typeof item !== 'object') continue
     const s = item as Record<string, unknown>
-    if (typeof s.id !== 'string' || !s.id) continue
+    if (typeof s.id !== 'string' || !s.id.trim()) continue
     if (s.kind !== 'focus' && s.kind !== 'break') continue
-    if (typeof s.actualSeconds !== 'number' || s.actualSeconds < 0) continue
-    if (typeof s.plannedSeconds !== 'number' || s.plannedSeconds < 0) continue
-    if (typeof s.startedAt !== 'number') continue
-    if (typeof s.endedAt !== 'number') continue
+    if (!isFiniteNumber(s.actualSeconds) || s.actualSeconds < 0) continue
+    if (!isFiniteNumber(s.plannedSeconds) || s.plannedSeconds < 0) continue
+    if (!isFiniteNumber(s.startedAt) || !isFiniteNumber(s.endedAt)) continue
+    if (
+      s.status !== undefined &&
+      s.status !== 'completed' &&
+      s.status !== 'stopped' &&
+      s.status !== 'abandoned'
+    ) continue
+    if (s.createdAt !== undefined && !isFiniteNumber(s.createdAt)) continue
+
     const status =
       s.status === 'completed' || s.status === 'stopped' || s.status === 'abandoned'
         ? s.status
@@ -57,7 +68,7 @@ export function parseBackup(raw: unknown): FocusSession[] {
       status,
       startedAt: s.startedAt,
       endedAt: s.endedAt,
-      createdAt: typeof s.createdAt === 'number' ? s.createdAt : s.startedAt,
+      createdAt: isFiniteNumber(s.createdAt) ? s.createdAt : s.startedAt,
     })
   }
   return out
