@@ -876,7 +876,7 @@ export default function App() {
                     <div
                       key={lap.number}
                       role="listitem"
-                      className={`stopwatch-lap-row flex items-center justify-between gap-4 px-4 py-3 ${index === 0 ? 'stopwatch-lap-latest' : ''}`}
+                      className={`stopwatch-lap-row flex flex-col gap-2.5 px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-4 ${index === 0 ? 'stopwatch-lap-latest' : ''}`}
                     >
                       <div className="flex items-center gap-3">
                         <span className="stopwatch-lap-number flex h-7 min-w-7 items-center justify-center rounded-full bg-white/5 px-2 text-xs font-semibold tabular-nums text-slate-400">
