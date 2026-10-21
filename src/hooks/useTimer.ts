@@ -9,7 +9,6 @@ import {
   setKind,
   setPlannedSeconds,
   startTimer,
-  tick,
 } from '../lib/timer'
 import { playCompletionChime, vibrateOnComplete } from '../lib/sound'
 import { notifySessionFinished } from '../lib/notify'
