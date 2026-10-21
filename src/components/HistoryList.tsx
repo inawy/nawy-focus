@@ -54,11 +54,11 @@ export function HistoryList({
   const [pendingDelete, setPendingDelete] = useState<string | null>(null)
 
   return (
-    <section className="w-full max-w-md" aria-labelledby="history-heading">
-      <details className="group surface-panel">
-        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-2.5 [&::-webkit-details-marker]:hidden">
+    <section className="history-section w-full max-w-md" aria-labelledby="history-heading">
+      <details className="history-disclosure group surface-panel">
+        <summary className="history-summary flex cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-3 [&::-webkit-details-marker]:hidden">
           <div className="flex items-center gap-2">
-            <h2 id="history-heading" className="text-sm font-medium">
+            <span className="history-heading-mark" aria-hidden>•/</span>\n            <h2 id="history-heading" className="text-sm font-semibold">
               السجل
             </h2>
             <span className="text-[11px] text-slate-500 transition group-open:rotate-0">
@@ -148,7 +148,7 @@ export function HistoryList({
               {sessions.map((s, index) => (
                 <li
                   key={s.id}
-                  className="history-row-enter surface-row rounded-xl px-3 py-2.5"
+                  className="history-row history-row-enter surface-row rounded-xl px-3 py-2.5"
                   style={{ animationDelay: `${Math.min(index, 6) * 35}ms` }}
                 >
                   <div className="flex items-start justify-between gap-2">
@@ -187,7 +187,7 @@ export function HistoryList({
                       <button
                         type="button"
                         onClick={() => setPendingDelete(s.id)}
-                        className="min-h-11 min-w-11 rounded-lg px-2 text-slate-500 transition hover:bg-rose-500/10 hover:text-rose-500"
+                        className="history-delete min-h-11 min-w-11 rounded-lg px-2 text-slate-500 transition hover:bg-rose-500/10 hover:text-rose-500"
                         title="حذف الجلسة"
                         aria-label="حذف الجلسة"
                       >
