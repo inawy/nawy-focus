@@ -181,7 +181,7 @@ export function useSessions() {
     let url: string | null = null
     try {
       const rows = await exportSessions()
-      const blob = new Blob(['\\ufeff' + toCsv(rows)], {
+      const blob = new Blob(['\uFEFF' + toCsv(rows)], {
         type: 'text/csv;charset=utf-8',
       })
       url = URL.createObjectURL(blob)
