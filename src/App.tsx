@@ -38,6 +38,14 @@ import {
   requestNotificationPermission,
 } from './lib/notify'
 
+function formatStopwatchLap(milliseconds: number) {
+  const total = Math.max(0, Math.floor(milliseconds))
+  const minutes = Math.floor(total / 60_000)
+  const seconds = Math.floor((total % 60_000) / 1000)
+  const centiseconds = Math.floor((total % 1000) / 10)
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(centiseconds).padStart(2, '0')}`
+}
+
 export default function App() {
   const {
     state,
@@ -827,11 +835,48 @@ export default function App() {
               onReset={
                 stopwatch.phase !== 'idle' ? stopwatch.reset : undefined
               }
+              onSecondary={
+                stopwatch.phase !== 'idle' ? stopwatch.recordLap : undefined
+              }
+              secondaryIcon="＋"
+              secondaryLabel="تسجيل لفة"
             />
             {stopwatch.phase === 'idle' && (
               <p className="text-center text-[11px] text-slate-600">
                 اضغط التشغيل لبدء القياس
               </p>
+            )}
+            {stopwatch.laps.length > 0 && (
+              <section className="stopwatch-laps surface-panel w-full max-w-sm overflow-hidden" aria-label="لفات ساعة الإيقاف">
+                <div className="flex items-center justify-between border-b border-white/5 px-4 py-3">
+                  <h2 className="text-sm font-semibold">اللفات</h2>
+                  <span className="text-xs text-slate-500">{stopwatch.laps.length} لفة</span>
+                </div>
+                <div className="max-h-56 overflow-y-auto" role="list">
+                  {stopwatch.laps.map((lap, index) => (
+                    <div
+                      key={lap.number}
+                      role="listitem"
+                      className={`stopwatch-lap-row flex items-center justify-between gap-4 px-4 py-3 ${index === 0 ? 'stopwatch-lap-latest' : ''}`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-white/5 px-2 text-xs font-semibold tabular-nums text-slate-400">
+                          {lap.number}
+                        </span>
+                        <span className="text-sm text-slate-500">اللفة {lap.number}</span>
+                      </div>
+                      <div className="flex items-center gap-4 font-mono text-sm tabular-nums" dir="ltr">
+                        <span className="text-slate-500">{formatStopwatchLap(lap.splitMs)}</span>
+                        <span className="font-semibold text-slate-200">{formatStopwatchLap(lap.elapsedMs)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-between px-4 py-2 text-[10px] text-slate-600">
+                  <span>زمن اللفة</span>
+                  <span>الوقت الإجمالي</span>
+                </div>
+              </section>
             )}
           </>
         )}
