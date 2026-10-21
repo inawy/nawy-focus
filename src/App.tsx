@@ -872,7 +872,7 @@ export default function App() {
                     </div>
                   ))}
                 </div>
-                <div className="flex justify-between px-4 py-2 text-[10px] text-slate-600">
+                <div dir="ltr" className="flex justify-between px-4 py-2 text-[10px] text-slate-600">
                   <span>زمن اللفة</span>
                   <span>الوقت الإجمالي</span>
                 </div>
