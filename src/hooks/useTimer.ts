@@ -213,6 +213,17 @@ export function useTimer() {
       return
     }
 
+    // A second stop click can arrive while the first local write is still
+    // pending. Reuse the pending operation instead of recording a duplicate.
+    const alreadyQueued = pendingSessionsRef.current.some(
+      ({ session, resetAfterSave }) =>
+        resetAfterSave &&
+        session.status === 'stopped' &&
+        session.kind === prev.kind &&
+        session.startedAt === prev.startedAt,
+    )
+    if (alreadyQueued) return
+
     setState((current) => pauseTimer(current))
     await persistSession(
       {
