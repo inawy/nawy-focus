@@ -56,6 +56,16 @@ describe('timer state machine', () => {
     expect(setPlannedSeconds(s, 600).plannedSeconds).toBe(1500)
   })
 
+  it('rejects non-finite planned durations and clamps valid values', () => {
+    const idle = createIdleState('focus', 1500)
+    expect(setPlannedSeconds(idle, Number.NaN)).toEqual(idle)
+    expect(setPlannedSeconds(idle, Number.POSITIVE_INFINITY)).toEqual(idle)
+    expect(setPlannedSeconds(idle, 61.9).plannedSeconds).toBe(61)
+    expect(setPlannedSeconds(idle, 1).plannedSeconds).toBe(60)
+    expect(setPlannedSeconds(idle, 99_999).plannedSeconds).toBe(10_800)
+    expect(createIdleState('focus', Number.NaN).plannedSeconds).toBe(1500)
+  })
+
   it('catchUp advances by wall-clock seconds', () => {
     let s = startTimer(createIdleState('focus', 30))
     s = catchUp(s, 10)
