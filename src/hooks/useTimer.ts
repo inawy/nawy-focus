@@ -211,8 +211,31 @@ export function useTimer() {
   const stop = useCallback(async () => {
     setFinishedWhileHidden(false)
     const prev = stateRef.current
-    if (prev.elapsedSeconds <= 0) {
-      setState(resetTimer(prev))
+
+    // Catch up before saving: a throttled background interval must not make
+    // an early stop persist less time than has actually elapsed.
+    let latest = prev
+    if (prev.phase === 'running') {
+      const now = Date.now()
+      const elapsedWholeSeconds = Math.max(
+        0,
+        Math.floor((now - lastTickAtRef.current) / 1000),
+      )
+      if (elapsedWholeSeconds > 0) {
+        lastTickAtRef.current += elapsedWholeSeconds * 1000
+        latest = catchUp(prev, elapsedWholeSeconds)
+      }
+    }
+
+    // If the catch-up reached zero, let the normal completion effect save it
+    // as completed instead of racing it with a second stopped-session write.
+    if (latest.phase === 'finished') {
+      setState(latest)
+      return
+    }
+
+    if (latest.elapsedSeconds <= 0) {
+      setState(resetTimer(latest))
       return
     }
 
@@ -222,20 +245,20 @@ export function useTimer() {
       ({ session, resetAfterSave }) =>
         resetAfterSave &&
         session.status === 'stopped' &&
-        session.kind === prev.kind &&
-        session.startedAt === prev.startedAt,
+        session.kind === latest.kind &&
+        session.startedAt === latest.startedAt,
     )
     if (alreadyQueued) return
 
-    setState((current) => pauseTimer(current))
+    setState(pauseTimer(latest))
     await persistSession(
       {
-        intention: prev.intention,
-        kind: prev.kind,
-        plannedSeconds: prev.plannedSeconds,
-        actualSeconds: prev.elapsedSeconds,
+        intention: latest.intention,
+        kind: latest.kind,
+        plannedSeconds: latest.plannedSeconds,
+        actualSeconds: latest.elapsedSeconds,
         status: 'stopped',
-        startedAt: prev.startedAt ?? Date.now(),
+        startedAt: latest.startedAt ?? Date.now(),
         endedAt: Date.now(),
       },
       true,
