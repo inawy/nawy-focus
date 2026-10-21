@@ -32,6 +32,15 @@ export async function addSession(
   return id
 }
 
+/**
+ * Idempotent session persistence for retryable writes.
+ * Reusing the same id makes a retry safe if a prior write committed but its
+ * promise failed before the caller received confirmation.
+ */
+export async function saveSession(session: FocusSession): Promise<void> {
+  await db.sessions.put(session)
+}
+
 export async function listSessions(limit = 50): Promise<FocusSession[]> {
   return db.sessions.orderBy('startedAt').reverse().limit(limit).toArray()
 }
