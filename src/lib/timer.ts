@@ -43,7 +43,13 @@ export function tick(
 ): TimerState {
   if (state.phase !== 'running') return state
 
-  const nextRemaining = Math.max(0, state.remainingSeconds - deltaSeconds)
+  // Ignore invalid/negative deltas so a bad caller cannot add time or corrupt elapsed time.
+  const delta = Number.isFinite(deltaSeconds)
+    ? Math.max(0, Math.floor(deltaSeconds))
+    : 0
+  if (delta === 0) return state
+
+  const nextRemaining = Math.max(0, state.remainingSeconds - delta)
   const nextElapsed = state.elapsedSeconds + (state.remainingSeconds - nextRemaining)
 
   if (nextRemaining <= 0) {
@@ -99,6 +105,6 @@ export function isActive(phase: TimerPhase): boolean {
  * (browsers throttle setInterval).
  */
 export function catchUp(state: TimerState, elapsedRealSeconds: number): TimerState {
-  if (state.phase !== 'running' || elapsedRealSeconds <= 0) return state
+  if (state.phase !== 'running' || !Number.isFinite(elapsedRealSeconds) || elapsedRealSeconds <= 0) return state
   return tick(state, Math.floor(elapsedRealSeconds))
 }
