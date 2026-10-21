@@ -43,6 +43,12 @@ describe('backup', () => {
     expect(parseBackup(backup).map((row) => row.id)).toEqual(['a1'])
   })
 
+  it('deduplicates repeated session ids in imported backups', () => {
+    const duplicate = { ...sample, intention: 'نسخة مكررة' }
+    expect(parseBackup(buildBackup([sample, duplicate]))).toHaveLength(1)
+    expect(parseBackup(buildBackup([sample, duplicate]))[0]?.intention).toBe('كتابة')
+  })
+
   it('merge keeps existing and adds new', () => {
     const other: FocusSession = { ...sample, id: 'b2', intention: 'قراءة' }
     const merged = mergeSessions([sample], [sample, other])
