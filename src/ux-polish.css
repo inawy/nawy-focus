@@ -680,3 +680,142 @@ html[data-theme='light'] .confirm-panel {
   .mode-tabs { min-height: 3.4rem; }
   .mode-tab { min-height: 3rem; }
 }
+
+
+/* Component-level responsive pass inspired by focused, local-first timer projects.
+   Keep Nawy's visual identity; adapt each control to small touch screens. */
+.mode-tabs,
+.stopwatch-laps,
+.history-disclosure {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.stopwatch-lap-row {
+  min-width: 0;
+  gap: clamp(.5rem, 3vw, 1rem);
+  font-variant-numeric: tabular-nums;
+}
+
+.stopwatch-lap-row > div {
+  min-width: 0;
+}
+
+.stopwatch-lap-row > div:first-child {
+  flex: 0 1 auto;
+}
+
+.stopwatch-lap-row > div:last-child {
+  display: flex;
+  flex: 1 1 auto;
+  justify-content: flex-end;
+  gap: clamp(.75rem, 5vw, 1.5rem);
+  white-space: nowrap;
+}
+
+.stopwatch-lap-row span {
+  font-size: clamp(.8rem, 3.4vw, .9rem);
+}
+
+.stopwatch-lap-row .stopwatch-lap-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.8rem;
+  min-height: 1.8rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--app-fg) 6%, transparent);
+  font-size: .75rem;
+  font-weight: 650;
+}
+
+.stopwatch-lap-latest .stopwatch-lap-number {
+  background: color-mix(in srgb, #3d7bff 16%, transparent);
+  color: #6b9aff;
+}
+
+.session-chip {
+  max-width: 100%;
+  white-space: nowrap;
+  flex: 0 1 auto;
+}
+
+.surface-panel,
+.surface-field,
+.install-banner {
+  min-width: 0;
+}
+
+@media (max-width: 390px) {
+  .stopwatch-laps {
+    border-radius: 1rem;
+  }
+
+  .stopwatch-lap-row {
+    padding-inline: .8rem;
+    gap: .5rem;
+  }
+
+  .stopwatch-lap-row > div:last-child {
+    gap: .7rem;
+  }
+
+  .stopwatch-lap-row span {
+    font-size: .78rem;
+  }
+
+  .history-row {
+    gap: .5rem;
+  }
+
+  .history-row > div:last-child {
+    gap: .1rem;
+  }
+
+  .history-row button {
+    min-width: 2.5rem;
+    padding-inline: .35rem;
+    font-size: .7rem;
+  }
+}
+
+@media (max-width: 340px) {
+  .mode-tab {
+    gap: .25rem;
+    padding-inline: .3rem;
+    font-size: .78rem;
+  }
+
+  .mode-tab > span:first-child {
+    font-size: .85rem;
+  }
+
+  .stopwatch-lap-row > div:last-child {
+    gap: .45rem;
+  }
+}
+
+@media (max-height: 650px) and (orientation: landscape) {
+  .app-header {
+    position: relative;
+  }
+
+  main.app-main,
+  .app-shell main {
+    padding-top: .75rem;
+    gap: .75rem;
+  }
+
+  .timer-face {
+    width: min(12.5rem, calc(100vw - 3rem));
+    height: min(12.5rem, calc(100vw - 3rem));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stopwatch-lap-row,
+  .history-row,
+  .history-summary {
+    transition: none;
+  }
+}
