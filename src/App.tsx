@@ -170,14 +170,15 @@ export default function App() {
   }, [state.phase, dismissFinishedBanner])
 
   useEffect(() => {
-    if (!isActive(state.phase)) return
+    // Protect both an active timer and unsaved sessions waiting for a storage retry.
+    if (!isActive(state.phase) && !persistenceError) return
     const onBeforeUnload = (e: BeforeUnloadEvent) => {
       e.preventDefault()
       e.returnValue = ''
     }
     window.addEventListener('beforeunload', onBeforeUnload)
     return () => window.removeEventListener('beforeunload', onBeforeUnload)
-  }, [state.phase])
+  }, [state.phase, persistenceError])
 
   useEffect(() => {
     if (!settingsOpen) return
