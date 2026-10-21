@@ -58,7 +58,8 @@ export function HistoryList({
       <details className="history-disclosure group surface-panel">
         <summary className="history-summary flex cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-3 [&::-webkit-details-marker]:hidden">
           <div className="flex items-center gap-2">
-            <span className="history-heading-mark" aria-hidden>•/</span>\n            <h2 id="history-heading" className="text-sm font-semibold">
+            <span className="history-heading-mark" aria-hidden>•/</span>
+            <h2 id="history-heading" className="text-sm font-semibold">
               السجل
             </h2>
             <span className="text-[11px] text-slate-500 transition group-open:rotate-0">
