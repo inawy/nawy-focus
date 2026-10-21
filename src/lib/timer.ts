@@ -6,8 +6,12 @@ const MIN_PLANNED_SECONDS = 60
 const MAX_PLANNED_SECONDS = 3 * 60 * 60
 const DEFAULT_PLANNED_SECONDS = 25 * 60
 
-function normalizePlannedSeconds(value: number, fallback = DEFAULT_PLANNED_SECONDS): number {
-  if (!Number.isFinite(value)) return fallback
+function normalizeInitialSeconds(value: number): number {
+  if (!Number.isFinite(value) || value <= 0) return DEFAULT_PLANNED_SECONDS
+  return Math.max(1, Math.min(Math.floor(value), MAX_PLANNED_SECONDS))
+}
+
+function normalizePlannedSeconds(value: number): number {
   return Math.max(MIN_PLANNED_SECONDS, Math.min(Math.floor(value), MAX_PLANNED_SECONDS))
 }
 
@@ -15,7 +19,7 @@ export function createIdleState(
   kind: SessionKind = 'focus',
   plannedSeconds = DEFAULT_PLANNED_SECONDS,
 ): TimerState {
-  const planned = normalizePlannedSeconds(plannedSeconds)
+  const planned = normalizeInitialSeconds(plannedSeconds)
   return {
     phase: 'idle',
     kind,
