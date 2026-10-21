@@ -24,8 +24,7 @@ export function bestFocusHour(
   const focus = sessions.filter((s) => s.kind === 'focus' && s.actualSeconds > 0)
   if (focus.length < minSessions) return null
 
-  const buckets = new Array<{ seconds: number; sessions: number }>(24)
-  for (let i = 0; i < 24; i++) buckets[i] = { seconds: 0, sessions: 0 }
+  const buckets = Array.from({ length: 24 }, () => ({ seconds: 0, sessions: 0 }))
 
   for (const s of focus) {
     const hour = new Date(s.startedAt).getHours()
