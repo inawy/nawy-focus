@@ -27,7 +27,7 @@ export function SessionControls({
   onStartBreak,
 }: Props) {
   return (
-    <div className="flex w-full max-w-sm flex-col items-stretch gap-2.5 px-0 sm:items-center">
+    <div className="session-controls w-full max-w-md min-w-0 flex-col items-stretch gap-2.5 px-0 sm:items-center">
       {phase === 'idle' && (
         <button
           type="button"
@@ -86,33 +86,44 @@ export function SessionControls({
       )}
 
       {phase === 'finished' && (
-        <div className="surface-panel motion-finish-card w-full px-4 py-5 sm:px-5">
-          <div className="text-center">
-            <p className="text-[15px] font-medium">
-              {kind === 'focus' ? 'أحسنت' : 'انتهت الراحة'}
-            </p>
-            <p className="mt-1 text-sm text-slate-500">
-              {kind === 'focus'
-                ? 'أتممت جلسة التركيز'
-                : 'يمكنك بدء جلسة تركيز جديدة'}
-            </p>
-            {elapsedSeconds > 0 && (
-              <p className="mt-3 font-mono text-2xl font-medium tabular-nums text-brand-500">
+        <section className={`session-finish-card surface-panel motion-finish-card w-full px-4 py-4 sm:px-5 sm:py-5 ${kind === 'break' ? 'session-finish-break' : ''}`} aria-labelledby="session-finish-title">
+          <div className="flex items-start gap-3 text-start">
+            <span className="session-finish-mark" aria-hidden="true">
+              {kind === 'focus' ? '•/' : '☕'}
+            </span>
+            <div className="min-w-0 flex-1 pt-0.5">
+              <p className="session-finish-eyebrow">
+                {kind === 'focus' ? 'خطوة اتحققت' : 'استعدت طاقتك'}
+              </p>
+              <h2 id="session-finish-title" className="mt-1 text-base font-semibold">
+                {kind === 'focus' ? 'أحسنت، خلصت جلستك' : 'انتهت الراحة'}
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-slate-500">
+                {kind === 'focus'
+                  ? 'خد لحظة تقدّر فيها اللي أنجزته.'
+                  : 'جاهز ترجع لحاجة ناوي تعملها؟'}
+              </p>
+            </div>
+          </div>
+          {elapsedSeconds > 0 && (
+            <div className="session-finish-duration mt-4 flex items-center justify-between gap-3 rounded-xl px-3.5 py-3">
+              <span className="text-xs text-slate-500">الوقت المستغرق</span>
+              <span className="font-mono text-xl font-semibold tabular-nums text-brand-500" dir="ltr">
                 {formatDurationShort(elapsedSeconds)}
                 {plannedSeconds > 0 && elapsedSeconds < plannedSeconds && (
-                  <span className="ms-1 text-sm font-normal text-slate-500">
+                  <span className="ms-1 text-xs font-normal text-slate-500">
                     / {formatDurationShort(plannedSeconds)}
                   </span>
                 )}
-              </p>
-            )}
-          </div>
-          <div className="mt-5 flex w-full flex-col items-stretch gap-2.5">
+              </span>
+            </div>
+          )}
+          <div className="mt-4 flex w-full flex-col items-stretch gap-2 sm:flex-row">
             {kind === 'focus' && onStartBreak && (
               <button
                 type="button"
                 onClick={onStartBreak}
-                className="btn-secondary-quiet w-full"
+                className="btn-secondary-quiet w-full sm:flex-1"
               >
                 بدء الراحة
               </button>
@@ -122,14 +133,14 @@ export function SessionControls({
               onClick={onReset}
               className={
                 kind === 'focus'
-                  ? 'btn-chrome min-h-12 w-full rounded-full text-sm'
-                  : 'btn-primary-brand w-full'
+                  ? 'btn-chrome min-h-12 w-full rounded-full text-sm sm:flex-1'
+                  : 'btn-primary-brand w-full sm:flex-1'
               }
             >
               {kind === 'focus' ? 'جلسة جديدة' : 'بدء التركيز'}
             </button>
           </div>
-        </div>
+        </section>
       )}
     </div>
   )
