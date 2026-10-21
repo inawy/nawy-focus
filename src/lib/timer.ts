@@ -2,16 +2,26 @@ import type { SessionKind, TimerPhase, TimerState } from '../types'
 
 /** Pure timer state machine — easy to unit test */
 
+const MIN_PLANNED_SECONDS = 60
+const MAX_PLANNED_SECONDS = 3 * 60 * 60
+const DEFAULT_PLANNED_SECONDS = 25 * 60
+
+function normalizePlannedSeconds(value: number, fallback = DEFAULT_PLANNED_SECONDS): number {
+  if (!Number.isFinite(value)) return fallback
+  return Math.max(MIN_PLANNED_SECONDS, Math.min(Math.floor(value), MAX_PLANNED_SECONDS))
+}
+
 export function createIdleState(
   kind: SessionKind = 'focus',
-  plannedSeconds = 25 * 60,
+  plannedSeconds = DEFAULT_PLANNED_SECONDS,
 ): TimerState {
+  const planned = normalizePlannedSeconds(plannedSeconds)
   return {
     phase: 'idle',
     kind,
     intention: '',
-    plannedSeconds,
-    remainingSeconds: plannedSeconds,
+    plannedSeconds: planned,
+    remainingSeconds: planned,
     elapsedSeconds: 0,
     startedAt: null,
   }
@@ -82,7 +92,9 @@ export function setPlannedSeconds(
   plannedSeconds: number,
 ): TimerState {
   if (state.phase === 'running' || state.phase === 'paused') return state
-  const clamped = Math.max(60, Math.min(plannedSeconds, 3 * 60 * 60))
+  if (!Number.isFinite(plannedSeconds)) return state
+
+  const clamped = normalizePlannedSeconds(plannedSeconds)
   return {
     ...state,
     plannedSeconds: clamped,
