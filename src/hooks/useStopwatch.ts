@@ -2,18 +2,25 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 export type StopwatchPhase = 'idle' | 'running' | 'paused'
 
+export interface StopwatchLap {
+  number: number
+  elapsedMs: number
+  splitMs: number
+}
+
 /**
- * Count-up stopwatch with millisecond display precision.
- * Wall-clock elapsed time prevents losing time when the browser throttles RAF
- * or the user pauses the stopwatch while the tab is in the background.
+ * Count-up stopwatch with millisecond display precision and lap/split tracking.
+ * Wall-clock elapsed time prevents losing time when the browser throttles RAF.
  */
 export function useStopwatch() {
   const [phase, setPhase] = useState<StopwatchPhase>('idle')
   const [elapsedMs, setElapsedMs] = useState(0)
+  const [laps, setLaps] = useState<StopwatchLap[]>([])
   const rafRef = useRef<number | null>(null)
   const startedAtRef = useRef(0)
   const baseMsRef = useRef(0)
   const liveMsRef = useRef(0)
+  const lapsRef = useRef<StopwatchLap[]>([])
 
   const clearRaf = useCallback(() => {
     if (rafRef.current !== null) {
@@ -48,6 +55,8 @@ export function useStopwatch() {
   const start = useCallback(() => {
     baseMsRef.current = 0
     liveMsRef.current = 0
+    lapsRef.current = []
+    setLaps([])
     setElapsedMs(0)
     setPhase('running')
   }, [])
@@ -64,11 +73,28 @@ export function useStopwatch() {
     setPhase('running')
   }, [])
 
+  const recordLap = useCallback(() => {
+    if (phase === 'idle') return
+    const exactElapsed = readElapsed()
+    const previousElapsed = lapsRef.current[lapsRef.current.length - 1]?.elapsedMs ?? 0
+    const lap: StopwatchLap = {
+      number: lapsRef.current.length + 1,
+      elapsedMs: exactElapsed,
+      splitMs: Math.max(0, exactElapsed - previousElapsed),
+    }
+    const nextLaps = [lap, ...lapsRef.current]
+    lapsRef.current = nextLaps
+    setLaps(nextLaps)
+    return lap
+  }, [phase, readElapsed])
+
   const reset = useCallback(() => {
     clearRaf()
     baseMsRef.current = 0
     liveMsRef.current = 0
     startedAtRef.current = 0
+    lapsRef.current = []
+    setLaps([])
     setElapsedMs(0)
     setPhase('idle')
   }, [clearRaf])
@@ -77,9 +103,11 @@ export function useStopwatch() {
     phase,
     elapsedMs,
     elapsedSeconds: Math.floor(elapsedMs / 1000),
+    laps,
     start,
     pause,
     resume,
+    recordLap,
     reset,
   }
 }
