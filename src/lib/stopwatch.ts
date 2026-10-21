@@ -1,5 +1,3 @@
-import type {} from 'vitest'
-
 export interface StopwatchLap {
   number: number
   elapsedMs: number
