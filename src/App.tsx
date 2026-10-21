@@ -762,7 +762,7 @@ export default function App() {
               </div>
             </section>
           ) : (
-            <section className="session-editor surface-panel w-full max-w-sm p-4 sm:p-5" aria-label="إعداد الجلسة">
+            <section className="session-editor surface-panel w-full max-w-md p-4 sm:p-5" aria-label="إعداد الجلسة">
               <div className="mb-4 flex items-start justify-between gap-3">
                 <div>
                   <h2 className="text-sm font-semibold">جهّز جلستك</h2>
