@@ -956,7 +956,7 @@ export default function App() {
               nawy.to/focus
             </a>
             <span className="mx-1.5 opacity-40">·</span>
-            <span className="tabular-nums opacity-50">v0.2.0</span>
+            <span className="tabular-nums opacity-50">v0.2.1</span>
           </footer>
         )}
       </main>

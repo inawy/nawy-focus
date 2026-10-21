@@ -1,7 +1,7 @@
 {
   "name": "nawy-focus",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Nawy Focus — A simple, local-first focus timer for the Nawy productivity ecosystem.",
   "type": "module",
   "scripts": {
