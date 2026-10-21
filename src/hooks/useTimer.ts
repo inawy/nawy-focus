@@ -40,36 +40,48 @@ export function useTimer() {
   /** Set when we finish while the tab is hidden — App can show a banner. */
   const [finishedWhileHidden, setFinishedWhileHidden] = useState(false)
   const [persistenceError, setPersistenceError] = useState<string | null>(null)
-  const pendingSessionRef = useRef<Parameters<typeof addSession>[0] | null>(null)
-  const pendingResetRef = useRef(false)
+  const pendingSessionsRef = useRef<
+    Array<{
+      session: Parameters<typeof addSession>[0]
+      resetAfterSave: boolean
+    }>
+  >([])
+  const savingSessionsRef = useRef(false)
+
+  const flushPendingSessions = useCallback(async () => {
+    if (savingSessionsRef.current) return
+    savingSessionsRef.current = true
+    try {
+      while (pendingSessionsRef.current.length > 0) {
+        const pending = pendingSessionsRef.current[0]
+        try {
+          await addSession(pending.session)
+        } catch {
+          setPersistenceError(
+            'تعذّر حفظ الجلسة في التخزين المحلي. الجلسة محفوظة مؤقتًا في الصفحة؛ حاول الحفظ مرة أخرى قبل إغلاقها.',
+          )
+          return
+        }
+        pendingSessionsRef.current.shift()
+        setPersistenceError(null)
+        if (pending.resetAfterSave) setState((current) => resetTimer(current))
+      }
+    } finally {
+      savingSessionsRef.current = false
+    }
+  }, [])
 
   const persistSession = useCallback(
     async (session: Parameters<typeof addSession>[0], resetAfterSave = false) => {
-      pendingSessionRef.current = session
-      pendingResetRef.current = resetAfterSave
-      try {
-        await addSession(session)
-        pendingSessionRef.current = null
-        const shouldReset = pendingResetRef.current
-        pendingResetRef.current = false
-        setPersistenceError(null)
-        if (shouldReset) setState((current) => resetTimer(current))
-        return true
-      } catch {
-        setPersistenceError(
-          'تعذّر حفظ الجلسة في التخزين المحلي. وقت الجلسة محفوظ مؤقتًا في الصفحة؛ حاول الحفظ مرة أخرى قبل إغلاقها.',
-        )
-        return false
-      }
+      pendingSessionsRef.current.push({ session, resetAfterSave })
+      await flushPendingSessions()
     },
-    [],
+    [flushPendingSessions],
   )
 
   const retrySave = useCallback(async () => {
-    const pending = pendingSessionRef.current
-    if (!pending) return
-    await persistSession(pending, pendingResetRef.current)
-  }, [persistSession])
+    await flushPendingSessions()
+  }, [flushPendingSessions])
 
   const clearTick = useCallback(() => {
     if (intervalRef.current !== null) {
