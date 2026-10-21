@@ -819,3 +819,200 @@ html[data-theme='light'] .confirm-panel {
     transition: none;
   }
 }
+
+
+/* Final mobile-first component pass: focus face, controls, and editor hierarchy. */
+.session-editor {
+  width: 100%;
+  max-width: 34rem;
+  min-width: 0;
+  padding: clamp(1rem, 4vw, 1.35rem);
+  border-radius: 1.4rem;
+}
+
+.session-editor > div:first-child {
+  gap: .75rem;
+}
+
+.session-editor-section {
+  min-width: 0;
+}
+
+.session-editor-label {
+  margin-bottom: .7rem;
+  font-size: .75rem;
+  font-weight: 650;
+  letter-spacing: .01em;
+  color: var(--app-fg);
+  opacity: .78;
+}
+
+.session-editor .session-chip {
+  min-height: 2.75rem;
+  max-width: 100%;
+  padding-inline: clamp(.7rem, 3vw, 1rem);
+  border-radius: .95rem;
+  line-height: 1.25;
+}
+
+.session-editor [role="group"] {
+  justify-content: flex-start;
+  gap: .5rem;
+}
+
+.session-editor [role="group"] button {
+  min-width: 3.4rem;
+  min-height: 2.75rem;
+  padding-inline: .85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.session-editor input {
+  min-height: 2.9rem;
+}
+
+.timer-face {
+  flex-shrink: 0;
+  max-width: 100%;
+}
+
+.timer-digits {
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+.timer-play-btn,
+.timer-secondary-btn {
+  flex-shrink: 0;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mode-tab {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.stopwatch-laps [role="list"] {
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--app-fg) 18%, transparent) transparent;
+}
+
+.stopwatch-lap-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.stopwatch-lap-row > div:first-child {
+  gap: .55rem;
+  min-width: 0;
+}
+
+.stopwatch-lap-row > div:first-child > span:nth-child(2) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stopwatch-lap-row > div:last-child {
+  gap: clamp(.45rem, 2.8vw, 1rem);
+}
+
+.history-row {
+  min-width: 0;
+}
+
+.history-row > * {
+  min-width: 0;
+}
+
+@media (max-width: 380px) {
+  main {
+    padding-inline: .75rem !important;
+    gap: .8rem;
+  }
+
+  .timer-face {
+    width: min(16rem, calc(100vw - 2.5rem));
+    height: min(16rem, calc(100vw - 2.5rem));
+  }
+
+  .timer-face .timer-digits > div > span:first-child {
+    font-size: clamp(1.8rem, 9vw, 2.2rem);
+  }
+
+  .timer-face .timer-digits > span {
+    font-size: 1.75rem;
+  }
+
+  .timer-face .timer-digits > div:last-child > span:first-child {
+    font-size: clamp(1.1rem, 5.5vw, 1.35rem);
+  }
+
+  .timer-face > div:last-child > div:last-child {
+    margin-top: .7rem;
+    gap: .6rem;
+  }
+
+  .timer-play-btn {
+    min-width: 3.15rem;
+    min-height: 3.15rem;
+    width: 3.15rem;
+    height: 3.15rem;
+    border-radius: 1.05rem;
+  }
+
+  .timer-secondary-btn {
+    width: 2.6rem;
+    height: 2.6rem;
+  }
+
+  .session-editor {
+    padding: .95rem;
+  }
+
+  .stopwatch-lap-row {
+    padding-inline: .7rem;
+  }
+}
+
+@media (max-width: 340px) {
+  .timer-face {
+    width: min(14.5rem, calc(100vw - 2rem));
+    height: min(14.5rem, calc(100vw - 2rem));
+  }
+
+  .timer-face .timer-digits > div > span:first-child {
+    font-size: 1.7rem;
+  }
+
+  .timer-face .timer-digits > span {
+    font-size: 1.5rem;
+  }
+
+  .timer-face .timer-digits > div:last-child > span:first-child {
+    font-size: 1rem;
+  }
+
+  .session-editor [role="group"] {
+    gap: .35rem;
+  }
+
+  .session-editor [role="group"] button {
+    min-width: 3rem;
+    padding-inline: .65rem;
+  }
+}
+
+@media (min-width: 640px) {
+  .session-editor {
+    padding: 1.35rem;
+  }
+
+  .timer-face {
+    width: min(18.25rem, calc(100vw - 4rem));
+    height: min(18.25rem, calc(100vw - 4rem));
+  }
+}
