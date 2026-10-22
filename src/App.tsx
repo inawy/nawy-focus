@@ -888,16 +888,18 @@ export default function App() {
                         </span>
                         <span className="text-sm text-slate-500">اللفة {lap.number}</span>
                       </div>
-                      <div className="flex items-center gap-4 font-mono text-sm tabular-nums" dir="ltr">
-                        <span className="text-slate-500">{formatStopwatchLap(lap.splitMs)}</span>
-                        <span className="font-semibold text-slate-200">{formatStopwatchLap(lap.elapsedMs)}</span>
+                      <div className="grid grid-cols-2 gap-4 sm:min-w-48" dir="ltr">
+                        <div className="flex flex-col items-end gap-1">
+                          <span dir="rtl" className="text-[10px] text-slate-500">زمن اللفة</span>
+                          <span className="font-mono text-sm tabular-nums text-slate-400">{formatStopwatchLap(lap.splitMs)}</span>
+                        </div>
+                        <div className="flex flex-col items-end gap-1">
+                          <span dir="rtl" className="text-[10px] text-slate-500">الوقت الإجمالي</span>
+                          <span className="font-mono text-sm font-semibold tabular-nums text-slate-200">{formatStopwatchLap(lap.elapsedMs)}</span>
+                        </div>
                       </div>
                     </div>
                   ))}
-                </div>
-                <div dir="ltr" className="flex justify-between px-4 py-2 text-[10px] text-slate-600">
-                  <span>زمن اللفة</span>
-                  <span>الوقت الإجمالي</span>
                 </div>
               </section>
             )}
