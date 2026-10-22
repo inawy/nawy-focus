@@ -111,7 +111,7 @@ export function useTimer() {
 
   useEffect(() => {
     if (state.phase === 'running') {
-      lastTickAtRef.current = Date.now()
+      lastTickAtRef.current = performance.now()
       intervalRef.current = window.setInterval(() => {
         const now = Date.now()
         const elapsedWholeSeconds = Math.floor(
@@ -138,7 +138,7 @@ export function useTimer() {
         if (prev.phase !== 'running') return prev
         const gapSec = (Date.now() - lastTickAtRef.current) / 1000
         if (gapSec < 1.5) return prev
-        lastTickAtRef.current = Date.now()
+        lastTickAtRef.current = performance.now()
         return catchUp(prev, gapSec)
       })
     }
@@ -195,7 +195,7 @@ export function useTimer() {
   const start = useCallback(() => {
     savedFinishedRef.current = false
     setFinishedWhileHidden(false)
-    lastTickAtRef.current = Date.now()
+    lastTickAtRef.current = performance.now()
     setState((s) => startTimer(s))
   }, [])
 
@@ -204,7 +204,7 @@ export function useTimer() {
   }, [])
 
   const resume = useCallback(() => {
-    lastTickAtRef.current = Date.now()
+    lastTickAtRef.current = performance.now()
     setState((s) => resumeTimer(s))
   }, [])
 
@@ -276,7 +276,7 @@ export function useTimer() {
     savedFinishedRef.current = false
     setFinishedWhileHidden(false)
     const breakSec = loadDefaultBreakSeconds()
-    lastTickAtRef.current = Date.now()
+    lastTickAtRef.current = performance.now()
     setState(() => {
       let s = createIdleState('break', breakSec)
       s = startTimer(s)
