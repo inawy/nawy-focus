@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { createStopwatchLap, type StopwatchLap } from '../lib/stopwatch'
+import {
+  createStopwatchLap,
+  getStopwatchElapsed,
+  type StopwatchLap,
+} from '../lib/stopwatch'
 
 export type StopwatchPhase = 'idle' | 'running' | 'paused'
 
@@ -26,7 +30,12 @@ export function useStopwatch() {
 
   const readElapsed = useCallback(() => {
     if (phase !== 'running') return baseMsRef.current
-    return baseMsRef.current + Math.max(0, Date.now() - startedAtRef.current)
+    return getStopwatchElapsed(
+      baseMsRef.current,
+      startedAtRef.current,
+      Date.now(),
+      liveMsRef.current,
+    )
   }, [phase])
 
   useEffect(() => {
@@ -37,7 +46,12 @@ export function useStopwatch() {
 
     startedAtRef.current = Date.now()
     const tick = () => {
-      const next = baseMsRef.current + Math.max(0, Date.now() - startedAtRef.current)
+      const next = getStopwatchElapsed(
+        baseMsRef.current,
+        startedAtRef.current,
+        Date.now(),
+        liveMsRef.current,
+      )
       liveMsRef.current = next
       setElapsedMs(next)
       rafRef.current = requestAnimationFrame(tick)

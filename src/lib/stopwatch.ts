@@ -4,6 +4,20 @@ export interface StopwatchLap {
   splitMs: number
 }
 
+/**
+ * Keep elapsed time non-negative and monotonic if the device clock is adjusted
+ * while the stopwatch is running.
+ */
+export function getStopwatchElapsed(
+  baseMs: number,
+  startedAt: number,
+  now: number,
+  lastElapsedMs = baseMs,
+): number {
+  const elapsed = baseMs + Math.max(0, now - startedAt)
+  return Math.max(0, lastElapsedMs, elapsed)
+}
+
 /** Existing laps are stored newest-first. The split uses the latest lap. */
 export function createStopwatchLap(
   elapsedMs: number,

@@ -1,5 +1,23 @@
 import { describe, expect, it } from 'vitest'
-import { createStopwatchLap, type StopwatchLap } from '../src/lib/stopwatch'
+import {
+  createStopwatchLap,
+  getStopwatchElapsed,
+  type StopwatchLap,
+} from '../src/lib/stopwatch'
+
+describe('stopwatch elapsed time', () => {
+  it('calculates elapsed time from the current run and accumulated base', () => {
+    expect(getStopwatchElapsed(5_000, 10_000, 13_250)).toBe(8_250)
+  })
+
+  it('does not go backwards if the system clock moves backwards', () => {
+    expect(getStopwatchElapsed(5_000, 10_000, 9_000, 7_000)).toBe(7_000)
+  })
+
+  it('never returns a negative elapsed duration', () => {
+    expect(getStopwatchElapsed(0, 10_000, 9_000)).toBe(0)
+  })
+})
 
 describe('stopwatch lap splits', () => {
   it('calculates each split from the immediately preceding lap', () => {
