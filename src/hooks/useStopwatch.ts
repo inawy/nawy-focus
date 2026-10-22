@@ -9,7 +9,8 @@ export type StopwatchPhase = 'idle' | 'running' | 'paused'
 
 /**
  * Count-up stopwatch with millisecond display precision and lap/split tracking.
- * Wall-clock elapsed time prevents losing time when the browser throttles RAF.
+ * A monotonic clock keeps timing accurate if the system date or time zone changes.
+ * Elapsed time is derived from the clock, so throttled animation frames don't lose time.
  */
 export function useStopwatch() {
   const [phase, setPhase] = useState<StopwatchPhase>('idle')
@@ -33,7 +34,7 @@ export function useStopwatch() {
     return getStopwatchElapsed(
       baseMsRef.current,
       startedAtRef.current,
-      Date.now(),
+      performance.now(),
       liveMsRef.current,
     )
   }, [phase])
@@ -44,12 +45,12 @@ export function useStopwatch() {
       return
     }
 
-    startedAtRef.current = Date.now()
+    startedAtRef.current = performance.now()
     const tick = () => {
       const next = getStopwatchElapsed(
         baseMsRef.current,
         startedAtRef.current,
-        Date.now(),
+        performance.now(),
         liveMsRef.current,
       )
       liveMsRef.current = next

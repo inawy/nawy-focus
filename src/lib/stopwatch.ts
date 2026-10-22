@@ -5,8 +5,8 @@ export interface StopwatchLap {
 }
 
 /**
- * Keep elapsed time non-negative and monotonic if the device clock is adjusted
- * while the stopwatch is running.
+ * Calculate elapsed time from a monotonic clock and guard against negative or
+ * regressing readings (for example, from mocked clocks or precision rounding).
  */
 export function getStopwatchElapsed(
   baseMs: number,
