@@ -173,7 +173,7 @@ export function TimerDisplay({
     <div
       className={`timer-face relative mx-auto flex items-center justify-center ${
         isActive ? 'timer-face-active' : ''
-      }`}
+      } ${isStopwatch ? 'timer-face-stopwatch' : ''}`}
     >
       <div className="timer-disc absolute inset-0 rounded-full" aria-hidden />
 
@@ -184,7 +184,47 @@ export function TimerDisplay({
         viewBox="0 0 240 240"
         aria-hidden
       >
-        {!isStopwatch && (
+        {isStopwatch ? (
+          <>
+            <circle cx="120" cy="120" r="112" fill="none" stroke="currentColor" strokeOpacity=".045" strokeWidth="1" />
+            {Array.from({ length: 60 }, (_, index) => {
+              const angle = (index * 6 - 90) * (Math.PI / 180)
+              const major = index % 15 === 0
+              const medium = index % 5 === 0
+              const inner = major ? 96 : medium ? 100 : 103
+              const outer = major ? 105 : medium ? 104 : 105
+              const x1 = 120 + Math.cos(angle) * inner
+              const y1 = 120 + Math.sin(angle) * inner
+              const x2 = 120 + Math.cos(angle) * outer
+              const y2 = 120 + Math.sin(angle) * outer
+              return (
+                <line
+                  key={index}
+                  x1={x1}
+                  y1={y1}
+                  x2={x2}
+                  y2={y2}
+                  stroke={index < Math.floor((totalMs % 60000) / 1000) ? 'var(--color-brand-500)' : 'currentColor'}
+                  strokeOpacity={major ? '.9' : medium ? '.48' : '.25'}
+                  strokeWidth={major ? '2.2' : medium ? '1.5' : '1'}
+                  strokeLinecap="round"
+                />
+              )
+            })}
+            <circle
+              cx="120"
+              cy="120"
+              r="109"
+              fill="none"
+              stroke="var(--color-brand-500)"
+              strokeWidth="7"
+              strokeLinecap="round"
+              strokeDasharray={2 * Math.PI * 109 * Math.min(1, (totalMs % 60000) / 60000)}
+              transform="rotate(-90 120 120)"
+              opacity={phase === 'idle' ? '.5' : '1'}
+            />
+          </>
+        ) : (
           <circle
             cx="120"
             cy="120"
@@ -215,7 +255,7 @@ export function TimerDisplay({
         )}
 
         {isStopwatch && phase === 'running' && (
-          <circle cx="120" cy="12" r="4" className="fill-brand-500" />
+          <circle cx="120" cy="11" r="3.5" className="fill-brand-500" />
         )}
       </svg>
 
