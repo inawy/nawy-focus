@@ -71,16 +71,16 @@ export default function App() {
 
   // Keep the browser tab useful when the stopwatch is running in the background.
   // Update the title at second precision rather than on every animation frame.
+  const stopwatchTitleSeconds = Math.max(0, Math.floor(stopwatch.elapsedMs / 1000))
   useEffect(() => {
     if (appMode !== 'stopwatch') return
-    const elapsed = Math.max(0, Math.floor(stopwatch.elapsedMs / 1000))
-    const minutes = Math.floor(elapsed / 60)
-    const seconds = elapsed % 60
+    const minutes = Math.floor(stopwatchTitleSeconds / 60)
+    const seconds = stopwatchTitleSeconds % 60
     document.title = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')} · ساعة الإيقاف · ناوي فوكاس`
     return () => {
       document.title = 'ناوي فوكاس'
     }
-  }, [appMode, stopwatch.phase, Math.floor(stopwatch.elapsedMs / 1000)])
+  }, [appMode, stopwatch.phase, stopwatchTitleSeconds])
 
   const {
     sessions,
