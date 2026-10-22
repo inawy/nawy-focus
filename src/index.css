@@ -486,3 +486,29 @@ input {
     height: 2.8rem;
   }
 }
+
+
+/* Keep the stopwatch usable in short landscape viewports without fullscreen mode. */
+@media (orientation: landscape) and (max-height: 560px) {
+  .timer-face-stopwatch {
+    width: min(22rem, calc(100vw - 2rem), 68vh);
+    height: min(22rem, calc(100vw - 2rem), 68vh);
+  }
+
+  .timer-face-stopwatch .timer-play-btn {
+    width: 3.25rem;
+    height: 3.25rem;
+    min-width: 3.25rem;
+    min-height: 3.25rem;
+  }
+
+  .timer-face-stopwatch .timer-secondary-btn {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .timer-face-stopwatch > div:last-child > div:last-child {
+    margin-top: .65rem;
+    gap: .75rem;
+  }
+}
