@@ -113,7 +113,7 @@ export function useTimer() {
     if (state.phase === 'running') {
       lastTickAtRef.current = performance.now()
       intervalRef.current = window.setInterval(() => {
-        const now = Date.now()
+        const now = performance.now()
         const elapsedWholeSeconds = Math.floor(
           (now - lastTickAtRef.current) / 1000,
         )
@@ -136,7 +136,7 @@ export function useTimer() {
       if (document.visibilityState !== 'visible') return
       setState((prev) => {
         if (prev.phase !== 'running') return prev
-        const gapSec = (Date.now() - lastTickAtRef.current) / 1000
+        const gapSec = (performance.now() - lastTickAtRef.current) / 1000
         if (gapSec < 1.5) return prev
         lastTickAtRef.current = performance.now()
         return catchUp(prev, gapSec)
@@ -216,7 +216,7 @@ export function useTimer() {
     // an early stop persist less time than has actually elapsed.
     let latest = prev
     if (prev.phase === 'running') {
-      const now = Date.now()
+      const now = performance.now()
       const elapsedWholeSeconds = Math.max(
         0,
         Math.floor((now - lastTickAtRef.current) / 1000),
