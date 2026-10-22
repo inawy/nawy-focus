@@ -141,7 +141,18 @@ export function useTimer() {
         // Consume only whole seconds and retain the fractional remainder for
         // the next interval instead of silently dropping it on tab return.
         const elapsedWholeSeconds = Math.floor(gapSec)
+        if (elapsedWholeSeconds <= 0) return prev
         lastTickAtRef.current += elapsedWholeSeconds * 1000
+
+        // React state updaters must stay pure: determine whether the timer
+        // expired during the absence before scheduling the state update.
+        const current = stateRef.current
+        if (
+          current.phase === 'running' &&
+          catchUp(current, elapsedWholeSeconds).phase === 'finished'
+        ) {
+          setFinishedWhileHidden(true)
+        }
         return catchUp(prev, elapsedWholeSeconds)
       })
     }

@@ -82,5 +82,6 @@ describe('timer state machine', () => {
     s = catchUp(s, 25)
     expect(s.phase).toBe('finished')
     expect(s.remainingSeconds).toBe(0)
+    expect(s.elapsedSeconds).toBe(30)
   })
 })
