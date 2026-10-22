@@ -18,8 +18,7 @@ describe('CSV export', () => {
   it('quotes commas, quotes, and line breaks correctly', () => {
     const newline = String.fromCharCode(10)
     const csv = toCsv([{ ...session, intention: 'مراجعة, "الملف"' + newline + 'اليوم' }])
-    expect(csv).toContain('"مراجعة, ""الملف"""')
-    expect(csv).toContain(newline + 'اليوم')
+    expect(csv).toContain('"مراجعة, ""الملف""' + newline + 'اليوم"')
   })
 
   it('neutralizes formula-like user text without changing numeric fields', () => {
