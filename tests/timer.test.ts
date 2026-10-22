@@ -66,6 +66,14 @@ describe('timer state machine', () => {
     expect(createIdleState('focus', Number.NaN).plannedSeconds).toBe(1500)
   })
 
+  it('catchUp floors fractional seconds without advancing early', () => {
+    const running = startTimer(createIdleState('focus', 30))
+    expect(catchUp(running, 0.99)).toEqual(running)
+    const caughtUp = catchUp(running, 1.99)
+    expect(caughtUp.remainingSeconds).toBe(29)
+    expect(caughtUp.elapsedSeconds).toBe(1)
+  })
+
   it('catchUp advances by wall-clock seconds', () => {
     let s = startTimer(createIdleState('focus', 30))
     s = catchUp(s, 10)

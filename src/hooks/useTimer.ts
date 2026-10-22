@@ -138,8 +138,11 @@ export function useTimer() {
         if (prev.phase !== 'running') return prev
         const gapSec = (performance.now() - lastTickAtRef.current) / 1000
         if (gapSec < 1.5) return prev
-        lastTickAtRef.current = performance.now()
-        return catchUp(prev, gapSec)
+        // Consume only whole seconds and retain the fractional remainder for
+        // the next interval instead of silently dropping it on tab return.
+        const elapsedWholeSeconds = Math.floor(gapSec)
+        lastTickAtRef.current += elapsedWholeSeconds * 1000
+        return catchUp(prev, elapsedWholeSeconds)
       })
     }
     document.addEventListener('visibilitychange', onVisibility)
