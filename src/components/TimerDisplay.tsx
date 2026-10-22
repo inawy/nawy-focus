@@ -219,7 +219,7 @@ export function TimerDisplay({
               stroke="var(--color-brand-500)"
               strokeWidth="7"
               strokeLinecap="round"
-              strokeDasharray={2 * Math.PI * 109 * Math.min(1, (totalMs % 60000) / 60000)}
+              strokeDasharray={`${2 * Math.PI * 109 * ((totalMs % 60000) / 60000)} ${2 * Math.PI * 109 * (1 - (totalMs % 60000) / 60000)}`}
               transform="rotate(-90 120 120)"
               opacity={phase === 'idle' ? '.5' : '1'}
             />
