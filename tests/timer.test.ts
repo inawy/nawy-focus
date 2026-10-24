@@ -74,6 +74,14 @@ describe('timer state machine', () => {
     expect(caughtUp.elapsedSeconds).toBe(1)
   })
 
+  it('catchUp does not advance idle or paused timers', () => {
+    const idle = createIdleState('focus', 30)
+    expect(catchUp(idle, 10)).toEqual(idle)
+
+    const paused = pauseTimer(startTimer(createIdleState('focus', 30)))
+    expect(catchUp(paused, 10)).toEqual(paused)
+  })
+
   it('catchUp advances by wall-clock seconds', () => {
     let s = startTimer(createIdleState('focus', 30))
     s = catchUp(s, 10)
