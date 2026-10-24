@@ -82,6 +82,12 @@ describe('timer state machine', () => {
     expect(catchUp(paused, 10)).toEqual(paused)
   })
 
+  it('catchUp leaves a finished timer unchanged', () => {
+    const finished = tick(startTimer(createIdleState('focus', 2)), 2)
+    expect(finished.phase).toBe('finished')
+    expect(catchUp(finished, 10)).toEqual(finished)
+  })
+
   it('catchUp advances by wall-clock seconds', () => {
     let s = startTimer(createIdleState('focus', 30))
     s = catchUp(s, 10)
