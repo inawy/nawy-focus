@@ -17,6 +17,16 @@ describe('stopwatch elapsed time', () => {
   it('never returns a negative elapsed duration', () => {
     expect(getStopwatchElapsed(0, 10_000, 9_000)).toBe(0)
   })
+
+  it('preserves the last valid elapsed time if a clock reading is invalid', () => {
+    expect(getStopwatchElapsed(5_000, 10_000, Number.NaN, 7_000)).toBe(7_000)
+    expect(getStopwatchElapsed(5_000, Number.NaN, 13_000, 6_000)).toBe(6_000)
+  })
+
+  it('normalizes invalid or negative elapsed inputs', () => {
+    expect(getStopwatchElapsed(Number.NaN, 0, 10_000)).toBe(0)
+    expect(getStopwatchElapsed(-2_000, 0, 1_000)).toBe(1_000)
+  })
 })
 
 describe('stopwatch lap splits', () => {
@@ -33,5 +43,13 @@ describe('stopwatch lap splits', () => {
   it('never reports a negative split', () => {
     const previous: StopwatchLap = { number: 1, elapsedMs: 12_000, splitMs: 12_000 }
     expect(createStopwatchLap(9_000, [previous]).splitMs).toBe(0)
+  })
+
+  it('normalizes an invalid elapsed reading when recording a lap', () => {
+    expect(createStopwatchLap(Number.NaN, [])).toEqual({
+      number: 1,
+      elapsedMs: 0,
+      splitMs: 0,
+    })
   })
 })
