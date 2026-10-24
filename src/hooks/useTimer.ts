@@ -223,60 +223,65 @@ export function useTimer() {
   }, [])
 
   const stop = useCallback(async () => {
-    setFinishedWhileHidden(false)
-    const prev = stateRef.current
+    if (stoppingRef.current) return
+    stoppingRef.current = true
+    try {
+      setFinishedWhileHidden(false)
+      const prev = stateRef.current
 
-    // Catch up before saving: a throttled background interval must not make
-    // an early stop persist less time than has actually elapsed.
-    let latest = prev
-    if (prev.phase === 'running') {
-      const now = performance.now()
-      const elapsedWholeSeconds = Math.max(
-        0,
-        Math.floor((now - lastTickAtRef.current) / 1000),
-      )
-      if (elapsedWholeSeconds > 0) {
-        lastTickAtRef.current += elapsedWholeSeconds * 1000
-        latest = catchUp(prev, elapsedWholeSeconds)
+      // Catch up before saving: a throttled background interval must not make
+      // an early stop persist less time than has actually elapsed.
+      let latest = prev
+      if (prev.phase === 'running') {
+        const now = performance.now()
+        const elapsedWholeSeconds = Math.max(
+          0,
+          Math.floor((now - lastTickAtRef.current) / 1000),
+        )
+        if (elapsedWholeSeconds > 0) {
+          lastTickAtRef.current += elapsedWholeSeconds * 1000
+          latest = catchUp(prev, elapsedWholeSeconds)
+        }
       }
+
+      // If catch-up reached zero, let the completion effect save it as
+      // completed rather than racing it with a second stopped-session write.
+      if (latest.phase === 'finished') {
+        setState(latest)
+        return
+      }
+
+      if (latest.elapsedSeconds <= 0) {
+        setState(resetTimer(latest))
+        return
+      }
+
+      // Guard against a duplicate queued stop for the same session.
+      const alreadyQueued = pendingSessionsRef.current.some(
+        ({ session, resetAfterSave }) =>
+          resetAfterSave &&
+          session.status === 'stopped' &&
+          session.kind === latest.kind &&
+          session.startedAt === latest.startedAt,
+      )
+      if (alreadyQueued) return
+
+      setState(pauseTimer(latest))
+      await persistSession(
+        {
+          intention: latest.intention,
+          kind: latest.kind,
+          plannedSeconds: latest.plannedSeconds,
+          actualSeconds: latest.elapsedSeconds,
+          status: 'stopped',
+          startedAt: latest.startedAt ?? Date.now(),
+          endedAt: Date.now(),
+        },
+        true,
+      )
+    } finally {
+      stoppingRef.current = false
     }
-
-    // If the catch-up reached zero, let the normal completion effect save it
-    // as completed instead of racing it with a second stopped-session write.
-    if (latest.phase === 'finished') {
-      setState(latest)
-      return
-    }
-
-    if (latest.elapsedSeconds <= 0) {
-      setState(resetTimer(latest))
-      return
-    }
-
-    // A second stop click can arrive while the first local write is still
-    // pending. Reuse the pending operation instead of recording a duplicate.
-    const alreadyQueued = pendingSessionsRef.current.some(
-      ({ session, resetAfterSave }) =>
-        resetAfterSave &&
-        session.status === 'stopped' &&
-        session.kind === latest.kind &&
-        session.startedAt === latest.startedAt,
-    )
-    if (alreadyQueued) return
-
-    setState(pauseTimer(latest))
-    await persistSession(
-      {
-        intention: latest.intention,
-        kind: latest.kind,
-        plannedSeconds: latest.plannedSeconds,
-        actualSeconds: latest.elapsedSeconds,
-        status: 'stopped',
-        startedAt: latest.startedAt ?? Date.now(),
-        endedAt: Date.now(),
-      },
-      true,
-    )
   }, [persistSession])
 
   const reset = useCallback(() => {
