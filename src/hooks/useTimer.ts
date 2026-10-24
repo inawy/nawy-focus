@@ -136,27 +136,20 @@ export function useTimer() {
   useEffect(() => {
     const onVisibility = () => {
       if (document.visibilityState !== 'visible') return
-      setState((prev) => {
-        if (prev.phase !== 'running') return prev
-        const gapSec = (performance.now() - lastTickAtRef.current) / 1000
-        if (gapSec < 1.5) return prev
-        // Consume only whole seconds and retain the fractional remainder for
-        // the next interval instead of silently dropping it on tab return.
-        const elapsedWholeSeconds = Math.floor(gapSec)
-        if (elapsedWholeSeconds <= 0) return prev
-        lastTickAtRef.current += elapsedWholeSeconds * 1000
+      const current = stateRef.current
+      if (current.phase !== 'running') return
+      const gapSec = (performance.now() - lastTickAtRef.current) / 1000
+      if (gapSec < 1.5) return
+      // Consume only whole seconds and retain the fractional remainder for
+      // the next interval instead of silently dropping it on tab return.
+      const elapsedWholeSeconds = Math.floor(gapSec)
+      if (elapsedWholeSeconds <= 0) return
+      lastTickAtRef.current += elapsedWholeSeconds * 1000
 
-        // React state updaters must stay pure: determine whether the timer
-        // expired during the absence before scheduling the state update.
-        const current = stateRef.current
-        if (
-          current.phase === 'running' &&
-          catchUp(current, elapsedWholeSeconds).phase === 'finished'
-        ) {
-          setFinishedWhileHidden(true)
-        }
-        return catchUp(prev, elapsedWholeSeconds)
-      })
+      // Keep React state updaters pure: calculate the next state outside them.
+      const next = catchUp(current, elapsedWholeSeconds)
+      if (next.phase === 'finished') setFinishedWhileHidden(true)
+      setState(next)
     }
     document.addEventListener('visibilitychange', onVisibility)
     return () => document.removeEventListener('visibilitychange', onVisibility)
