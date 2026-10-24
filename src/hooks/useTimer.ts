@@ -37,6 +37,8 @@ export function useTimer() {
   const intervalRef = useRef<number | null>(null)
   const savedFinishedRef = useRef(false)
   const lastTickAtRef = useRef<number>(Date.now())
+  /** Prevents concurrent stop calls from saving the same session twice. */
+  const stoppingRef = useRef(false)
   /** Set when we finish while the tab is hidden — App can show a banner. */
   const [finishedWhileHidden, setFinishedWhileHidden] = useState(false)
   const [persistenceError, setPersistenceError] = useState<string | null>(null)
