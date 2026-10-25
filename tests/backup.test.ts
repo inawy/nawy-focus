@@ -53,6 +53,14 @@ describe('backup', () => {
     expect(parseBackup(backup).map((row) => row.id)).toEqual(['a1'])
   })
 
+  it('skips sessions whose actual duration exceeds the planned duration', () => {
+    const backup = buildBackup([
+      sample,
+      { ...sample, id: 'overrun', actualSeconds: 1501, plannedSeconds: 1500 },
+    ])
+    expect(parseBackup(backup).map((row) => row.id)).toEqual(['a1'])
+  })
+
   it('deduplicates repeated session ids in imported backups', () => {
     const duplicate = { ...sample, intention: 'نسخة مكررة' }
     expect(parseBackup(buildBackup([sample, duplicate]))).toHaveLength(1)
