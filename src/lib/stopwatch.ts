@@ -42,3 +42,18 @@ export function createStopwatchLap(
     splitMs: Math.max(0, safeElapsed - previousElapsed),
   }
 }
+
+/** Format a lap as MM:SS.cc, adding HH when the elapsed time reaches an hour. */
+export function formatStopwatchLap(milliseconds: number): string {
+  const total = Number.isFinite(milliseconds)
+    ? Math.max(0, Math.floor(milliseconds))
+    : 0
+  const hours = Math.floor(total / 3_600_000)
+  const minutes = Math.floor((total % 3_600_000) / 60_000)
+  const seconds = Math.floor((total % 60_000) / 1000)
+  const centiseconds = Math.floor((total % 1000) / 10)
+  const clock = hours > 0
+    ? `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
+    : String(minutes + hours * 60).padStart(2, '0')
+  return `${clock}:${String(seconds).padStart(2, '0')}.${String(centiseconds).padStart(2, '0')}`
+}
