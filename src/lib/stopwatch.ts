@@ -14,12 +14,15 @@ export function getStopwatchElapsed(
   now: number,
   lastElapsedMs = baseMs,
 ): number {
-  const safeBase = Number.isFinite(baseMs) ? Math.max(0, baseMs) : 0
+  const baseIsValid = Number.isFinite(baseMs)
+  const safeBase = baseIsValid ? Math.max(0, baseMs) : 0
   const safeLast = Number.isFinite(lastElapsedMs)
     ? Math.max(0, lastElapsedMs)
     : safeBase
+  // An invalid base means the current run cannot be trusted. Do not let a
+  // seemingly valid clock delta turn corrupted elapsed state into real time.
   const clockDelta =
-    Number.isFinite(now) && Number.isFinite(startedAt)
+    baseIsValid && Number.isFinite(now) && Number.isFinite(startedAt)
       ? Math.max(0, now - startedAt)
       : 0
   return Math.max(safeBase + clockDelta, safeLast)
