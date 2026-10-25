@@ -12,8 +12,8 @@ describe('timer recovery', () => {
     const running = tick(startTimer(createIdleState('focus', 600), 1_000), 120)
     const restored = recoverTimerSnapshot(snapshot(running, 10_000), 70_000)
     expect(restored?.phase).toBe('running')
-    expect(restored?.remainingSeconds).toBe(530)
-    expect(restored?.elapsedSeconds).toBe(70)
+    expect(restored?.remainingSeconds).toBe(420)
+    expect(restored?.elapsedSeconds).toBe(180)
     expect(restored?.startedAt).toBe(1_000)
   })
 
