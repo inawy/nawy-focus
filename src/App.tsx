@@ -325,6 +325,8 @@ export default function App() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      // Holding Space must not repeatedly toggle the timer on key-repeat.
+      if (e.repeat) return
       const tag = (e.target as HTMLElement | null)?.tagName
       if (
         tag === 'INPUT' ||
