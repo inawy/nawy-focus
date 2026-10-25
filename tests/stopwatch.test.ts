@@ -25,6 +25,7 @@ describe('stopwatch elapsed time', () => {
 
   it('normalizes invalid or negative elapsed inputs', () => {
     expect(getStopwatchElapsed(Number.NaN, 0, 10_000)).toBe(0)
+    expect(getStopwatchElapsed(Number.NaN, 0, 10_000, 7_000)).toBe(7_000)
     expect(getStopwatchElapsed(-2_000, 0, 1_000)).toBe(1_000)
   })
 })
