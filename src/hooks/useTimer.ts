@@ -22,9 +22,10 @@ import {
 import type { FocusSession, SessionKind, TimerState } from '../types'
 import { saveSession } from '../db'
 import { formatTime } from '../lib/format'
+import { readTimerRecovery, writeTimerRecovery, clearTimerRecovery } from '../lib/timerRecovery'
 
 function initialState(): TimerState {
-  return createIdleState('focus', loadDefaultFocusSeconds())
+  return readTimerRecovery() ?? createIdleState('focus', loadDefaultFocusSeconds())
 }
 
 /**
@@ -51,6 +52,17 @@ export function useTimer() {
     }>
   >([])
   const savingSessionsRef = useRef(false)
+
+  // Keep active sessions recoverable across refreshes and browser restarts.
+  // Running time is reconciled against the wall clock by the recovery helper;
+  // paused sessions are restored without accruing time.
+  useEffect(() => {
+    if (state.phase === 'running' || state.phase === 'paused') {
+      writeTimerRecovery(state)
+    } else {
+      clearTimerRecovery()
+    }
+  }, [state])
 
   // A failed IndexedDB write leaves the session queued in memory. Warn before
   // navigation so the user has a chance to retry instead of losing that queue.
