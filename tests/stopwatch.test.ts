@@ -62,7 +62,7 @@ describe('stopwatch lap formatting', () => {
   })
 
   it('adds an hours segment when a lap reaches one hour', () => {
-    expect(formatStopwatchLap(3_661_234)).toBe('01:01:01.12')
+    expect(formatStopwatchLap(3_661_234)).toBe('01:01:01.23')
   })
 
   it('normalizes invalid lap times instead of displaying NaN', () => {
