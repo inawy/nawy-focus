@@ -357,6 +357,8 @@ export default function App() {
       }
       // Do not let global timer shortcuts activate behind an open menu or dialog.
       if (settingsOpen || confirmAction || notice) return
+      // Leave modified Space combinations to the browser and assistive tools.
+      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return
       if (e.key === ' ' || e.code === 'Space') {
         // Preserve native Space behavior for focused controls and disclosure widgets.
         if (
