@@ -43,6 +43,16 @@ describe('backup', () => {
     expect(parseBackup(backup).map((row) => row.id)).toEqual(['a1'])
   })
 
+  it('skips sessions with impossible durations or reversed timestamps', () => {
+    const backup = buildBackup([
+      sample,
+      { ...sample, id: 'zero-plan', plannedSeconds: 0 },
+      { ...sample, id: 'too-long-plan', plannedSeconds: 10_801 },
+      { ...sample, id: 'reversed-time', startedAt: 2_000, endedAt: 1_000 },
+    ])
+    expect(parseBackup(backup).map((row) => row.id)).toEqual(['a1'])
+  })
+
   it('deduplicates repeated session ids in imported backups', () => {
     const duplicate = { ...sample, intention: 'نسخة مكررة' }
     expect(parseBackup(buildBackup([sample, duplicate]))).toHaveLength(1)
