@@ -298,6 +298,13 @@ export function useTimer() {
     })
   }, [])
 
+  /** Reset an ended break to the focus setup, using the saved focus duration. */
+  const resetToFocus = useCallback(() => {
+    savedFinishedRef.current = false
+    setFinishedWhileHidden(false)
+    setState(createIdleState('focus', loadDefaultFocusSeconds()))
+  }, [])
+
   const dismissFinishedBanner = useCallback(() => {
     setFinishedWhileHidden(false)
   }, [])
@@ -337,6 +344,7 @@ export function useTimer() {
     stop,
     reset,
     startBreak,
+    resetToFocus,
     updateIntention,
     updatePlanned,
     updateKind,
