@@ -79,10 +79,13 @@ export function ConfirmDialog({
 }: Props) {
   const panelRef = useRef<HTMLDivElement | null>(null)
   const onCancelRef = useRef(onCancel)
-  onCancelRef.current = onCancel
   const titleId = useId()
   const bodyId = useId()
   const tone = toneFromProps(notice, danger)
+
+  useEffect(() => {
+    onCancelRef.current = onCancel
+  }, [onCancel])
 
   useEffect(() => {
     if (!open) return
