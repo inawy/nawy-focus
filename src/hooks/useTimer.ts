@@ -52,6 +52,18 @@ export function useTimer() {
   >([])
   const savingSessionsRef = useRef(false)
 
+  // A failed IndexedDB write leaves the session queued in memory. Warn before
+  // navigation so the user has a chance to retry instead of losing that queue.
+  useEffect(() => {
+    if (!hasUnsavedSessions) return
+    const warnBeforeLeaving = (event: BeforeUnloadEvent) => {
+      event.preventDefault()
+      event.returnValue = ''
+    }
+    window.addEventListener('beforeunload', warnBeforeLeaving)
+    return () => window.removeEventListener('beforeunload', warnBeforeLeaving)
+  }, [hasUnsavedSessions])
+
   const flushPendingSessions = useCallback(async () => {
     if (savingSessionsRef.current) return
     savingSessionsRef.current = true
