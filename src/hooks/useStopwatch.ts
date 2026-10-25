@@ -45,7 +45,6 @@ export function useStopwatch() {
       return
     }
 
-    startedAtRef.current = performance.now()
     const tick = () => {
       const next = getStopwatchElapsed(
         baseMsRef.current,
@@ -63,6 +62,7 @@ export function useStopwatch() {
   }, [phase, clearRaf])
 
   const start = useCallback(() => {
+    startedAtRef.current = performance.now()
     baseMsRef.current = 0
     liveMsRef.current = 0
     lapsRef.current = []
@@ -80,6 +80,7 @@ export function useStopwatch() {
   }, [readElapsed])
 
   const resume = useCallback(() => {
+    startedAtRef.current = performance.now()
     setPhase('running')
   }, [])
 
