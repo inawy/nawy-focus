@@ -307,12 +307,14 @@ export function useTimer() {
   }, [])
 
   const updatePlanned = useCallback((seconds: number) => {
-    setState((s) => {
-      const next = setPlannedSeconds(s, seconds)
-      if (next.kind === 'focus') saveDefaultFocusSeconds(next.plannedSeconds)
-      else saveDefaultBreakSeconds(next.plannedSeconds)
-      return next
-    })
+    // Persist preferences outside the React state updater. Updaters must stay
+    // pure because React may invoke them more than once in development.
+    const current = stateRef.current
+    const next = setPlannedSeconds(current, seconds)
+    if (next === current) return
+    if (next.kind === 'focus') saveDefaultFocusSeconds(next.plannedSeconds)
+    else saveDefaultBreakSeconds(next.plannedSeconds)
+    setState(next)
   }, [])
 
   const updateKind = useCallback((kind: SessionKind) => {
