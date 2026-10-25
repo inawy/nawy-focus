@@ -261,8 +261,10 @@ export default function App() {
     // A finished session is already saved by the completion effect. Starting
     // a fresh one should not show a warning claiming its time will be lost.
     if (state.phase === 'finished') {
-      if (state.kind === 'break') resetToFocus()
-      else reset()
+      // A new session starts from a clean focus setup, not a stale preset
+      // whose intention or duration may no longer match the visible chip.
+      setPresetId('focus')
+      resetToFocus()
       return
     }
     if (isActive(state.phase) || state.elapsedSeconds > 0) {
@@ -270,7 +272,7 @@ export default function App() {
       return
     }
     reset()
-  }, [state.phase, state.kind, state.elapsedSeconds, reset, resetToFocus])
+  }, [state.phase, state.elapsedSeconds, resetToFocus])
 
   const handleResume = useCallback(() => {
     resume()
