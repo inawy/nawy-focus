@@ -87,6 +87,7 @@ export function HistoryList({
                 key={f.id}
                 type="button"
                 onClick={() => onFilterChange(f.id)}
+                aria-pressed={filter === f.id}
                 className={`history-filter-btn min-h-9 rounded-full px-3 text-xs font-medium transition ${
                   filter === f.id
                     ? 'bg-brand-500/20 text-brand-500'
