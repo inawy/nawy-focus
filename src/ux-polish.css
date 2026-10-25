@@ -984,15 +984,15 @@ html[data-theme='light'] .confirm-panel {
     height: min(14.5rem, calc(100vw - 2rem));
   }
 
-  .timer-face .timer-digits > div > span:first-child {
+  .timer-face:not(.timer-face-stopwatch) .timer-digits > div > span:first-child {
     font-size: 1.7rem;
   }
 
-  .timer-face .timer-digits > span {
+  .timer-face:not(.timer-face-stopwatch) .timer-digits > span {
     font-size: 1.5rem;
   }
 
-  .timer-face .timer-digits > div:last-child > span:first-child {
+  .timer-face:not(.timer-face-stopwatch) .timer-digits > div:last-child > span:first-child {
     font-size: 1rem;
   }
 
