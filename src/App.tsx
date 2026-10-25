@@ -366,7 +366,10 @@ export default function App() {
   }, [
     state.phase,
     appMode,
-    stopwatch,
+    stopwatch.phase,
+    stopwatch.start,
+    stopwatch.pause,
+    stopwatch.resume,
     settingsOpen,
     confirmAction,
     notice,
