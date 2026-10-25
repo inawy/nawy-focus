@@ -59,6 +59,7 @@ export default function App() {
     updateIntention,
     updatePlanned,
     updateKind,
+    configurePreset,
     finishedWhileHidden,
     dismissFinishedBanner,
     persistenceError,
@@ -296,12 +297,13 @@ export default function App() {
   const handlePreset = useCallback(
     (preset: SessionPreset) => {
       setPresetId(preset.id)
-      updateKind(preset.kind)
-      if (preset.minutes) updatePlanned(preset.minutes * 60)
-      if (preset.intention !== undefined) updateIntention(preset.intention)
-      else if (preset.id === 'focus') updateIntention('')
+      configurePreset(
+        preset.kind,
+        preset.minutes ? preset.minutes * 60 : undefined,
+        preset.intention ?? '',
+      )
     },
-    [updateKind, updatePlanned, updateIntention],
+    [configurePreset],
   )
 
   const handleTimerPrimary = useCallback(() => {

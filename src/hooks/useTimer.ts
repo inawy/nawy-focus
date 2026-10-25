@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   catchUp,
+  createConfiguredIdleState,
   createIdleState,
   pauseTimer,
   resetTimer,
@@ -324,6 +325,22 @@ export function useTimer() {
     setState(next)
   }, [])
 
+  const configurePreset = useCallback(
+    (kind: SessionKind, plannedSeconds: number | undefined, intention: string) => {
+      const current = stateRef.current
+      if (current.phase === 'running' || current.phase === 'paused') return
+      const duration =
+        plannedSeconds ??
+        (kind === 'focus' ? loadDefaultFocusSeconds() : loadDefaultBreakSeconds())
+      const next = createConfiguredIdleState(kind, duration, intention)
+      // Preset selection intentionally becomes the remembered duration for this session kind.
+      if (kind === 'focus') saveDefaultFocusSeconds(next.plannedSeconds)
+      else saveDefaultBreakSeconds(next.plannedSeconds)
+      setState(next)
+    },
+    [],
+  )
+
   const updateKind = useCallback((kind: SessionKind) => {
     setState((s) => {
       let next = setKind(s, kind)
@@ -348,6 +365,7 @@ export function useTimer() {
     updateIntention,
     updatePlanned,
     updateKind,
+    configurePreset,
     finishedWhileHidden,
     dismissFinishedBanner,
     persistenceError,

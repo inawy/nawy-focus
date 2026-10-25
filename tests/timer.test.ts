@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   catchUp,
+  createConfiguredIdleState,
   createIdleState,
   pauseTimer,
   resumeTimer,
@@ -10,6 +11,15 @@ import {
 } from '../src/lib/timer'
 
 describe('timer state machine', () => {
+  it('configures a preset atomically with its own kind, duration, and intention', () => {
+    const preset = createConfiguredIdleState('break', 300, 'استراحة قهوة')
+    expect(preset.phase).toBe('idle')
+    expect(preset.kind).toBe('break')
+    expect(preset.plannedSeconds).toBe(300)
+    expect(preset.remainingSeconds).toBe(300)
+    expect(preset.intention).toBe('استراحة قهوة')
+  })
+
   it('starts from idle', () => {
     const idle = createIdleState('focus', 1500)
     expect(idle.phase).toBe('idle')

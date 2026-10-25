@@ -31,6 +31,15 @@ export function createIdleState(
   }
 }
 
+/** Build a new idle session as one atomic state, avoiding stale preset values. */
+export function createConfiguredIdleState(
+  kind: SessionKind,
+  plannedSeconds: number,
+  intention = '',
+): TimerState {
+  return { ...createIdleState(kind, plannedSeconds), intention }
+}
+
 export function startTimer(state: TimerState, now = Date.now()): TimerState {
   if (state.phase === 'running') return state
   return {
