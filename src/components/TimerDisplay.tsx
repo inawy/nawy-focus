@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import type { SessionKind, TimerPhase } from '../types'
 import type { StopwatchPhase } from '../hooks/useStopwatch'
 
@@ -135,6 +136,28 @@ export function TimerDisplay({
   const showRing =
     !isStopwatch && progress !== undefined && (progress > 0 || isActive)
 
+  const stopwatchSecond = Math.floor((totalMs % 60_000) / 1000)
+  const stopwatchTicks = useMemo(
+    () => Array.from({ length: 60 }, (_, index) => {
+      const angle = (index * 6 - 90) * (Math.PI / 180)
+      const major = index % 15 === 0
+      const medium = index % 5 === 0
+      const inner = major ? 96 : medium ? 100 : 103
+      const outer = major ? 105 : medium ? 104 : 105
+      return {
+        index,
+        x1: 120 + Math.cos(angle) * inner,
+        y1: 120 + Math.sin(angle) * inner,
+        x2: 120 + Math.cos(angle) * outer,
+        y2: 120 + Math.sin(angle) * outer,
+        major,
+        medium,
+        elapsed: index < stopwatchSecond,
+      }
+    }),
+    [stopwatchSecond],
+  )
+
   const playIcon =
     phase === 'running' ? (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -187,30 +210,19 @@ export function TimerDisplay({
         {isStopwatch ? (
           <>
             <circle cx="120" cy="120" r="112" fill="none" stroke="currentColor" strokeOpacity=".045" strokeWidth="1" />
-            {Array.from({ length: 60 }, (_, index) => {
-              const angle = (index * 6 - 90) * (Math.PI / 180)
-              const major = index % 15 === 0
-              const medium = index % 5 === 0
-              const inner = major ? 96 : medium ? 100 : 103
-              const outer = major ? 105 : medium ? 104 : 105
-              const x1 = 120 + Math.cos(angle) * inner
-              const y1 = 120 + Math.sin(angle) * inner
-              const x2 = 120 + Math.cos(angle) * outer
-              const y2 = 120 + Math.sin(angle) * outer
-              return (
-                <line
-                  key={index}
-                  x1={x1}
-                  y1={y1}
-                  x2={x2}
-                  y2={y2}
-                  stroke={index < Math.floor((totalMs % 60000) / 1000) ? 'var(--color-brand-500)' : 'currentColor'}
-                  strokeOpacity={major ? '.9' : medium ? '.48' : '.25'}
-                  strokeWidth={major ? '2.2' : medium ? '1.5' : '1'}
-                  strokeLinecap="round"
-                />
-              )
-            })}
+            {stopwatchTicks.map((tick) => (
+              <line
+                key={tick.index}
+                x1={tick.x1}
+                y1={tick.y1}
+                x2={tick.x2}
+                y2={tick.y2}
+                stroke={tick.elapsed ? 'var(--color-brand-500)' : 'currentColor'}
+                strokeOpacity={tick.major ? '.9' : tick.medium ? '.48' : '.25'}
+                strokeWidth={tick.major ? '2.2' : tick.medium ? '1.5' : '1'}
+                strokeLinecap="round"
+              />
+            ))}
             <circle
               cx="120"
               cy="120"
