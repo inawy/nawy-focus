@@ -353,6 +353,8 @@ export default function App() {
         }
         return
       }
+      // Do not let global timer shortcuts activate behind an open menu or dialog.
+      if (settingsOpen || confirmAction || notice) return
       if (e.key === ' ' || e.code === 'Space') {
         // Preserve native Space behavior for focused controls and disclosure widgets.
         if (
