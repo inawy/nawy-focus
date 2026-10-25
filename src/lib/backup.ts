@@ -46,8 +46,15 @@ export function parseBackup(raw: unknown): FocusSession[] {
     if (typeof s.id !== 'string' || !s.id.trim() || seenIds.has(s.id)) continue
     if (s.kind !== 'focus' && s.kind !== 'break') continue
     if (!isFiniteNumber(s.actualSeconds) || s.actualSeconds < 0) continue
-    if (!isFiniteNumber(s.plannedSeconds) || s.plannedSeconds < 0) continue
+    // Match durations the app can actually create; reject malformed backup rows
+    // before they can pollute history totals or session ordering.
+    if (
+      !isFiniteNumber(s.plannedSeconds) ||
+      s.plannedSeconds < 60 ||
+      s.plannedSeconds > 3 * 60 * 60
+    ) continue
     if (!isFiniteNumber(s.startedAt) || !isFiniteNumber(s.endedAt)) continue
+    if (s.endedAt < s.startedAt) continue
     if (
       s.status !== undefined &&
       s.status !== 'completed' &&
