@@ -32,8 +32,13 @@ export function useWakeLock(active: boolean): void {
     if (!nav.wakeLock?.request) return
 
     let cancelled = false
+    let requestPending = false
 
     const request = async () => {
+      // visibilitychange can fire repeatedly before the browser resolves the
+      // first request. Keep only one in-flight request per effect lifecycle.
+      if (cancelled || requestPending || lockRef.current) return
+      requestPending = true
       try {
         const sentinel = await nav.wakeLock!.request('screen')
         if (cancelled) {
@@ -46,6 +51,8 @@ export function useWakeLock(active: boolean): void {
         })
       } catch {
         // denied / unsupported in this context
+      } finally {
+        requestPending = false
       }
     }
 
