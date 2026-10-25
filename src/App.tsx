@@ -55,6 +55,7 @@ export default function App() {
     stop,
     reset,
     startBreak,
+    resetToFocus,
     updateIntention,
     updatePlanned,
     updateKind,
@@ -260,7 +261,8 @@ export default function App() {
     // A finished session is already saved by the completion effect. Starting
     // a fresh one should not show a warning claiming its time will be lost.
     if (state.phase === 'finished') {
-      reset()
+      if (state.kind === 'break') resetToFocus()
+      else reset()
       return
     }
     if (isActive(state.phase) || state.elapsedSeconds > 0) {
@@ -268,7 +270,7 @@ export default function App() {
       return
     }
     reset()
-  }, [state.phase, state.elapsedSeconds, reset])
+  }, [state.phase, state.kind, state.elapsedSeconds, reset, resetToFocus])
 
   const handleResume = useCallback(() => {
     resume()
