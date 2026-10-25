@@ -8,7 +8,7 @@ import {
   listSessions,
   totalFocusSeconds,
 } from '../db'
-import { buildBackup, parseBackup } from '../lib/backup'
+import { buildBackup, MAX_BACKUP_FILE_BYTES, parseBackup } from '../lib/backup'
 import { toCsv } from '../lib/csv'
 import { startOfToday, startOfWeek } from '../lib/format'
 import {
@@ -164,6 +164,11 @@ export function useSessions() {
 
   const uploadBackup = useCallback(
     async (file: File) => {
+      if (file.size > MAX_BACKUP_FILE_BYTES) {
+        setBackupMessage('حجم ملف النسخة الاحتياطية أكبر من الحد المسموح (25 ميجابايت).')
+        return
+      }
+
       let raw: unknown
       try {
         raw = JSON.parse(await file.text()) as unknown
