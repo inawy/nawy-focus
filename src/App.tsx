@@ -257,6 +257,12 @@ export default function App() {
   }, [clearAutoBreakTimer, startBreak])
 
   const handleReset = useCallback(() => {
+    // A finished session is already saved by the completion effect. Starting
+    // a fresh one should not show a warning claiming its time will be lost.
+    if (state.phase === 'finished') {
+      reset()
+      return
+    }
     if (isActive(state.phase) || state.elapsedSeconds > 0) {
       setConfirmAction('reset')
       return
