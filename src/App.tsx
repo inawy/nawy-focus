@@ -302,7 +302,10 @@ export default function App() {
     else if (state.phase === 'finished') handleReset()
   }, [
     appMode,
-    stopwatch,
+    stopwatch.phase,
+    stopwatch.pause,
+    stopwatch.resume,
+    stopwatch.start,
     state.phase,
     handleStart,
     pause,
