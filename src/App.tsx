@@ -19,6 +19,7 @@ import { useTimer } from './hooks/useTimer'
 import { useWakeLock } from './hooks/useWakeLock'
 import { playCompletionChime } from './lib/sound'
 import { isActive } from './lib/timer'
+import { formatStopwatchLap } from './lib/stopwatch'
 import {
   loadAutoBreakDelaySeconds,
   loadAutoBreakMode,
@@ -37,14 +38,6 @@ import {
   getNotificationPermission,
   requestNotificationPermission,
 } from './lib/notify'
-
-function formatStopwatchLap(milliseconds: number) {
-  const total = Math.max(0, Math.floor(milliseconds))
-  const minutes = Math.floor(total / 60_000)
-  const seconds = Math.floor((total % 60_000) / 1000)
-  const centiseconds = Math.floor((total % 1000) / 10)
-  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(centiseconds).padStart(2, '0')}`
-}
 
 export default function App() {
   const {
