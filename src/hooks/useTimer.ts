@@ -205,7 +205,9 @@ export function useTimer() {
     savedFinishedRef.current = false
     setFinishedWhileHidden(false)
     lastTickAtRef.current = performance.now()
-    setState((s) => startTimer(s))
+    const startedAt = Date.now()
+    // Keep the updater deterministic: React may call it more than once.
+    setState((s) => startTimer(s, startedAt))
   }, [])
 
   const pause = useCallback(() => {
@@ -291,11 +293,9 @@ export function useTimer() {
     setFinishedWhileHidden(false)
     const breakSec = loadDefaultBreakSeconds()
     lastTickAtRef.current = performance.now()
-    setState(() => {
-      let s = createIdleState('break', breakSec)
-      s = startTimer(s)
-      return s
-    })
+    const startedAt = Date.now()
+    const next = startTimer(createIdleState('break', breakSec), startedAt)
+    setState(next)
   }, [])
 
   /** Reset an ended break to the focus setup, using the saved focus duration. */
