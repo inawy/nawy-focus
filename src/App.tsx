@@ -330,6 +330,7 @@ export default function App() {
       if (
         tag === 'INPUT' ||
         tag === 'TEXTAREA' ||
+        tag === 'SELECT' ||
         (e.target as HTMLElement)?.isContentEditable
       ) {
         return
