@@ -134,6 +134,7 @@ export default function App() {
   )
   const settingsRef = useRef<HTMLDivElement | null>(null)
   const autoBreakTimerRef = useRef<number | null>(null)
+  const autoBreakTriggeredRef = useRef(false)
 
   const clearAutoBreakTimer = useCallback(() => {
     if (autoBreakTimerRef.current !== null) {
@@ -157,25 +158,29 @@ export default function App() {
       autoBreak === 'auto'
     ) {
       const delay = loadAutoBreakDelaySeconds()
+      autoBreakTriggeredRef.current = false
       setAutoBreakDelayTotal(delay)
       setAutoBreakCountdown(delay)
       autoBreakTimerRef.current = window.setInterval(() => {
-        setAutoBreakCountdown((prev) => {
-          if (prev === null) return null
-          if (prev <= 1) {
-            if (autoBreakTimerRef.current !== null) {
-              window.clearInterval(autoBreakTimerRef.current)
-              autoBreakTimerRef.current = null
-            }
-            startBreak()
-            return null
-          }
-          return prev - 1
-        })
+        // Keep state updaters pure: React Strict Mode may invoke them twice.
+        setAutoBreakCountdown((prev) =>
+          prev === null ? null : Math.max(0, prev - 1),
+        )
       }, 1000)
     }
     return clearAutoBreakTimer
   }, [state.phase, state.kind, autoBreak, clearAutoBreakTimer, startBreak])
+
+  useEffect(() => {
+    if (autoBreakCountdown !== 0 || autoBreakTriggeredRef.current) return
+    autoBreakTriggeredRef.current = true
+    if (autoBreakTimerRef.current !== null) {
+      window.clearInterval(autoBreakTimerRef.current)
+      autoBreakTimerRef.current = null
+    }
+    setAutoBreakCountdown(null)
+    startBreak()
+  }, [autoBreakCountdown, startBreak])
 
   useEffect(() => {
     if (state.phase !== 'finished' && state.phase !== 'idle') {
