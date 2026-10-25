@@ -78,6 +78,8 @@ export function ConfirmDialog({
   onCancel,
 }: Props) {
   const panelRef = useRef<HTMLDivElement | null>(null)
+  const onCancelRef = useRef(onCancel)
+  onCancelRef.current = onCancel
   const titleId = useId()
   const bodyId = useId()
   const tone = toneFromProps(notice, danger)
@@ -101,7 +103,7 @@ export function ConfirmDialog({
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault()
-        onCancel()
+        onCancelRef.current()
         return
       }
 
@@ -140,7 +142,7 @@ export function ConfirmDialog({
       window.clearTimeout(t)
       previousFocus?.focus()
     }
-  }, [open, onCancel, onConfirm])
+  }, [open])
 
   if (!open) return null
 
