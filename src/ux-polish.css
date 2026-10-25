@@ -139,7 +139,7 @@ main {
   gap: 1rem;
 }
 
-.timer-face {
+.timer-face:not(.timer-face-stopwatch) {
   width: min(18.25rem, calc(100vw - 3.25rem));
   height: min(18.25rem, calc(100vw - 3.25rem));
   filter: drop-shadow(0 16px 28px rgba(0,0,0,.055));
@@ -258,7 +258,7 @@ main {
 
 @media (max-width: 380px) {
   main { gap: .85rem; }
-  .timer-face {
+  .timer-face:not(.timer-face-stopwatch) {
     width: min(16.5rem, calc(100vw - 3rem));
     height: min(16.5rem, calc(100vw - 3rem));
   }
@@ -267,7 +267,7 @@ main {
 
 @media (min-width: 720px) {
   main { padding-top: 2rem !important; }
-  .timer-face {
+  .timer-face:not(.timer-face-stopwatch) {
     width: 19rem;
     height: 19rem;
   }
@@ -806,7 +806,7 @@ html[data-theme='light'] .confirm-panel {
     gap: .75rem;
   }
 
-  .timer-face {
+  .timer-face:not(.timer-face-stopwatch) {
     width: min(12.5rem, calc(100vw - 3rem));
     height: min(12.5rem, calc(100vw - 3rem));
   }
@@ -934,24 +934,24 @@ html[data-theme='light'] .confirm-panel {
     gap: .8rem;
   }
 
-  .timer-face {
+  .timer-face:not(.timer-face-stopwatch) {
     width: min(16rem, calc(100vw - 2.5rem));
     height: min(16rem, calc(100vw - 2.5rem));
   }
 
-  .timer-face .timer-digits > div > span:first-child {
+  .timer-face:not(.timer-face-stopwatch) .timer-digits > div > span:first-child {
     font-size: clamp(1.8rem, 9vw, 2.2rem);
   }
 
-  .timer-face .timer-digits > span {
+  .timer-face:not(.timer-face-stopwatch) .timer-digits > span {
     font-size: 1.75rem;
   }
 
-  .timer-face .timer-digits > div:last-child > span:first-child {
+  .timer-face:not(.timer-face-stopwatch) .timer-digits > div:last-child > span:first-child {
     font-size: clamp(1.1rem, 5.5vw, 1.35rem);
   }
 
-  .timer-face > div:last-child > div:last-child {
+  .timer-face:not(.timer-face-stopwatch) > div:last-child > div:last-child {
     margin-top: .7rem;
     gap: .6rem;
   }
@@ -979,7 +979,7 @@ html[data-theme='light'] .confirm-panel {
 }
 
 @media (max-width: 340px) {
-  .timer-face {
+  .timer-face:not(.timer-face-stopwatch) {
     width: min(14.5rem, calc(100vw - 2rem));
     height: min(14.5rem, calc(100vw - 2rem));
   }
@@ -1011,7 +1011,7 @@ html[data-theme='light'] .confirm-panel {
     padding: 1.35rem;
   }
 
-  .timer-face {
+  .timer-face:not(.timer-face-stopwatch) {
     width: min(18.25rem, calc(100vw - 4rem));
     height: min(18.25rem, calc(100vw - 4rem));
   }
