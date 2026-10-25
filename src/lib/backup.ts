@@ -2,6 +2,8 @@ import type { FocusSession } from '../types'
 
 export const BACKUP_FORMAT = 'nawy-focus-backup' as const
 export const BACKUP_VERSION = 1 as const
+// Avoid reading unexpectedly large files into memory during backup import.
+export const MAX_BACKUP_FILE_BYTES = 25 * 1024 * 1024
 
 export interface FocusBackup {
   format: typeof BACKUP_FORMAT
