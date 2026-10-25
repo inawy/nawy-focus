@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   createStopwatchLap,
   getStopwatchElapsed,
+  formatStopwatchLap,
   type StopwatchLap,
 } from '../src/lib/stopwatch'
 
@@ -52,5 +53,19 @@ describe('stopwatch lap splits', () => {
       elapsedMs: 0,
       splitMs: 0,
     })
+  })
+})
+
+describe('stopwatch lap formatting', () => {
+  it('formats short laps as minutes, seconds, and centiseconds', () => {
+    expect(formatStopwatchLap(65_432)).toBe('01:05.43')
+  })
+
+  it('adds an hours segment when a lap reaches one hour', () => {
+    expect(formatStopwatchLap(3_661_234)).toBe('01:01:01.12')
+  })
+
+  it('normalizes invalid lap times instead of displaying NaN', () => {
+    expect(formatStopwatchLap(Number.NaN)).toBe('00:00.00')
   })
 })
