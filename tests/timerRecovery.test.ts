@@ -36,6 +36,25 @@ describe('timer recovery', () => {
     expect(recoverTimerSnapshot(snapshot(running, 20_000), 10_000)).toEqual(running)
   })
 
+  it('rejects fractional and unsafe integer fields in recovery snapshots', () => {
+    const running = startTimer(createIdleState('focus', 600), 1_000)
+    const valid = { version: 1, savedAt: 10_000, state: running }
+
+    expect(recoverTimerSnapshot(JSON.stringify({ ...valid, savedAt: 10_000.5 }), 10_000)).toBeNull()
+    expect(recoverTimerSnapshot(JSON.stringify({
+      ...valid,
+      state: { ...running, remainingSeconds: running.remainingSeconds - 0.5 },
+    }), 10_000)).toBeNull()
+    expect(recoverTimerSnapshot(JSON.stringify({
+      ...valid,
+      state: { ...running, startedAt: 1_000.5 },
+    }), 10_000)).toBeNull()
+    expect(recoverTimerSnapshot(JSON.stringify({
+      ...valid,
+      state: { ...running, plannedSeconds: Number.MAX_SAFE_INTEGER + 1 },
+    }), 10_000)).toBeNull()
+  })
+
   it('rejects malformed, unsupported, and inconsistent snapshots', () => {
     expect(recoverTimerSnapshot('{')).toBeNull()
     expect(recoverTimerSnapshot(null)).toBeNull()
