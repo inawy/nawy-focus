@@ -101,12 +101,16 @@ export function ConfirmDialog({
         panelRef.current?.querySelectorAll<HTMLElement>(
           'button:not(:disabled), [href]:not([tabindex="-1"]), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [contenteditable="true"], [role="button"], [tabindex]:not([tabindex="-1"])',
         ) ?? [],
-      ).filter(
-        (el) =>
-          !el.hidden &&
-          el.getAttribute('aria-hidden') !== 'true' &&
-          el.getClientRects().length > 0,
-      )
+      ).filter((el) => {
+        const style = window.getComputedStyle(el)
+        return (
+          !el.closest('[hidden], [inert], [aria-hidden="true"]') &&
+          el.getAttribute('aria-disabled') !== 'true' &&
+          style.visibility !== 'hidden' &&
+          style.visibility !== 'collapse' &&
+          el.getClientRects().length > 0
+        )
+      })
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
