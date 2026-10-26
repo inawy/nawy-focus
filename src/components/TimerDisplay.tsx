@@ -1,4 +1,6 @@
 import { useMemo } from 'react'
+import { Icon } from './Icon'
+import type { IconName } from './Icon'
 import type { SessionKind, TimerPhase } from '../types'
 import type { StopwatchPhase } from '../hooks/useStopwatch'
 
@@ -12,11 +14,11 @@ interface Props {
   progress?: number
   accent?: TimerAccent
   activityLabel?: string
-  activityIcon?: string
+  activityIcon?: IconName
   onPrimary?: () => void
   primaryLabel?: string
   onSecondary?: () => void
-  secondaryIcon?: string
+  secondaryIcon?: IconName
   secondaryLabel?: string
   onReset?: () => void
   showMs?: boolean
@@ -85,7 +87,7 @@ export function TimerDisplay({
   onPrimary,
   primaryLabel,
   onSecondary,
-  secondaryIcon = '🔔',
+  secondaryIcon = 'bell',
   secondaryLabel = 'تنبيه',
   onReset,
   showMs = false,
@@ -125,8 +127,8 @@ export function TimerDisplay({
               ? 'راحة'
               : 'تركيز')
 
-  const icon =
-    activityIcon ?? (isStopwatch ? '⏱' : isBreak ? '☕' : '◎')
+  const icon: IconName =
+    activityIcon ?? (isStopwatch ? 'stopwatch' : isBreak ? 'coffee' : 'timer')
 
   const radius = 108
   const circumference = 2 * Math.PI * radius
@@ -160,14 +162,9 @@ export function TimerDisplay({
 
   const playIcon =
     phase === 'running' ? (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-        <rect x="6" y="5" width="4" height="14" rx="1.2" />
-        <rect x="14" y="5" width="4" height="14" rx="1.2" />
-      </svg>
+      <Icon name="pause" size={20} />
     ) : (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-        <path d="M8 5.5v13l11-6.5-11-6.5z" />
-      </svg>
+      <Icon name="play" size={20} />
     )
 
   const digitClass = showMs
@@ -275,9 +272,7 @@ export function TimerDisplay({
         <div
           className={`mb-0.5 flex items-center gap-1.5 text-sm font-semibold ${ACCENT_TEXT[resolvedAccent]}`}
         >
-          <span aria-hidden className="text-base leading-none">
-            {icon}
-          </span>
+          <Icon name={icon} size={17} />
           {title}
         </div>
 
@@ -326,7 +321,7 @@ export function TimerDisplay({
                 aria-label="إعادة التعيين"
                 title="إعادة التعيين"
               >
-                ↺
+                <Icon name="rotate-ccw" size={18} />
               </button>
             )}
             {onPrimary && (
@@ -349,7 +344,7 @@ export function TimerDisplay({
                 aria-label={secondaryLabel}
                 title={secondaryLabel}
               >
-                {secondaryIcon}
+                <Icon name={secondaryIcon} size={17} />
               </button>
             )}
           </div>
