@@ -85,6 +85,7 @@ export function SessionControls({
             onClick={onStop}
             className="btn-chrome min-h-12 w-full rounded-full px-5 text-sm sm:w-auto"
           >
+            <Icon name="stop" size={17} className="me-2 inline-block align-[-3px]" />
             إنهاء
           </button>
         </div>
