@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ConfirmDialog } from './components/ConfirmDialog'
+import { Icon } from './components/Icon'
 import { DurationPicker } from './components/DurationPicker'
 import { HistoryList } from './components/HistoryList'
 import { IntentionInput } from './components/IntentionInput'
@@ -483,7 +484,7 @@ export default function App() {
               title={`المظهر: ${themeLabel}`}
               aria-label={`المظهر الحالي: ${themeLabel}`}
             >
-              {themeLabel === 'ليل' ? '◐' : themeLabel === 'نهار' ? '○' : '◎'}
+              <Icon name={themeLabel === 'ليل' ? 'moon' : themeLabel === 'نهار' ? 'sun' : 'monitor'} size={20} />
             </button>
 
             <div className="relative">
@@ -498,7 +499,7 @@ export default function App() {
                 aria-expanded={settingsOpen}
                 aria-haspopup="true"
               >
-                ⋯
+                <Icon name="more" size={21} />
                 {settingsActiveCount > 0 && !settingsOpen && (
                   <span
                     className="absolute -top-0.5 -start-0.5 h-2 w-2 rounded-full bg-brand-500"
@@ -519,7 +520,7 @@ export default function App() {
                     className="flex min-h-11 w-full items-center justify-between gap-2 rounded-xl px-3 text-sm transition hover:opacity-90"
                     aria-pressed={soundOn}
                   >
-                    <span>الصوت</span>
+                    <span className="flex items-center gap-3"><Icon name={soundOn ? 'volume' : 'volume-off'} /><span>الصوت</span></span>
                     <span
                       className={`text-xs font-medium ${
                         soundOn ? 'text-brand-500' : 'text-slate-500'
@@ -535,7 +536,7 @@ export default function App() {
                     className="flex min-h-11 w-full items-center justify-between gap-2 rounded-xl px-3 text-sm transition hover:opacity-90"
                     aria-pressed={vibrateOn}
                   >
-                    <span>الاهتزاز</span>
+                    <span className="flex items-center gap-3"><Icon name="vibrate" /><span>الاهتزاز</span></span>
                     <span
                       className={`text-xs font-medium ${
                         vibrateOn ? 'text-brand-500' : 'text-slate-500'
@@ -553,7 +554,7 @@ export default function App() {
                     }`}
                     aria-pressed={autoBreak === 'auto'}
                   >
-                    <span>راحة تلقائية</span>
+                    <span className="flex items-center gap-3"><Icon name="coffee" /><span>راحة تلقائية</span></span>
                     <span className="text-xs text-slate-500">
                       {autoBreak === 'auto' ? 'مفعّل' : 'متوقف'}
                     </span>
@@ -567,7 +568,7 @@ export default function App() {
                     }`}
                     aria-pressed={notifyOn}
                   >
-                    <span>إشعار</span>
+                    <span className="flex items-center gap-3"><Icon name="bell" /><span>إشعارات</span></span>
                     <span className="text-xs text-slate-500">
                       {notifyOn ? 'مفعّل' : 'متوقف'}
                     </span>
@@ -580,7 +581,7 @@ export default function App() {
                     className="flex min-h-11 w-full items-center justify-between gap-2 rounded-xl px-3 text-sm transition hover:opacity-90"
                     title="ليل / نهار / تلقائي"
                   >
-                    <span>المظهر</span>
+                    <span className="flex items-center gap-3"><Icon name="palette" /><span>المظهر</span></span>
                     <span className="text-xs font-medium text-brand-500">
                       {themeLabel}
                     </span>
@@ -592,7 +593,7 @@ export default function App() {
                       onClick={() => void installPwa()}
                       className="flex min-h-11 w-full items-center justify-between gap-2 rounded-xl px-3 text-sm transition hover:opacity-90"
                     >
-                      <span>تثبيت التطبيق</span>
+                      <span className="flex items-center gap-3"><Icon name="download" /><span>تثبيت التطبيق</span></span>
                       <span className="text-xs text-brand-500">PWA</span>
                     </button>
                   )}
