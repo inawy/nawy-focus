@@ -1,3 +1,5 @@
+import { Icon } from './Icon'
+
 export type AppMode = 'session' | 'stopwatch'
 
 interface Props {
@@ -6,9 +8,9 @@ interface Props {
   disabled?: boolean
 }
 
-const TABS: { id: AppMode; label: string; icon: string }[] = [
-  { id: 'session', label: 'جلسة', icon: '⌛' },
-  { id: 'stopwatch', label: 'ساعة إيقاف', icon: '⏱' },
+const TABS: { id: AppMode; label: string; icon: 'timer' | 'stopwatch' }[] = [
+  { id: 'session', label: 'جلسة', icon: 'timer' },
+  { id: 'stopwatch', label: 'ساعة إيقاف', icon: 'stopwatch' },
 ]
 
 /** Mobile-first segmented control for switching timer modes. */
@@ -58,9 +60,7 @@ export function ModeTabs({ mode, onChange, disabled }: Props) {
             }}
             className={`mode-tab flex min-h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-xl px-3 text-sm font-semibold transition-colors ${active ? 'mode-tab-active' : 'mode-tab-idle'} disabled:opacity-40`}
           >
-            <span aria-hidden className="shrink-0 text-base leading-none">
-              {tab.icon}
-            </span>
+            <Icon name={tab.icon} size={19} />
             <span className="mode-tab-label">{tab.label}</span>
           </button>
         )
