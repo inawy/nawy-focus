@@ -11,7 +11,7 @@ export interface SessionPreset {
   intention?: string
   /** Accent for chip (css color token name) */
   tone: 'brand' | 'orange' | 'green' | 'purple' | 'pink' | 'teal'
-  icon: 'timer' | 'coffee' | 'vibrate' | 'book' | 'heart'
+  icon: 'timer' | 'coffee' | 'dumbbell' | 'book' | 'heart'
 }
 
 export const SESSION_PRESETS: SessionPreset[] = [
@@ -39,7 +39,7 @@ export const SESSION_PRESETS: SessionPreset[] = [
     minutes: 10,
     intention: 'تمرين خفيف',
     tone: 'green',
-    icon: 'vibrate',
+    icon: 'dumbbell',
   },
   {
     id: 'read',
