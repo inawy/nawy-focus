@@ -1,4 +1,5 @@
 import type { SessionKind } from '../types'
+import { Icon } from './Icon'
 
 export interface SessionPreset {
   id: string
@@ -10,7 +11,7 @@ export interface SessionPreset {
   intention?: string
   /** Accent for chip (css color token name) */
   tone: 'brand' | 'orange' | 'green' | 'purple' | 'pink' | 'teal'
-  icon: string
+  icon: 'timer' | 'coffee' | 'vibrate' | 'book' | 'heart'
 }
 
 export const SESSION_PRESETS: SessionPreset[] = [
@@ -20,7 +21,7 @@ export const SESSION_PRESETS: SessionPreset[] = [
     kind: 'focus',
     minutes: 25,
     tone: 'brand',
-    icon: '◎',
+    icon: 'timer',
   },
   {
     id: 'coffee',
@@ -29,7 +30,7 @@ export const SESSION_PRESETS: SessionPreset[] = [
     minutes: 5,
     intention: 'استراحة قهوة',
     tone: 'orange',
-    icon: '☕',
+    icon: 'coffee',
   },
   {
     id: 'exercise',
@@ -38,7 +39,7 @@ export const SESSION_PRESETS: SessionPreset[] = [
     minutes: 10,
     intention: 'تمرين خفيف',
     tone: 'green',
-    icon: '🏃',
+    icon: 'vibrate',
   },
   {
     id: 'read',
@@ -47,7 +48,7 @@ export const SESSION_PRESETS: SessionPreset[] = [
     minutes: 30,
     intention: 'قراءة',
     tone: 'purple',
-    icon: '📖',
+    icon: 'book',
   },
   {
     id: 'relax',
@@ -56,7 +57,7 @@ export const SESSION_PRESETS: SessionPreset[] = [
     minutes: 15,
     intention: 'استرخاء',
     tone: 'pink',
-    icon: '♡',
+    icon: 'heart',
   },
 ]
 
@@ -99,9 +100,7 @@ export function SessionTypeChips({
               active ? 'session-chip-active' : ''
             }`}
           >
-            <span aria-hidden className="me-1.5">
-              {p.icon}
-            </span>
+            <Icon name={p.icon} size={17} className="me-1.5 inline-block align-[-3px]" />
             {p.label}
           </button>
         )
