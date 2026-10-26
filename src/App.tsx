@@ -72,10 +72,15 @@ export default function App() {
     const minutes = Math.floor(stopwatchTitleSeconds / 60)
     const seconds = stopwatchTitleSeconds % 60
     document.title = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')} · ساعة الإيقاف · ناوي فوكاس`
+  }, [appMode, stopwatch.phase, stopwatchTitleSeconds])
+
+  // Restore the title when leaving stopwatch mode, not on every second.
+  useEffect(() => {
+    if (appMode !== 'stopwatch') return
     return () => {
       document.title = 'ناوي فوكاس'
     }
-  }, [appMode, stopwatch.phase, stopwatchTitleSeconds])
+  }, [appMode])
 
   const {
     sessions,
