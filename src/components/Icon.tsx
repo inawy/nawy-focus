@@ -60,7 +60,7 @@ const paths: Record<IconName, ReactNode> = {
   'alert-triangle': <><path d="m10.3 4.3-7.7 13.7a2 2 0 0 0 1.75 3h15.3a2 2 0 0 0 1.75-3L13.7 4.3a2 2 0 0 0-3.4 0Z" /><path d="M12 9v4.5M12 17h.01" /></>,
   info: <><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></>,
   upload: <><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="m17 8-5-5-5 5M12 3v12" /></>,
-  dumbbell: <><path d="m6.5 6.5 11 11M5 9l4-4m6 14 4-4M3 7l4-4m10 18 4-4M2 8l6-6m8 20 6-6" /><path d="m4 4 16 16" /></>,
+  dumbbell: <><path d="m6.5 6.5 11 11" /><path d="M3 7v10m3-13v16m12-16v16m3-13v10M1 9v6m22-6v6" /></>,
 }
 
 export function Icon({
