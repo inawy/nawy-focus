@@ -512,3 +512,9 @@ input {
     gap: .75rem;
   }
 }
+
+
+/* Keep vertical scrolling native while allowing lightweight horizontal mode swipes. */
+.mode-swipe-surface {
+  touch-action: pan-y;
+}
