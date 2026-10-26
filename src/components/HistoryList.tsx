@@ -119,7 +119,7 @@ export function HistoryList({
                 className="inline-flex min-h-10 min-w-10 cursor-pointer items-center justify-center rounded-lg px-2 text-[11px] text-slate-500 transition hover:text-inherit"
                 title="استيراد نسخة احتياطية"
               >
-                <span className="inline-flex items-center gap-1"><Icon name="download" size={14} /> استيراد</span>
+                <span className="inline-flex items-center gap-1"><Icon name="upload" size={14} /> استيراد</span>
                 <input
                   type="file"
                   accept="application/json,.json"
