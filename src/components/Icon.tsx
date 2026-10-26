@@ -13,6 +13,7 @@ export type IconName =
   | 'palette'
   | 'download'
   | 'timer'
+  | 'hourglass'
   | 'stopwatch'
   | 'play'
   | 'pause'
@@ -44,6 +45,7 @@ const paths: Record<IconName, ReactNode> = {
   palette: <><path d="M12 3a9 9 0 1 0 0 18h1.2a2 2 0 0 0 1.4-3.4 1.8 1.8 0 0 1 1.3-3.1H18a3 3 0 0 0 3-3c0-4.7-4-8.5-9-8.5Z" /><circle cx="7.5" cy="11" r=".8" /><circle cx="10" cy="7.5" r=".8" /><circle cx="15" cy="8" r=".8" /></>,
   download: <><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="m7 10 5 5 5-5M12 15V3" /></>,
   timer: <><circle cx="12" cy="13" r="8" /><path d="M12 9v4l2.5 1.5M9 2h6M12 2v3" /></>,
+  hourglass: <><path d="M6 3h12M6 21h12M7 3c0 4 2 6 5 9-3 3-5 5-5 9m10-18c0 4-2 6-5 9 3 3 5 5 5 9" /><path d="M9 6h6m-6 12h6" /></>,
   stopwatch: <><circle cx="12" cy="14" r="8" /><path d="M12 10v4l2.5 1.5M10 2h4M12 2v4m5.5 1.5 1.5-1.5" /></>,
   play: <path d="m8 5 11 7-11 7V5Z" />,
   pause: <><rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" /></>,
