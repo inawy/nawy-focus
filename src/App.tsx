@@ -134,6 +134,7 @@ export default function App() {
     loadInstallBannerDismissed(),
   )
   const settingsRef = useRef<HTMLDivElement | null>(null)
+  const modeSwipeStartRef = useRef<{ x: number; y: number } | null>(null)
   const autoBreakTimerRef = useRef<number | null>(null)
   const autoBreakTriggeredRef = useRef(false)
 
@@ -744,13 +745,44 @@ export default function App() {
           </div>
         )}
 
-        <ModeTabs
-          mode={appMode}
-          onChange={handleModeChange}
-          disabled={isActive(state.phase) || stopwatch.phase === 'running' || stopwatch.phase === 'paused'}
-        />
+        <div
+          className="mode-swipe-area flex w-full flex-col items-center gap-5"
+          onTouchStart={(event) => {
+            const target = event.target as HTMLElement
+            if (target.closest('input, textarea, select, [contenteditable="true"]')) {
+              modeSwipeStartRef.current = null
+              return
+            }
+            const touch = event.touches[0]
+            if (touch) modeSwipeStartRef.current = { x: touch.clientX, y: touch.clientY }
+          }}
+          onTouchEnd={(event) => {
+            const startPoint = modeSwipeStartRef.current
+            modeSwipeStartRef.current = null
+            const touch = event.changedTouches[0]
+            if (!startPoint || !touch) return
+            const dx = touch.clientX - startPoint.x
+            const dy = touch.clientY - startPoint.y
+            if (Math.abs(dx) < 56 || Math.abs(dx) < Math.abs(dy) * 1.35) return
+            if (
+              isActive(state.phase) ||
+              stopwatch.phase === 'running' ||
+              stopwatch.phase === 'paused' ||
+              settingsOpen ||
+              confirmAction ||
+              notice
+            ) return
+            // RTL layout: swipe left advances to the stopwatch; swipe right returns to the session.
+            handleModeChange(dx < 0 ? 'stopwatch' : 'session')
+          }}
+        >
+          <ModeTabs
+            mode={appMode}
+            onChange={handleModeChange}
+            disabled={isActive(state.phase) || stopwatch.phase === 'running' || stopwatch.phase === 'paused'}
+          />
 
-        {appMode === 'session' ? (
+          {appMode === 'session' ? (
           <>
             <TimerDisplay
               seconds={state.remainingSeconds}
@@ -946,7 +978,8 @@ export default function App() {
               </section>
             )}
           </>
-        )}
+          )}
+        </div>
 
         {appMode === 'session' && state.phase === 'idle' && (
           <p className="hidden text-center text-[11px] text-slate-600 opacity-60 sm:block">
