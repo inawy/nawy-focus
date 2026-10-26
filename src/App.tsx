@@ -623,16 +623,21 @@ export default function App() {
           if (!startPoint) return
           const dx = event.clientX - startPoint.x
           const dy = event.clientY - startPoint.y
-          if (Math.abs(dx) < 32 || Math.abs(dx) < Math.abs(dy) * 1.2) return
-          if (
-            isActive(state.phase) ||
-            stopwatch.phase === 'running' ||
-            stopwatch.phase === 'paused' ||
-            settingsOpen ||
-            confirmAction ||
-            notice
-          ) return
-          handleModeChange(dx < 0 ? 'stopwatch' : 'session')
+          // Keep the gesture forgiving, especially for the right-swipe back to session.
+          if (Math.abs(dx) < 20 || Math.abs(dx) < Math.abs(dy) * 1.1) return
+          if (settingsOpen || confirmAction || notice) return
+
+          if (dx < 0) {
+            // Never leave an active session timer hidden behind the stopwatch.
+            if (isActive(state.phase) || stopwatch.phase === 'running' || stopwatch.phase === 'paused') return
+            handleModeChange('stopwatch')
+            return
+          }
+
+          // Allow returning to sessions even if the stopwatch is running or paused;
+          // its state continues safely in the background.
+          if (isActive(state.phase)) return
+          setAppMode('session')
         }}
         onPointerCancel={() => {
           modeSwipeStartRef.current = null
