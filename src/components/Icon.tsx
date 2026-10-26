@@ -12,6 +12,16 @@ export type IconName =
   | 'bell'
   | 'palette'
   | 'download'
+  | 'timer'
+  | 'stopwatch'
+  | 'play'
+  | 'pause'
+  | 'stop'
+  | 'rotate-ccw'
+  | 'copy'
+  | 'trash'
+  | 'chevron-down'
+  | 'check'
 
 const paths: Record<IconName, ReactNode> = {
   more: <><circle cx="5" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /></>,
@@ -25,6 +35,16 @@ const paths: Record<IconName, ReactNode> = {
   bell: <><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" /><path d="M10 21h4" /></>,
   palette: <><path d="M12 3a9 9 0 1 0 0 18h1.2a2 2 0 0 0 1.4-3.4 1.8 1.8 0 0 1 1.3-3.1H18a3 3 0 0 0 3-3c0-4.7-4-8.5-9-8.5Z" /><circle cx="7.5" cy="11" r=".8" /><circle cx="10" cy="7.5" r=".8" /><circle cx="15" cy="8" r=".8" /></>,
   download: <><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="m7 10 5 5 5-5M12 15V3" /></>,
+  timer: <><circle cx="12" cy="13" r="8" /><path d="M12 9v4l2.5 1.5M9 2h6M12 2v3" /></>,
+  stopwatch: <><circle cx="12" cy="14" r="8" /><path d="M12 10v4l2.5 1.5M10 2h4M12 2v4m5.5 1.5 1.5-1.5" /></>,
+  play: <path d="m8 5 11 7-11 7V5Z" />,
+  pause: <><rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" /></>,
+  stop: <rect x="6" y="6" width="12" height="12" rx="1.5" />,
+  'rotate-ccw': <><path d="M3 7v5h5M3.5 12a8.5 8.5 0 1 0 2.1-5.7L3 9" /><path d="M12 7v5l3 2" /></>,
+  copy: <><rect x="8" y="8" width="12" height="12" rx="2" /><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3" /></>,
+  trash: <><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6" /><path d="M10 10v6m4-6v6" /></>,
+  'chevron-down': <path d="m6 9 6 6 6-6" />,
+  check: <path d="m5 12 4 4L19 6" />,
 }
 
 export function Icon({
