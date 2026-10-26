@@ -15,15 +15,15 @@ function isValidSnapshot(value: unknown): value is TimerRecoverySnapshot {
   if (!value || typeof value !== 'object') return false
   const snapshot = value as Partial<TimerRecoverySnapshot>
   const state = snapshot.state
-  if (snapshot.version !== 1 || !Number.isFinite(snapshot.savedAt) || !state || typeof state !== 'object') return false
+  if (snapshot.version !== 1 || !Number.isSafeInteger(snapshot.savedAt) || (snapshot.savedAt ?? -1) < 0 || !state || typeof state !== 'object') return false
   if (state.phase !== 'running' && state.phase !== 'paused') return false
   if (state.kind !== 'focus' && state.kind !== 'break') return false
   if (typeof state.intention !== 'string' || state.intention.length > 2000) return false
-  if (!Number.isFinite(state.plannedSeconds) || state.plannedSeconds < 1 || state.plannedSeconds > MAX_PLANNED_SECONDS) return false
-  if (!Number.isFinite(state.remainingSeconds) || state.remainingSeconds < 0 || state.remainingSeconds > state.plannedSeconds) return false
-  if (!Number.isFinite(state.elapsedSeconds) || state.elapsedSeconds < 0 || state.elapsedSeconds > state.plannedSeconds) return false
+  if (!Number.isSafeInteger(state.plannedSeconds) || state.plannedSeconds < 1 || state.plannedSeconds > MAX_PLANNED_SECONDS) return false
+  if (!Number.isSafeInteger(state.remainingSeconds) || state.remainingSeconds < 0 || state.remainingSeconds > state.plannedSeconds) return false
+  if (!Number.isSafeInteger(state.elapsedSeconds) || state.elapsedSeconds < 0 || state.elapsedSeconds > state.plannedSeconds) return false
   if (Math.floor(state.remainingSeconds + state.elapsedSeconds) !== Math.floor(state.plannedSeconds)) return false
-  if (!Number.isFinite(state.startedAt) || (state.startedAt ?? 0) <= 0) return false
+  if (!Number.isSafeInteger(state.startedAt) || (state.startedAt ?? 0) <= 0) return false
   return true
 }
 
