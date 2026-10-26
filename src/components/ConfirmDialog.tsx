@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef } from 'react'
+import { Icon } from './Icon'
 
 export type ConfirmTone = 'default' | 'danger' | 'notice'
 
@@ -22,48 +23,7 @@ function toneFromProps(notice?: boolean, danger?: boolean): ConfirmTone {
 }
 
 function ConfirmIcon({ tone }: { tone: ConfirmTone }) {
-  if (tone === 'danger') {
-    return (
-      <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6" aria-hidden>
-        <path
-          d="M12 9v4.5M12 17h.01"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-        <path
-          d="M10.3 4.3 2.6 18a2 2 0 0 0 1.75 3h15.3a2 2 0 0 0 1.75-3L13.7 4.3a2 2 0 0 0-3.4 0Z"
-          stroke="currentColor"
-          strokeWidth="1.75"
-          strokeLinejoin="round"
-        />
-      </svg>
-    )
-  }
-  if (tone === 'notice') {
-    return (
-      <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6" aria-hidden>
-        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.75" />
-        <path
-          d="M12 8v5M12 16h.01"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-      </svg>
-    )
-  }
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6" aria-hidden>
-      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.75" />
-      <path
-        d="M12 11.5V17M12 8h.01"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  )
+  return <Icon name={tone === 'danger' ? 'alert-triangle' : 'info'} size={24} />
 }
 
 export function ConfirmDialog({
