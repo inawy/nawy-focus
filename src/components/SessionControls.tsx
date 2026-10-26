@@ -1,5 +1,6 @@
 import { formatDurationShort } from '../lib/format'
 import type { SessionKind, TimerPhase } from '../types'
+import { Icon } from './Icon'
 
 interface Props {
   phase: TimerPhase
@@ -89,7 +90,7 @@ export function SessionControls({
         <section className={`session-finish-card surface-panel motion-finish-card w-full px-4 py-4 sm:px-5 sm:py-5 ${kind === 'break' ? 'session-finish-break' : ''}`} aria-labelledby="session-finish-title">
           <div className="flex items-start gap-3 text-start">
             <span className="session-finish-mark" aria-hidden="true">
-              {kind === 'focus' ? '•/' : '☕'}
+              <Icon name={kind === 'focus' ? 'timer' : 'coffee'} size={24} />
             </span>
             <div className="min-w-0 flex-1 pt-0.5">
               <p className="session-finish-eyebrow">
@@ -125,7 +126,7 @@ export function SessionControls({
                 onClick={onStartBreak}
                 className="btn-secondary-quiet w-full sm:flex-1"
               >
-                بدء الراحة
+                <Icon name="coffee" size={17} className="me-2 inline-block align-[-3px]" /> بدء الراحة
               </button>
             )}
             <button
@@ -137,7 +138,7 @@ export function SessionControls({
                   : 'btn-primary-brand w-full sm:flex-1'
               }
             >
-              {kind === 'focus' ? 'جلسة جديدة' : 'بدء التركيز'}
+              <Icon name={kind === 'focus' ? 'rotate-ccw' : 'play'} size={17} className="me-2 inline-block align-[-3px]" />{kind === 'focus' ? 'جلسة جديدة' : 'بدء التركيز'}
             </button>
           </div>
         </section>
