@@ -7,6 +7,7 @@ import {
 import type { HistoryFilter } from '../lib/prefs'
 import type { FocusSession } from '../types'
 import { ConfirmDialog } from './ConfirmDialog'
+import { Icon } from './Icon'
 
 interface Props {
   sessions: FocusSession[]
@@ -58,7 +59,7 @@ export function HistoryList({
       <details className="history-disclosure group surface-panel">
         <summary className="history-summary flex cursor-pointer list-none flex-col items-stretch justify-between gap-2.5 px-3.5 py-3 sm:flex-row sm:items-center sm:gap-3 [&::-webkit-details-marker]:hidden">
           <div className="flex items-center gap-2">
-            <span className="history-heading-mark" aria-hidden>•/</span>
+            <span className="history-heading-mark" aria-hidden><Icon name="timer" size={18} /></span>
             <h2 id="history-heading" className="text-sm font-semibold">
               السجل
             </h2>
@@ -104,7 +105,7 @@ export function HistoryList({
                 className="min-h-10 min-w-10 rounded-lg px-2 text-[11px] text-slate-500 transition hover:text-inherit"
                 title="تصدير بصيغة JSON"
               >
-                JSON
+                <span className="inline-flex items-center gap-1"><Icon name="download" size={14} /> JSON</span>
               </button>
               <button
                 type="button"
@@ -112,13 +113,13 @@ export function HistoryList({
                 className="min-h-10 min-w-10 rounded-lg px-2 text-[11px] text-slate-500 transition hover:text-inherit"
                 title="تصدير بصيغة CSV"
               >
-                CSV
+                <span className="inline-flex items-center gap-1"><Icon name="download" size={14} /> CSV</span>
               </button>
               <label
                 className="inline-flex min-h-10 min-w-10 cursor-pointer items-center justify-center rounded-lg px-2 text-[11px] text-slate-500 transition hover:text-inherit"
                 title="استيراد نسخة احتياطية"
               >
-                استيراد
+                <span className="inline-flex items-center gap-1"><Icon name="download" size={14} /> استيراد</span>
                 <input
                   type="file"
                   accept="application/json,.json"
@@ -184,7 +185,7 @@ export function HistoryList({
                         title="نسخ ملخص الجلسة"
                         aria-label="نسخ ملخص الجلسة"
                       >
-                        نسخ
+                        <Icon name="copy" size={17} />
                       </button>
                       <button
                         type="button"
@@ -193,7 +194,7 @@ export function HistoryList({
                         title="حذف الجلسة"
                         aria-label="حذف الجلسة"
                       >
-                        ×
+                        <Icon name="trash" size={17} />
                       </button>
                     </div>
                   </div>
