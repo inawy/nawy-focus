@@ -40,6 +40,7 @@ export function SessionControls({
           }
           title="اختصار: مفتاح المسافة"
         >
+          <Icon name="play" size={18} className="me-2 inline-block align-[-4px]" />
           {kind === 'break' ? 'بدء الراحة' : 'بدء التركيز'}
         </button>
       )}
@@ -51,6 +52,7 @@ export function SessionControls({
             onClick={onPause}
             className="btn-secondary-quiet w-full sm:w-auto sm:min-w-[8.5rem] sm:px-7"
           >
+            <Icon name="pause" size={18} className="me-2 inline-block align-[-4px]" />
             إيقاف مؤقت
           </button>
           <button
@@ -58,6 +60,7 @@ export function SessionControls({
             onClick={onStop}
             className="btn-chrome min-h-12 w-full rounded-full px-5 text-sm sm:w-auto"
           >
+            <Icon name="stop" size={17} className="me-2 inline-block align-[-3px]" />
             إنهاء
           </button>
         </div>
@@ -74,6 +77,7 @@ export function SessionControls({
                 : 'btn-primary-brand w-full sm:w-auto sm:min-w-[8.5rem] sm:px-7'
             }
           >
+            <Icon name="play" size={18} className="me-2 inline-block align-[-4px]" />
             استئناف
           </button>
           <button
