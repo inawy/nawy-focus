@@ -119,10 +119,12 @@ export function ConfirmDialog({
         }
         const first = focusable[0]
         const last = focusable[focusable.length - 1]
-        if (e.shiftKey && document.activeElement === first) {
+        const active = document.activeElement
+        const focusIsInside = panelRef.current?.contains(active)
+        if (e.shiftKey && (active === first || !focusIsInside)) {
           e.preventDefault()
           last?.focus()
-        } else if (!e.shiftKey && document.activeElement === last) {
+        } else if (!e.shiftKey && (active === last || !focusIsInside)) {
           e.preventDefault()
           first?.focus()
         }
