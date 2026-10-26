@@ -667,7 +667,7 @@ export default function App() {
                 aria-label="إغلاق"
                 title="إغلاق"
               >
-                ×
+                <Icon name="x" size={16} />
               </button>
             </div>
           )}
@@ -790,7 +790,7 @@ export default function App() {
                   ? requestStop
                   : undefined
               }
-              secondaryIcon="■"
+              secondaryIcon="stop"
               secondaryLabel="إنهاء"
             />
 
@@ -803,7 +803,7 @@ export default function App() {
             >
               <div className="flex items-center gap-3">
                 <span className={`session-live-mark ${state.kind === 'break' ? 'session-live-mark-break' : ''}`} aria-hidden>
-                  {state.kind === 'break' ? '☕' : '•/'}
+                  {state.kind === 'break' ? <Icon name="coffee" size={20} /> : <Icon name="timer" size={20} />}
                 </span>
                 <div className="min-w-0 flex-1 text-start">
                   <div className="flex flex-wrap items-center gap-2">
@@ -833,7 +833,7 @@ export default function App() {
                   <h2 className="text-sm font-semibold">جهّز جلستك</h2>
                   <p className="mt-1 text-xs leading-5 text-slate-500">اختار نوع الجلسة ومدتها، وحدد ناوي تركز على إيه.</p>
                 </div>
-                <span className="session-editor-mark" aria-hidden>•/</span>
+                <span className="session-editor-mark" aria-hidden><Icon name="timer" size={18} /></span>
               </div>
               <div className="flex flex-col gap-4">
                 <div className="session-editor-section">
