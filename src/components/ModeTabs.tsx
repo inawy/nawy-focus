@@ -8,8 +8,8 @@ interface Props {
   disabled?: boolean
 }
 
-const TABS: { id: AppMode; label: string; icon: 'timer' | 'stopwatch' }[] = [
-  { id: 'session', label: 'جلسة', icon: 'timer' },
+const TABS: { id: AppMode; label: string; icon: 'hourglass' | 'stopwatch' }[] = [
+  { id: 'session', label: 'جلسة', icon: 'hourglass' },
   { id: 'stopwatch', label: 'ساعة إيقاف', icon: 'stopwatch' },
 ]
 
