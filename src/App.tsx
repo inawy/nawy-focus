@@ -243,7 +243,7 @@ export default function App() {
       kind: 'focus' as const,
       minutes: 25,
       tone: 'brand' as const,
-      icon: '◎',
+      icon: 'timer' as const,
     }
 
   useWakeLock(state.phase === 'running' || stopwatch.phase === 'running')
@@ -903,7 +903,7 @@ export default function App() {
               onSecondary={
                 stopwatch.phase !== 'idle' ? stopwatch.recordLap : undefined
               }
-              secondaryIcon="＋"
+              secondaryIcon="flag"
               secondaryLabel="تسجيل لفة"
             />
             {stopwatch.phase === 'idle' && (
