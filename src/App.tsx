@@ -606,7 +606,37 @@ export default function App() {
       </header>
 
       <main
-        className="mx-auto flex w-full min-w-0 max-w-md flex-col items-center gap-4 px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4 sm:gap-5 sm:px-5 sm:pt-6"
+        className="mode-swipe-surface mx-auto flex w-full min-w-0 max-w-md flex-col items-center gap-4 px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-4 sm:gap-5 sm:px-5 sm:pt-6"
+        onPointerDown={(event) => {
+          if (event.pointerType !== 'touch' || !event.isPrimary) return
+          const target = event.target as HTMLElement
+          if (target.closest('input, textarea, select, [contenteditable="true"], button, a, [role="button"], [role="tab"], [role="menu"], .stopwatch-laps, .history-list')) {
+            modeSwipeStartRef.current = null
+            return
+          }
+          modeSwipeStartRef.current = { x: event.clientX, y: event.clientY }
+        }}
+        onPointerUp={(event) => {
+          if (event.pointerType !== 'touch' || !event.isPrimary) return
+          const startPoint = modeSwipeStartRef.current
+          modeSwipeStartRef.current = null
+          if (!startPoint) return
+          const dx = event.clientX - startPoint.x
+          const dy = event.clientY - startPoint.y
+          if (Math.abs(dx) < 32 || Math.abs(dx) < Math.abs(dy) * 1.2) return
+          if (
+            isActive(state.phase) ||
+            stopwatch.phase === 'running' ||
+            stopwatch.phase === 'paused' ||
+            settingsOpen ||
+            confirmAction ||
+            notice
+          ) return
+          handleModeChange(dx < 0 ? 'stopwatch' : 'session')
+        }}
+        onPointerCancel={() => {
+          modeSwipeStartRef.current = null
+        }}
       >
 
         {persistenceError && (
@@ -745,37 +775,7 @@ export default function App() {
           </div>
         )}
 
-        <div
-          className="mode-swipe-area flex w-full flex-col items-center gap-5"
-          onTouchStart={(event) => {
-            const target = event.target as HTMLElement
-            if (target.closest('input, textarea, select, [contenteditable="true"]')) {
-              modeSwipeStartRef.current = null
-              return
-            }
-            const touch = event.touches[0]
-            if (touch) modeSwipeStartRef.current = { x: touch.clientX, y: touch.clientY }
-          }}
-          onTouchEnd={(event) => {
-            const startPoint = modeSwipeStartRef.current
-            modeSwipeStartRef.current = null
-            const touch = event.changedTouches[0]
-            if (!startPoint || !touch) return
-            const dx = touch.clientX - startPoint.x
-            const dy = touch.clientY - startPoint.y
-            if (Math.abs(dx) < 56 || Math.abs(dx) < Math.abs(dy) * 1.35) return
-            if (
-              isActive(state.phase) ||
-              stopwatch.phase === 'running' ||
-              stopwatch.phase === 'paused' ||
-              settingsOpen ||
-              confirmAction ||
-              notice
-            ) return
-            // RTL layout: swipe left advances to the stopwatch; swipe right returns to the session.
-            handleModeChange(dx < 0 ? 'stopwatch' : 'session')
-          }}
-        >
+        <div className="mode-swipe-area flex w-full flex-col items-center gap-5">
           <ModeTabs
             mode={appMode}
             onChange={handleModeChange}
