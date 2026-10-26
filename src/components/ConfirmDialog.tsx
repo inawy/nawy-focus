@@ -99,9 +99,14 @@ export function ConfirmDialog({
     const getFocusable = () =>
       Array.from(
         panelRef.current?.querySelectorAll<HTMLElement>(
-          'button:not(:disabled), [href], input:not(:disabled), [tabindex]:not([tabindex="-1"])',
+          'button:not(:disabled), [href]:not([tabindex="-1"]), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [contenteditable="true"], [role="button"], [tabindex]:not([tabindex="-1"])',
         ) ?? [],
-      ).filter((el) => el.getAttribute('aria-hidden') !== 'true')
+      ).filter(
+        (el) =>
+          !el.hidden &&
+          el.getAttribute('aria-hidden') !== 'true' &&
+          el.getClientRects().length > 0,
+      )
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
