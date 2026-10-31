@@ -27,46 +27,50 @@
 
 ## التشغيل
 
-```bash
+~~~bash
 npm install
-npm run dev        # تطوير
-npm run build      # فحص الأنواع + بناء dist/
-npm run preview    # تجربة النسخة المبنية (يعمل Service Worker)
-```
+npm run dev
+npm run build
+npm run preview
+~~~
 
-## الجودة
+## الجودة والحوكمة
 
-```bash
-npm test && npm run lint && npm run build
-```
+~~~bash
+npm test
+npm run lint
+npm run typecheck
+npm run build
+node scripts/validate-governance.mjs
+~~~
+
+راجع [تعليمات الوكلاء](AGENTS.md)، [حقائق المنتج](docs/product-facts.md)، [المعمارية](docs/architecture.md)، [القيود المعروفة](docs/known-limitations.md)، و[سجل القرارات](docs/decisions.md).
 
 ## النشر على GitHub Pages
 
-1. ارفع المشروع إلى مستودع `nawy-focus` (الفرع `main`).
-2. من **Settings → Pages** اختر **Source: GitHub Actions**.
-3. أي `push` على `main` ينشر تلقائياً عبر `.github/workflows/deploy.yml`.
+1. افتح **Settings → Pages** واختر **Source: GitHub Actions**.
+2. أي push على الفرع main ينشر تلقائياً عبر .github/workflows/deploy.yml.
 
-`base: './'` في `vite.config.ts` يجعل البناء يعمل على مسار فرعي ونطاق مخصص.
+base: './' في vite.config.ts يجعل البناء يعمل على مسار فرعي ونطاق مخصص.
 
 ## الهيكل
 
-```
+~~~text
 src/
   types.ts          الأنواع المشتركة
-  db.ts             Dexie + استعلامات الجلسات
-  lib/timer.ts      آلة حالة المؤقت (نقية، قابلة للاختبار)
-  lib/format.ts     تنسيق الوقت والتاريخ
-  lib/insights.ts   أفضل ساعة تركيز + نص المشاركة
-  hooks/            useTimer, useSessions
+  db.ts             Dexie + عمليات الجلسات
+  lib/              منطق المؤقت والساعة والنسخ الاحتياطي
+  hooks/            تنسيق دورة حياة المؤقت والجلسات
   components/       واجهة المؤقت والسجل
-docs/decisions.md   سجل القرارات المعمارية
-docs/roadmap.md     خطة التطوير بالمراحل
+tests/              اختبارات الوحدات
+docs/               الحقائق والمعمارية والقرارات والقيود
+.agents/skills/     مهارات الوكلاء
 AGENTS.md           قواعد العمل للوكلاء والمطورين
-```
+~~~
 
 ## المبادئ
 
 - المؤقت هو البطل — ليس لوحة إحصائيات
 - الإشعارات اختيارية وموافقة صريحة فقط
-- لا تعدّل `version(n)` قديمة في Dexie؛ أضف `version(n+1)`
-- كل اعتمادية جديدة تُسجَّل في `docs/decisions.md`
+- لا تعدّل version(n) قديمة في Dexie؛ أضف version(n+1)
+- كل اعتمادية جديدة تُسجَّل في docs/decisions.md
